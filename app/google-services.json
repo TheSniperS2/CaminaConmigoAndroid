@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "925265916348",
+    "project_id": "caminaconmigo-e1596",
+    "storage_bucket": "caminaconmigo-e1596.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:925265916348:android:91b0eb5b6ff37a5357fbb9",
+        "android_client_info": {
+          "package_name": "com.franco.testing4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "925265916348-euugrt6eqkorq1nmht87hho89u8a4t02.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.franco.testing4",
+            "certificate_hash": "49cc052a2484eed67af3aef459b7fa7064dc4202"
+          }
+        },
+        {
+          "client_id": "925265916348-8l7e2dotbohh2g0bc37bntbs60h7qh67.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH8MThVys4otFHnQ4T9t_bGzQOrw00QBA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "925265916348-8l7e2dotbohh2g0bc37bntbs60h7qh67.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "925265916348-1o235sdivb2nkq2hs2940gd7iedpt5fv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.CaminaConmigo.CaminaConmigo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

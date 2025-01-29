@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".model_mvvm.ayuda.view.AyudaActivity">
+
+    <!-- Título en CardView -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Centros de ayuda"
+            android:textColor="#000000"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Programa para víctimas -->
+
+    <TextView
+        android:id="@+id/textView42"
+        android:layout_width="372dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="24dp"
+        android:text="Programa para víctimas de violencia de género grave o extrema:"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardView" />
+
+    <!-- Detalle adicional del programa -->
+
+    <!-- Fonos de denuncia -->
+
+    <TextView
+        android:id="@+id/tv_detalle_programa"
+        android:layout_width="372dp"
+        android:layout_height="90dp"
+        android:layout_marginTop="5dp"
+        android:text="Atención integral, psicosocial, jurídica, psiquiátrica y recuperación de las autonomías económicas para las mujeres. Esta será profunda y especializada, buscando disminuir de alguna manera las violencias de género que siguen sucediendo en el país."
+        android:textColor="#000000"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView42" />
+
+    <TextView
+        android:id="@+id/tv_detalle_programa2"
+        android:layout_width="372dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="5dp"
+        android:text="Operará desde fines de mayo la etapa piloto, será un beneficio directo para quienes consulten de manera espontánea y también para usuarias derivadas de Tribunales o Fiscalía."
+        android:textColor="#000000"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_detalle_programa" />
+
+    <TextView
+        android:id="@+id/textView41"
+        android:layout_width="372dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="20dp"
+        android:text="Fonos denuncia:"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_detalle_programa2" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Fono de orientación para la violencia contra la mujer: 1455"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="#000000"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView41" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Fono familia de carabineros: 149"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView3" />
+
+    <TextView
+        android:id="@+id/textView33"
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="PDI: 134"
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView2" />
+
+    <TextView
+        android:id="@+id/textView32"
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Denuncia Seguro de PDI (pueden ser denuncias como testigo, de carácter anónimo): *4242"
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView33" />
+
+    <!--Centro de la mujer-->
+    <TextView
+        android:id="@+id/textView43"
+        android:layout_width="372dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="20dp"
+        android:text="Centro de la Mujer:"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView32" />
+
+    <TextView
+        android:id="@+id/textView44"
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Centro de la Mujer Sernameg - La Serena"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView43" />
+
+    <TextView
+        android:id="@+id/textView45"
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Centro de la Mujer Liwen"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView44" />
+
+    <TextView
+        android:id="@+id/textView46"
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Horario: 08:30 a 17:30 horas."
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView45" />
+
+    <TextView
+        android:id="@+id/textView47"
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Contacto: 51-2641850 / 51-2427844 / 961244738 "
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView46" />
+
+    <TextView
+        android:id="@+id/textView48"
+        android:layout_width="372dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Correo: centroliwen@laserena.cl"
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView47" />
+
+
+    <!-- Fragment Container -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView3"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="78dp"
+        android:background="#FA79B6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView48" />
+
+    <!-- Mapa -->
+    <ImageButton
+        android:id="@+id/imageButton10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="16dp"
+        android:background="#00FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
+        app:srcCompat="@drawable/ic_mapa" />
+
+    <TextView
+        android:id="@+id/textView49"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="47dp"
+        android:text="Mapa"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+
+    <!-- Novedad -->
+    <ImageButton
+        android:id="@+id/imageButton11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="114dp"
+        android:layout_marginTop="16dp"
+        android:background="#00FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
+        app:srcCompat="@drawable/ic_novedad" />
+
+    <TextView
+        android:id="@+id/textView50"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="101dp"
+        android:layout_marginTop="47dp"
+        android:text="Novedad"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+
+    <!-- Chats -->
+    <ImageButton
+        android:id="@+id/imageButton12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="187dp"
+        android:layout_marginTop="16dp"
+        android:background="#00FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
+        app:srcCompat="@drawable/ic_chat" />
+
+    <TextView
+        android:id="@+id/textView51"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="187dp"
+        android:layout_marginTop="47dp"
+        android:text="Chats"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+
+    <!-- Ayuda -->
+    <ImageButton
+        android:id="@+id/imageButton13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="264dp"
+        android:layout_marginTop="16dp"
+        android:background="#00FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
+        app:srcCompat="@drawable/ic_ayuda" />
+
+    <TextView
+        android:id="@+id/textView52"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="262dp"
+        android:layout_marginTop="47dp"
+        android:text="Ayuda"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+
+    <!-- Menú -->
+    <ImageButton
+        android:id="@+id/imageButton14"
+        android:layout_width="wrap_content"
+        android:layout_height="29dp"
+        android:layout_marginStart="351dp"
+        android:layout_marginTop="16dp"
+        android:background="#00FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
+        app:srcCompat="@drawable/ic_menu" />
+
+    <TextView
+        android:id="@+id/textView53"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="346dp"
+        android:layout_marginTop="47dp"
+        android:text="Menú"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
+        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+</androidx.constraintlayout.widget.ConstraintLayout>
