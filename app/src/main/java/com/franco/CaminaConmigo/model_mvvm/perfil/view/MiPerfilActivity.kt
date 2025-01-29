@@ -1,6 +1,5 @@
-package com.franco.testing4.model_mvvm.perfil.view
+package com.franco.CaminaConmigo.model_mvvm.perfil.view
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,8 +8,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.franco.testing4.databinding.ActivityMiperfilBinding
-import com.franco.testing4.model_mvvm.perfil.viewmodel.MiPerfilViewModel
+import com.franco.CaminaConmigo.databinding.ActivityMiperfilBinding
+import com.franco.CaminaConmigo.model_mvvm.perfil.viewmodel.MiPerfilViewModel
 
 class MiPerfilActivity : AppCompatActivity() {
 
@@ -101,7 +100,7 @@ class MiPerfilActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.data != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
             val imageUri: Uri = data.data!!
 
             viewModel.saveProfileImage(imageUri.toString())

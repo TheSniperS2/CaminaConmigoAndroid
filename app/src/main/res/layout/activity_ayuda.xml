@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".model_mvvm.ayuda.view.AyudaActivity">
+    tools:context="com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity">
 
     <!-- Título en CardView -->
     <androidx.cardview.widget.CardView

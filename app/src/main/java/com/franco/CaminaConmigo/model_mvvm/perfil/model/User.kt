@@ -1,4 +1,4 @@
-package com.franco.testing4.model_mvvm.perfil.model
+package com.franco.CaminaConmigo.model_mvvm.perfil.model
 
 data class User(
     val name: String,

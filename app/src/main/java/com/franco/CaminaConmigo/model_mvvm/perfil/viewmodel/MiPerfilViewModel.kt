@@ -1,9 +1,9 @@
-package com.franco.testing4.model_mvvm.perfil.viewmodel
+package com.franco.CaminaConmigo.model_mvvm.perfil.viewmodel
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.auth.FirebaseAuth
-import com.franco.testing4.model_mvvm.perfil.model.User
+import com.franco.CaminaConmigo.model_mvvm.perfil.model.User
 import kotlin.random.Random
 
 class MiPerfilViewModel(private val context: Context) {

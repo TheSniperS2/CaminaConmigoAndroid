@@ -1,11 +1,11 @@
-package com.franco.testing4.model_mvvm.ayuda.view
+package com.franco.CaminaConmigo.model_mvvm.ayuda.view
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.franco.testing4.databinding.ActivityAyudaBinding
+import com.franco.CaminaConmigo.databinding.ActivityAyudaBinding
 
 class AyudaActivity : AppCompatActivity() {
 

@@ -15,7 +15,7 @@
 
         <!-- Actividad principal -->
         <activity
-            android:name=".model_mvvm.inicio.view.MainActivity"
+            android:name="com.franco.CaminaConmigo.model_mvvm.inicio.view.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,12 +25,12 @@
 
         <!-- Nueva actividad para Mi Perfil -->
         <activity
-            android:name=".model_mvvm.perfil.view.MiPerfilActivity"
+            android:name="com.franco.CaminaConmigo.model_mvvm.perfil.view.MiPerfilActivity"
             android:exported="true" />
 
         <!-- Actividad de Ayuda -->
         <activity
-            android:name=".model_mvvm.ayuda.view.AyudaActivity"
+            android:name="com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity"
             android:exported="true" />
 
         <!-- Configuración para Google Sign-In -->

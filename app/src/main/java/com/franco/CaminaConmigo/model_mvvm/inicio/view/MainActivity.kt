@@ -1,4 +1,4 @@
-package com.franco.testing4.model_mvvm.inicio.view
+package com.franco.CaminaConmigo.model_mvvm.inicio.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,9 +6,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.franco.testing4.databinding.ActivityMainBinding
-import com.franco.testing4.model_mvvm.inicio.viewmodel.GoogleSignInViewModel
-import com.franco.testing4.model_mvvm.perfil.view.MiPerfilActivity
+import com.franco.CaminaConmigo.databinding.ActivityMainBinding
+import com.franco.CaminaConmigo.model_mvvm.inicio.viewmodel.GoogleSignInViewModel
+import com.franco.CaminaConmigo.model_mvvm.perfil.view.MiPerfilActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Método para iniciar sesión con Google
+    /* Método para iniciar sesión con Google */
     private fun signInWithGoogle() {
         val signInIntent = googleSignInClient.signInIntent
         signInLauncher.launch(signInIntent)

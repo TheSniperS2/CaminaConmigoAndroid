@@ -1,9 +1,9 @@
-package com.franco.testing4.model_mvvm.inicio.viewmodel
+package com.franco.CaminaConmigo.model_mvvm.inicio.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.franco.testing4.model_mvvm.inicio.model.GoogleSignInModel
+import com.franco.CaminaConmigo.model_mvvm.inicio.model.GoogleSignInModel
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.franco.testing4"
+    namespace = "com.franco.CaminaConmigo"
     compileSdk = 35
 
     buildFeatures {
@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.franco.testing4"
+        applicationId = "com.franco.CaminaConmigo"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
@@ -46,7 +46,7 @@ android {
 dependencies {
     implementation("com.google.android.material:material:1.12.0")
     // Google Sign-In
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.android.gms:play-services-auth:20.7.1")
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth:23.1.0")
     // ViewModel, LiveData, y otras dependencias de MVVM
