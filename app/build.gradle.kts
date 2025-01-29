@@ -46,7 +46,7 @@ android {
 dependencies {
     implementation("com.google.android.material:material:1.12.0")
     // Google Sign-In
-    implementation("com.google.android.gms:play-services-auth:20.7.1")
+    implementation("com.google.android.gms:play-services-auth:20.7.'") // Or the latest version
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth:23.1.0")
     // ViewModel, LiveData, y otras dependencias de MVVM

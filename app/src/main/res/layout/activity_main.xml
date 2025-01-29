@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".model_mvvm.inicio.view.MainActivity">
+    tools:context="com.franco.CaminaConmigo.model_mvvm.inicio.view.MainActivity">
 
     <!-- FragmentContainerView con restricciones -->
     <androidx.fragment.app.FragmentContainerView
