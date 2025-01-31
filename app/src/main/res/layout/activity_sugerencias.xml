@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView5"
+        android:layout_width="410dp"
+        android:layout_height="110dp"
+        android:layout_margin="0dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="120dp"
+            android:layout_marginTop="56dp"
+            android:text="Sugerencias"
+            android:textColor="@color/colorText"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="68dp"
+            app:srcCompat="@drawable/ic_retroceder" />
+    </androidx.cardview.widget.CardView>
+
+    <EditText
+        android:id="@+id/etNombre"
+        android:layout_width="393dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_edit_text"
+        android:hint="Nombre"
+        android:inputType="textPersonName"
+        android:padding="18dp"
+        android:textColor="#000000"
+        android:textColorHint="#808080"
+        android:textSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView5" />
+
+    <EditText
+        android:id="@+id/etNombre2"
+        android:layout_width="393dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/rounded_edit_text"
+        android:hint="Número"
+        android:inputType="textPersonName"
+        android:padding="18dp"
+        android:textColor="#000000"
+        android:textColorHint="#808080"
+        android:textSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etNombre" />
+
+    <EditText
+        android:id="@+id/etNombre3"
+        android:layout_width="393dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/rounded_edit_text"
+        android:hint="Razon"
+        android:inputType="textPersonName"
+        android:padding="18dp"
+        android:textColor="#000000"
+        android:textColorHint="#808080"
+        android:textSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etNombre2" />
+
+    <!-- Checkbox para enviar de forma anónima -->
+
+    <EditText
+        android:id="@+id/etNombre4"
+        android:layout_width="393dp"
+        android:layout_height="173dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/rounded_edit_text"
+        android:gravity="top"
+        android:hint="Mensaje"
+        android:inputType="textImeMultiLine"
+        android:padding="18dp"
+        android:textColor="#000000"
+        android:textColorHint="#808080"
+        android:textSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etNombre3" />
+
+    <CheckBox
+        android:id="@+id/cbAnonimo"
+        android:layout_width="239dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="20dp"
+        android:text="Enviar de forma Anónima"
+        android:textColor="@color/colorText"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.052"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etNombre4" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="360dp"
+        android:layout_height="50dp"
+        android:backgroundTint="#FA79B6"
+        android:text="Enviar"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cbAnonimo" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.franco.CaminaConmigo.databinding.ActivityMiperfilBinding
 import com.franco.CaminaConmigo.model_mvvm.perfil.viewmodel.MiPerfilViewModel
+import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
 
 class MiPerfilActivity : AppCompatActivity() {
 
@@ -43,10 +44,13 @@ class MiPerfilActivity : AppCompatActivity() {
             }
         }
 
-        // Listeners
+// Listeners
         binding.atras.setOnClickListener {
-            finish()
+            val intent = Intent(this, MenuActivity::class.java)
+            startActivity(intent)
+            finish() // Opcional, si quieres cerrar la actividad actual
         }
+
 
         binding.imageButton11.setOnClickListener {
             showEditDialog("Editar Nombre", binding.textView14) { newValue ->

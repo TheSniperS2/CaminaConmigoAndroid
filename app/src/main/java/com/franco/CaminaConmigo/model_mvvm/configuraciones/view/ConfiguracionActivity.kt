@@ -1,0 +1,79 @@
+package com.franco.CaminaConmigo.model_mvvm.configuraciones.view
+
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.widget.ImageView
+import android.widget.Switch
+import androidx.appcompat.app.AppCompatActivity
+import com.franco.CaminaConmigo.R
+import androidx.appcompat.app.AppCompatDelegate
+
+class ConfiguracionActivity : AppCompatActivity() {
+
+    private lateinit var switchNotificacionesGrupos: Switch
+    private lateinit var switchNotificacionesReporte: Switch
+    private lateinit var switchModoOscuro: Switch
+    private lateinit var switchShakeAlerta: Switch
+    private lateinit var sharedPreferences: SharedPreferences
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_configuraciones)
+
+        // Inicializar elementos de la interfaz
+        val btnRetroceder: ImageView = findViewById(R.id.imageView)
+        switchNotificacionesGrupos = findViewById(R.id.switch3)
+        switchNotificacionesReporte = findViewById(R.id.switch2)
+        switchModoOscuro = findViewById(R.id.switch4)
+        switchShakeAlerta = findViewById(R.id.switch5)
+
+        // Inicializar SharedPreferences
+        sharedPreferences = getSharedPreferences("configuraciones", MODE_PRIVATE)
+
+        // Cargar estado de los switches desde SharedPreferences
+        switchNotificacionesGrupos.isChecked = sharedPreferences.getBoolean("notificaciones_grupos", false)
+        switchNotificacionesReporte.isChecked = sharedPreferences.getBoolean("notificaciones_reporte", false)
+        switchModoOscuro.isChecked = sharedPreferences.getBoolean("modo_oscuro", false)
+        switchShakeAlerta.isChecked = sharedPreferences.getBoolean("shake_alerta", false)
+
+        // Listener para el botón de retroceso
+        btnRetroceder.setOnClickListener {
+            finish() // Cierra la actividad y vuelve atrás
+        }
+
+        // Listeners para los switches
+        switchNotificacionesGrupos.setOnCheckedChangeListener { _, isChecked ->
+            guardarConfiguracion("notificaciones_grupos", isChecked)
+        }
+
+        switchNotificacionesReporte.setOnCheckedChangeListener { _, isChecked ->
+            guardarConfiguracion("notificaciones_reporte", isChecked)
+        }
+
+        switchModoOscuro.setOnCheckedChangeListener { _, isChecked ->
+            guardarConfiguracion("modo_oscuro", isChecked)
+            aplicarModoOscuro(isChecked)
+        }
+
+        switchShakeAlerta.setOnCheckedChangeListener { _, isChecked ->
+            guardarConfiguracion("shake_alerta", isChecked)
+        }
+    }
+
+    private fun guardarConfiguracion(clave: String, valor: Boolean) {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean(clave, valor)
+        editor.apply()
+    }
+
+    private fun aplicarModoOscuro(activar: Boolean) {
+        val modo = if (activar) {
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            AppCompatDelegate.MODE_NIGHT_NO
+        }
+        AppCompatDelegate.setDefaultNightMode(modo)
+        recreate()
+    }
+
+}

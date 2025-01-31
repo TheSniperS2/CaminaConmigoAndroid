@@ -34,6 +34,41 @@
             android:name="com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity"
             android:exported="true" />
 
+        <!-- Actividad de Menú -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity"
+            android:exported="true" />
+
+        <!-- Actividad de Chat -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.chat.view.ChatActivity"
+            android:exported="true" />
+
+        <!-- Actividad de Configuraciones -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.configuraciones.view.ConfiguracionActivity"
+            android:exported="true" />
+
+        <!-- Actividad de Contactos de emergencia -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.contactoemegencia.view.ContactoEmegenciaActivity"
+            android:exported="true" />
+
+        <!-- Actividad de Invitar amigos -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.invitaramigos.view.InvitarAmigosActivity"
+            android:exported="true" />
+
+        <!-- Actividad de Notificaciones -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.notificaciones.view.NotificacionesActivity"
+            android:exported="true" />
+
+        <!-- Actividad de Sugerencias -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.sugerencias.view.SugerenciasActivity"
+            android:exported="true" />
+
         <!-- Configuración para Google Sign-In -->
         <meta-data
             android:name="com.google.android.gms.auth.api.signin.default_web_client_id"
