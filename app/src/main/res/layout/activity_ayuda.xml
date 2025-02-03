@@ -210,131 +210,135 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView47" />
 
-
-    <!-- Fragment Container -->
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerView3"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="78dp"
+        android:layout_height="65dp"
+        android:layout_alignParentBottom="true"
         android:background="#FA79B6"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView48" />
+        android:orientation="horizontal"
+        android:weightSum="5"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <!-- Mapa -->
-    <ImageButton
-        android:id="@+id/imageButton10"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="34dp"
-        android:layout_marginTop="16dp"
-        android:background="#00FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
-        app:srcCompat="@drawable/ic_mapa" />
+        <!-- Mapa -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView49"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="47dp"
-        android:text="Mapa"
-        android:textColor="#FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+            <ImageButton
+                android:id="@+id/imageButton10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_mapa" />
 
-    <!-- Novedad -->
-    <ImageButton
-        android:id="@+id/imageButton11"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="114dp"
-        android:layout_marginTop="16dp"
-        android:background="#00FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
-        app:srcCompat="@drawable/ic_novedad" />
+            <TextView
+                android:id="@+id/textView49"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mapa"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView50"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="101dp"
-        android:layout_marginTop="47dp"
-        android:text="Novedad"
-        android:textColor="#FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+        <!-- Novedad -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
 
-    <!-- Chats -->
-    <ImageButton
-        android:id="@+id/imageButton12"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="187dp"
-        android:layout_marginTop="16dp"
-        android:background="#00FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
-        app:srcCompat="@drawable/ic_chat" />
+            <ImageButton
+                android:id="@+id/imageButton11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_novedad" />
 
-    <TextView
-        android:id="@+id/textView51"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="187dp"
-        android:layout_marginTop="47dp"
-        android:text="Chats"
-        android:textColor="#FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+            <TextView
+                android:id="@+id/textView50"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Novedad"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
 
-    <!-- Ayuda -->
-    <ImageButton
-        android:id="@+id/imageButton13"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="264dp"
-        android:layout_marginTop="16dp"
-        android:background="#00FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
-        app:srcCompat="@drawable/ic_ayuda" />
+        <!-- Chat -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView52"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="262dp"
-        android:layout_marginTop="47dp"
-        android:text="Ayuda"
-        android:textColor="#FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+            <ImageButton
+                android:id="@+id/imageButton12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_chat" />
 
-    <!-- Menú -->
-    <ImageButton
-        android:id="@+id/imageButton14"
-        android:layout_width="wrap_content"
-        android:layout_height="29dp"
-        android:layout_marginStart="351dp"
-        android:layout_marginTop="16dp"
-        android:background="#00FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3"
-        app:srcCompat="@drawable/ic_menu" />
+            <TextView
+                android:id="@+id/textView51"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chat"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView53"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="346dp"
-        android:layout_marginTop="47dp"
-        android:text="Menú"
-        android:textColor="#FFFFFF"
-        app:layout_constraintStart_toStartOf="@id/fragmentContainerView3"
-        app:layout_constraintTop_toTopOf="@id/fragmentContainerView3" />
+        <!-- Ayuda -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/imageButton13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_ayuda" />
+
+            <TextView
+                android:id="@+id/textView52"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ayuda"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Menú -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/imageButton14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_menu" />
+
+            <TextView
+                android:id="@+id/textView53"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Menú"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

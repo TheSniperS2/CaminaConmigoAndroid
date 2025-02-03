@@ -3,21 +3,23 @@ package com.franco.CaminaConmigo.model_mvvm.ayuda.view
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.franco.CaminaConmigo.databinding.ActivityAyudaBinding
+import com.franco.CaminaConmigo.R
+import com.franco.CaminaConmigo.model_mvvm.chat.view.ChatActivity
+import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
+import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
+import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
 
 class AyudaActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAyudaBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAyudaBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_ayuda)
 
         // Redirigir al cliente de correo
-        binding.textView48.setOnClickListener {
+        val emailTextView = findViewById<TextView>(R.id.textView48)
+        emailTextView.setOnClickListener {
             val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:centroliwen@laserena.cl")
             }
@@ -29,7 +31,8 @@ class AyudaActivity : AppCompatActivity() {
         }
 
         // Redirigir a los números de teléfono
-        binding.textView47.setOnClickListener {
+        val phoneTextView = findViewById<TextView>(R.id.textView47)
+        phoneTextView.setOnClickListener {
             val phoneNumbers = listOf("51-2641850", "51-2427844", "961244738")
             val intent = Intent(Intent.ACTION_DIAL).apply {
                 data = Uri.parse("tel:${phoneNumbers.first()}")
@@ -38,29 +41,25 @@ class AyudaActivity : AppCompatActivity() {
         }
 
         // Funcionalidad de los botones inferiores
-        binding.imageButton10.setOnClickListener {
-            Toast.makeText(this, "Abrir Mapa", Toast.LENGTH_SHORT).show()
-            // Agregar lógica para abrir la actividad de mapas aquí
+        val btnMapa = findViewById<ImageButton>(R.id.imageButton10)
+        val btnNovedades = findViewById<ImageButton>(R.id.imageButton11)
+        val btnChats = findViewById<ImageButton>(R.id.imageButton12)
+        val btnMenu = findViewById<ImageButton>(R.id.imageButton14)
+
+        btnMapa.setOnClickListener {
+            startActivity(Intent(this, MapaActivity::class.java))
         }
 
-        binding.imageButton11.setOnClickListener {
-            Toast.makeText(this, "Abrir Novedades", Toast.LENGTH_SHORT).show()
-            // Agregar lógica para abrir la actividad de novedades aquí
+        btnNovedades.setOnClickListener {
+            startActivity(Intent(this, NovedadActivity::class.java))
         }
 
-        binding.imageButton12.setOnClickListener {
-            Toast.makeText(this, "Abrir Chats", Toast.LENGTH_SHORT).show()
-            // Agregar lógica para abrir la actividad de chats aquí
+        btnChats.setOnClickListener {
+            startActivity(Intent(this, ChatActivity::class.java))
         }
 
-        binding.imageButton13.setOnClickListener {
-            Toast.makeText(this, "Ayuda seleccionada", Toast.LENGTH_SHORT).show()
-            // Este botón puede ser el actual
-        }
-
-        binding.imageButton14.setOnClickListener {
-            Toast.makeText(this, "Abrir Menú", Toast.LENGTH_SHORT).show()
-            // Agregar lógica para abrir el menú aquí
+        btnMenu.setOnClickListener {
+            startActivity(Intent(this, MenuActivity::class.java))
         }
     }
 }

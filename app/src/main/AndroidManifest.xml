@@ -3,6 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.franco.CaminaConmigo">
 
+    <!-- Permisos para el uso de Internet y ubicación -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -69,10 +81,30 @@
             android:name="com.franco.CaminaConmigo.model_mvvm.sugerencias.view.SugerenciasActivity"
             android:exported="true" />
 
+        <!-- Actividad de Mapa -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity"
+            android:exported="true" />
+
+        <!-- Actividad de Agregar reportes -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.mapa.view.AgregarReporteActivity"
+            android:exported="true" />
+
+        <!-- Actividad de Agregar reportes -->
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity"
+            android:exported="true" />
+
         <!-- Configuración para Google Sign-In -->
         <meta-data
             android:name="com.google.android.gms.auth.api.signin.default_web_client_id"
             android:value="@string/default_web_client_id" />
+
+        <!-- Configuración para Google Mapa -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_map_api_key" />
 
     </application>
 

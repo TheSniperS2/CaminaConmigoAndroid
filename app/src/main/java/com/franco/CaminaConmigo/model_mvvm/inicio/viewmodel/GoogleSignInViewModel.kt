@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.franco.CaminaConmigo.model_mvvm.inicio.viewmodel
 
 import androidx.lifecycle.LiveData

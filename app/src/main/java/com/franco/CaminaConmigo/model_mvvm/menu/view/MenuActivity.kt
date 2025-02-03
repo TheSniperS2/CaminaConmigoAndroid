@@ -3,9 +3,11 @@ package com.franco.CaminaConmigo.model_mvvm.menu.view
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.franco.CaminaConmigo.R
+import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
 import com.franco.CaminaConmigo.model_mvvm.inicio.view.MainActivity
 import com.franco.CaminaConmigo.model_mvvm.perfil.view.MiPerfilActivity
 import com.franco.CaminaConmigo.model_mvvm.chat.view.ChatActivity
@@ -14,6 +16,8 @@ import com.franco.CaminaConmigo.model_mvvm.invitaramigos.view.InvitarAmigosActiv
 import com.franco.CaminaConmigo.model_mvvm.sugerencias.view.SugerenciasActivity
 import com.franco.CaminaConmigo.model_mvvm.configuraciones.view.ConfiguracionActivity
 import com.franco.CaminaConmigo.model_mvvm.contactoemegencia.view.ContactoEmegenciaActivity
+import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
+import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
 
 
 class MenuActivity : AppCompatActivity() {
@@ -31,6 +35,11 @@ class MenuActivity : AppCompatActivity() {
         val sugerencias = findViewById<ImageView>(R.id.imageView14)
         val configuracion = findViewById<ImageView>(R.id.imageView15)
         val btnCerrarSesion = findViewById<Button>(R.id.button2)
+        val Mapa = findViewById<ImageButton>(R.id.imageButton10)
+        val Novedad = findViewById<ImageButton>(R.id.imageButton11)
+        val chat_friend = findViewById<ImageButton>(R.id.imageButton12)
+        val Ayuda = findViewById<ImageButton>(R.id.imageButton13)
+
 
         // Navegación entre actividades
         perfil.setOnClickListener {
@@ -59,6 +68,22 @@ class MenuActivity : AppCompatActivity() {
 
         configuracion.setOnClickListener {
             startActivity(Intent(this, ConfiguracionActivity::class.java))
+        }
+
+        Mapa.setOnClickListener {
+            startActivity(Intent(this, MapaActivity::class.java))
+        }
+
+        Novedad.setOnClickListener {
+            startActivity(Intent(this, NovedadActivity::class.java))
+        }
+
+        chat_friend.setOnClickListener {
+            startActivity(Intent(this, ChatActivity::class.java))
+        }
+
+        Ayuda.setOnClickListener {
+            startActivity(Intent(this, AyudaActivity::class.java))
         }
 
         // Cerrar sesión
