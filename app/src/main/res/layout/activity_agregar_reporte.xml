@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Titulo con el tipo de reporte -->
+    <TextView
+        android:id="@+id/txtTipoReporte"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipo de Reporte"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Campo de descripción -->
+    <EditText
+        android:id="@+id/edtDescripcion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Descripción"
+        android:layout_below="@id/txtTipoReporte"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"/>
+
+    <!-- Botón para agregar imagen -->
+    <ImageView
+        android:id="@+id/btnAgregarImagen"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/edtDescripcion"
+        android:layout_marginTop="20dp"
+        android:src="@android:drawable/ic_menu_gallery" />
+
+    <!-- Mostrar la imagen seleccionada -->
+    <ImageView
+        android:id="@+id/imagenSeleccionada"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@id/btnAgregarImagen"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Texto que muestra el título del reporte -->
+    <TextView
+        android:id="@+id/txtTituloReporte"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Título"
+        android:layout_below="@id/imagenSeleccionada"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Checkbox para enviar anónimamente -->
+    <CheckBox
+        android:id="@+id/chkAnonimo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enviar de forma anónima"
+        android:layout_below="@id/txtTituloReporte"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Botón para enviar el reporte -->
+    <Button
+        android:id="@+id/btnEnviarReporte"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enviar Reporte"
+        android:layout_below="@id/chkAnonimo"
+        android:layout_marginTop="20dp"/>
+
+</RelativeLayout>
