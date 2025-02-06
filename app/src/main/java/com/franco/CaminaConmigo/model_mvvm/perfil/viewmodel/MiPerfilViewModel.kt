@@ -1,47 +1,74 @@
 package com.franco.CaminaConmigo.model_mvvm.perfil.viewmodel
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.google.firebase.auth.FirebaseAuth
+import android.util.Log
 import com.franco.CaminaConmigo.model_mvvm.perfil.model.User
-import kotlin.random.Random
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 class MiPerfilViewModel(private val context: Context) {
 
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
-    fun getUser(): User? {
-        val user = auth.currentUser ?: return null
+    fun getUser(callback: (User?) -> Unit) {
+        val user = auth.currentUser ?: return callback(null)
+        val id = user.uid
 
-        val name = sharedPreferences.getString("user_name", user.displayName) ?: "Usuario Desconocido"
-        val username = sharedPreferences.getString("user_username", generateUsername(name))
-        val isPrivate = sharedPreferences.getBoolean("user_is_private", false)
-        val photoUrl = user.photoUrl?.toString()
+        firestore.collection("users").document(id).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val name = document.getString("name") ?: user.displayName ?: "Usuario Desconocido"
+                    val username = document.getString("username") ?: ""  // Permite estar vacío
+                    val profileType = document.getString("profileType") ?: "Público"
+                    val email = document.getString("email") ?: user.email ?: "No Email"
+                    val joinDate = document.getTimestamp("joinDate") ?: Timestamp.now()
 
-        return User(name, username!!, isPrivate, photoUrl)
+                    callback(User(name, username, profileType, email, id, joinDate))
+                } else {
+                    val newUser = User(
+                        name = user.displayName ?: "Usuario Desconocido",
+                        username = "",  // Se deja vacío por defecto
+                        profileType = "Público",
+                        email = user.email ?: "No Email",
+                        id = id,
+                        joinDate = Timestamp.now()
+                    )
+                    saveNewUserToFirestore(newUser)
+                    callback(newUser)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error al obtener datos del usuario", e)
+                callback(null)
+            }
     }
 
-    fun saveUserName(name: String) {
-        sharedPreferences.edit().putString("user_name", name).apply()
+    fun saveUserProfileType(profileType: String) {
+        val user = auth.currentUser ?: return
+
+        val userRef = firestore.collection("users").document(user.uid)
+        userRef.update("profileType", profileType)
+            .addOnSuccessListener { Log.d("Firestore", "Perfil cambiado a: $profileType") }
+            .addOnFailureListener { e -> Log.e("Firestore", "Error al actualizar perfil", e) }
     }
 
     fun saveUserUsername(username: String) {
-        sharedPreferences.edit().putString("user_username", username).apply()
+        val user = auth.currentUser ?: return
+
+        val userRef = firestore.collection("users").document(user.uid)
+        userRef.update("username", username)
+            .addOnSuccessListener { Log.d("Firestore", "Username actualizado a: $username") }
+            .addOnFailureListener { e -> Log.e("Firestore", "Error al actualizar username", e) }
     }
 
-    fun setPrivacy(isPrivate: Boolean) {
-        sharedPreferences.edit().putBoolean("user_is_private", isPrivate).apply()
-    }
+    private fun saveNewUserToFirestore(user: User) {
+        val userRef = firestore.collection("users").document(user.id)
 
-    fun saveProfileImage(imageUri: String) {
-        sharedPreferences.edit().putString("user_profile_image", imageUri).apply()
-    }
-
-    private fun generateUsername(name: String): String {
-        val cleanName = name.lowercase().replace(" ", "").replace("[^a-zA-Z0-9]".toRegex(), "")
-        val randomSuffix = Random.nextInt(100, 999)
-        return "$cleanName$randomSuffix"
+        userRef.set(user, SetOptions.merge())
+            .addOnSuccessListener { Log.d("Firestore", "Usuario guardado correctamente") }
+            .addOnFailureListener { e -> Log.e("Firestore", "Error al guardar usuario", e) }
     }
 }

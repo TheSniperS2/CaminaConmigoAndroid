@@ -8,7 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.franco.CaminaConmigo.databinding.ActivityMainBinding
 import com.franco.CaminaConmigo.model_mvvm.inicio.viewmodel.GoogleSignInViewModel
-import com.franco.CaminaConmigo.model_mvvm.perfil.view.MiPerfilActivity
+import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         googleSignInViewModel.accountLiveData.observe(this) { account ->
             account?.let {
                 // Redirige al perfil del usuario
-                val intent = Intent(this, MiPerfilActivity::class.java)
+                val intent = Intent(this, MapaActivity::class.java)
                 startActivity(intent)
                 finish()  // Cierra la actividad principal
             }

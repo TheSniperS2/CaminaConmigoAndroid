@@ -62,7 +62,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation(libs.play.services.location)
     implementation(libs.firebase.firestore.ktx)
-    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.recyclerview) // Asegúrate de que está aquí
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     // Dependencias adicionales

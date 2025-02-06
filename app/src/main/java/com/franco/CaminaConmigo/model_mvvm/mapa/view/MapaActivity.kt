@@ -1,9 +1,14 @@
 package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Location
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -22,6 +27,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -34,6 +41,10 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val db = FirebaseFirestore.getInstance()
     private val reportsCollection = "reports"
+    private var mediaPlayer: MediaPlayer? = null
+    private var audioManager: AudioManager? = null
+    private var originalVolume: Int = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,36 +55,60 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        val btnReportar = findViewById<Button>(R.id.btnReportar)
-        btnReportar.setOnClickListener {
-            // Mostrar el diálogo de selección de tipo de reporte
+        findViewById<Button>(R.id.btnReportar).setOnClickListener {
             val dialogFragment = TipoReporteDialogFragment()
             dialogFragment.show(supportFragmentManager, "TipoReporteDialogFragment")
         }
 
-        // Agregar listeners para los ImageButtons
+// Inicializar el AudioManager para controlar el volumen
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+// Guardar el volumen original
+        originalVolume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: 0
+
+// Inicializar el MediaPlayer para la alarma
+        mediaPlayer = MediaPlayer.create(this, R.raw.emergency_alarm)
+        mediaPlayer?.isLooping = true
+        mediaPlayer?.setVolume(1.0f, 1.0f)
+
+
+// Configurar el botón para activar y desactivar la alarma de emergencia
+        findViewById<Button>(R.id.btnSOS).setOnClickListener {
+            // Si la alarma no está sonando, activamos la alarma
+            if (mediaPlayer?.isPlaying == false) {
+                // Subir el volumen al máximo
+                audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 0, 0)
+
+                // Reproducir el sonido de emergencia
+                mediaPlayer?.start()
+
+                // Mostrar un mensaje de emergencia
+                Toast.makeText(this, "¡Emergencia activada!", Toast.LENGTH_SHORT).show()
+            } else {
+                // Si la alarma está sonando, desactivarla
+                mediaPlayer?.pause()
+
+                // Restaurar el volumen original
+                audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
+
+                // Mostrar mensaje de desactivación
+                Toast.makeText(this, "¡Emergencia desactivada!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+        // Botones de navegación
         findViewById<ImageButton>(R.id.imageButton11).setOnClickListener {
-            // Redirigir a otra vista
-            val intent = Intent(this, NovedadActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, NovedadActivity::class.java))
         }
-
         findViewById<ImageButton>(R.id.imageButton12).setOnClickListener {
-            // Redirigir a otra vista
-            val intent = Intent(this, ChatActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, ChatActivity::class.java))
         }
-
         findViewById<ImageButton>(R.id.imageButton13).setOnClickListener {
-            // Redirigir a otra vista
-            val intent = Intent(this, AyudaActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, AyudaActivity::class.java))
         }
-
         findViewById<ImageButton>(R.id.imageButton14).setOnClickListener {
-            // Redirigir a otra vista
-            val intent = Intent(this, MenuActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, MenuActivity::class.java))
         }
     }
 
@@ -81,24 +116,59 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         mMap = googleMap
         cargarReportes()
 
-        // Solicitar permisos de ubicación si no se han concedido
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
             return
         }
         mMap.isMyLocationEnabled = true
 
-        // Obtener ubicación actual y mover la cámara hacia ella
+        // Coordenadas de La Serena, Chile
+        val laSerena = LatLng(-29.9027, -71.2519)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(laSerena, 12f))
+
+        mMap.setOnMarkerClickListener { marker ->
+            val reporteId = marker.tag as? String
+            if (reporteId != null) {
+                // Recuperar los demás datos desde Firestore
+                db.collection("reportes").document(reporteId)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        if (document != null && document.exists()) {
+                            // Extraer los datos del reporte
+                            val type = document.getString("type") ?: "Tipo desconocido"
+                            val description = document.getString("description") ?: "Descripción desconocida"
+                            val timestamp = document.getDate("timestamp") // Obtener la fecha de Firestore
+                            val likes = document.getLong("likes")?.toInt() ?: 0  // Convertir likes a Int
+
+                            // Crear la instancia del fragmento con los datos
+                            val dialogFragment = DetallesReporteDialogFragment.newInstance(
+                                reporteId, type, description, timestamp, likes
+                            )
+                            dialogFragment.show(supportFragmentManager, "DetallesReporteDialogFragment")
+                        }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Error al obtener los detalles del reporte", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            true
+        }
+
+
+
+        /*
+        // CÓDIGO COMENTADO PARA GPS EN TIEMPO REAL (Activar cuando sea necesario)
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
                 val miUbicacion = LatLng(it.latitude, it.longitude)
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 15f))
             }
         }
+        */
     }
 
     private fun cargarReportes() {
-        db.collection(reportsCollection).get().addOnSuccessListener { documents ->
+        db.collection("reportes").get().addOnSuccessListener { documents ->
             for (document in documents) {
                 val lat = document.getDouble("latitude") ?: continue
                 val lng = document.getDouble("longitude") ?: continue
@@ -106,21 +176,55 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
                 val type = document.getString("type") ?: "Sin tipo"
 
                 val ubicacion = LatLng(lat, lng)
-                mMap.addMarker(MarkerOptions().position(ubicacion).title(type).snippet(description))
+                val icon = obtenerIconoPorTipo(type)
+
+                val marker = mMap.addMarker(
+                    MarkerOptions()
+                        .position(ubicacion)
+                        .title(type)
+                        .snippet(description)
+                        .icon(icon)
+                )
+                marker?.tag = document.id
             }
         }.addOnFailureListener {
             Toast.makeText(this, "Error al cargar reportes", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun reportarUbicacion(tipo: String, descripcion: String) {
-        // Verificar permisos de ubicación
+    private fun obtenerIconoPorTipo(type: String): BitmapDescriptor {
+        val resId = when (type) {
+            "Reunión de Hombres" -> R.drawable.i_reunion_de_hombre
+            "Poca Iluminación" -> R.drawable.i_poca_iluminacion
+            "Presencia de bares" -> R.drawable.i_presencia_de_bares_y_restobares
+            "Veredas en mal estado" -> R.drawable.i_veredas_en_mal_estado
+            "Vegetación abundante" -> R.drawable.i_vegetacion_abundante
+            "Espacios Abandonados" -> R.drawable.i_espacios_abandonados
+            "Agresión física" -> R.drawable.i_agresion_fisica
+            "Agresión Sexual" -> R.drawable.i_agresion_sexual
+            "Agresión verbal" -> R.drawable.i_agresion_verbal
+            "Falta de Baños Públicos" -> R.drawable.icon_faltabanos
+            "Mobiliario inadecuado" -> R.drawable.i_mobiliario_inadecuado
+            "Puntos ciegos" -> R.drawable.i_puntos_ciegos
+            "Personas en situación de calle" -> R.drawable.i_personas_en_situacion_de_calle
+            else -> return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+        }
+
+        return BitmapDescriptorFactory.fromBitmap(redimensionarIcono(resId, 100, 100))
+    }
+
+    private fun redimensionarIcono(resId: Int, width: Int, height: Int): Bitmap {
+        val imageBitmap = BitmapFactory.decodeResource(resources, resId)
+        return Bitmap.createScaledBitmap(imageBitmap, width, height, false)
+    }
+
+
+    private fun reportarUbicacion(tipo: String, descripcion: String, imageUrl: String?) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Permiso de ubicación no concedido", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Obtener la ubicación y guardar el reporte
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
                 val latitud = it.latitude
@@ -133,22 +237,16 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
                     "longitude" to longitud,
                     "timestamp" to FieldValue.serverTimestamp(),
                     "userId" to (FirebaseAuth.getInstance().currentUser?.uid ?: "Anónimo"),
-                    "isAnonymous" to (FirebaseAuth.getInstance().currentUser == null)
+                    "isAnonymous" to (FirebaseAuth.getInstance().currentUser == null),
+                    "imageUrl" to imageUrl,
+                    "likes" to 0 // Se agrega el campo de likes con valor inicial 0
                 )
 
-                // Guardar reporte en Firestore
                 db.collection(reportsCollection)
                     .add(reporte)
-                    .addOnSuccessListener { documentReference ->
+                    .addOnSuccessListener {
                         Toast.makeText(this, "Reporte enviado", Toast.LENGTH_SHORT).show()
-
-                        // Agregar el marcador en el mapa
-                        mMap.addMarker(
-                            MarkerOptions()
-                                .position(LatLng(latitud, longitud))
-                                .title(tipo)
-                                .snippet(descripcion)
-                        )
+                        cargarReportes() // Recargar los marcadores con la nueva imagen
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, "Error al enviar reporte", Toast.LENGTH_SHORT).show()
@@ -157,9 +255,24 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         }
     }
 
-    override fun onTipoReporteSeleccionado(tipoReporte: String) {
-        // Una vez que el usuario seleccione un tipo, mostramos un formulario o el diálogo
-        // Abre los campos de descripción para agregar más detalles.
-        val edtDescripcion = findViewById<EditText>(R.id.edtDescripcion)
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // Liberar el recurso del MediaPlayer cuando la actividad se destruye
+        mediaPlayer?.release()
+        mediaPlayer = null
+
+        // Restaurar el volumen original al cerrar la actividad
+        audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
     }
+
+
+
+    override fun onTipoReporteSeleccionado(tipoReporte: String) {
+        val descripcionEditText = findViewById<EditText>(R.id.edtDescripcion)
+        descripcionEditText.setText(tipoReporte) // Establece el tipo de reporte como descripción
+    }
+
+
+
 }

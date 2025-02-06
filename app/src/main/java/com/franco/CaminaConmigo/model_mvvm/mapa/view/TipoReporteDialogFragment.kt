@@ -1,7 +1,6 @@
 package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -42,9 +41,9 @@ class TipoReporteDialogFragment : BottomSheetDialogFragment() {
             TipoReporte("Puntos ciegos", R.drawable.icon_puntosciegos),
             TipoReporte("Presencia de bares", R.drawable.icono_bares),
             TipoReporte("Veredas en mal estado", R.drawable.icono_veredas),
-            TipoReporte("Poca iluminación", R.drawable.icono_iluminacion),
+            TipoReporte("Poca Iluminación", R.drawable.icono_iluminacion),
             TipoReporte("Vegetación abundante", R.drawable.icono_vegetacion),
-            TipoReporte("Lugar abandonado", R.drawable.icon_abandonados),
+            TipoReporte("Espacios Abandonados", R.drawable.icon_abandonados),
             TipoReporte("Agresión fisica", R.drawable.icon_agre_fisica),
             TipoReporte("Agresión sexual", R.drawable.icon_agre_sexual),
             TipoReporte("Agresión verbal", R.drawable.icon_agre_verbal),
@@ -54,13 +53,14 @@ class TipoReporteDialogFragment : BottomSheetDialogFragment() {
         )
 
         val adapter = TipoReporteAdapter(tipos) { tipo ->
-            // Al seleccionar el tipo de reporte, abrir la nueva actividad para agregar el reporte
-            val intent = Intent(context, AgregarReporteActivity::class.java)
-            intent.putExtra("TIPO_REPORTE", tipo.nombre)  // Pasamos el tipo de reporte seleccionado
-            startActivity(intent)
-            dismiss()  // Cierra el diálogo
+            val dialog = AgregarReporteDialogFragment.newInstance(tipo.nombre)
+            dialog.show(parentFragmentManager, "AgregarReporteDialog")
+            dismiss()
         }
         recyclerView.adapter = adapter
+
+        // Agregamos espacio entre los elementos
+        recyclerView.addItemDecoration(SpaceItemDecoration(24))
 
         return view
     }
@@ -75,6 +75,7 @@ class TipoReporteDialogFragment : BottomSheetDialogFragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_tipo_reporte, parent, false)
+
             return ViewHolder(view)
         }
 
@@ -94,8 +95,23 @@ class TipoReporteDialogFragment : BottomSheetDialogFragment() {
                 tipoImageView.setImageResource(tipo.imagen)
 
                 itemView.setOnClickListener {
-                    onClick(tipo)  // Ejecuta la acción cuando se selecciona un tipo
+                    onClick(tipo)
                 }
+            }
+        }
+    }
+
+    // Clase para agregar espacio entre elementos en el RecyclerView
+    class SpaceItemDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(
+            outRect: android.graphics.Rect, view: View, parent: RecyclerView, state: RecyclerView.State
+        ) {
+            outRect.left = space / 2
+            outRect.right = space / 2
+            outRect.bottom = space
+
+            if (parent.getChildAdapterPosition(view) < 2) {
+                outRect.top = space
             }
         }
     }

@@ -1,32 +1,40 @@
+<!-- Archivo: res/layout/item_contacto.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:padding="16dp"
+    android:background="?android:attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/textViewNombre"
         android:layout_width="0dp"
-        android:layout_weight="2"
-        android:textSize="18sp"
-        android:textColor="#000"/>
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Nombre"
+        android:textSize="16sp"
+        android:layout_marginEnd="8dp" />
 
     <TextView
         android:id="@+id/textViewNumero"
         android:layout_width="0dp"
-        android:layout_weight="3"
-        android:textSize="18sp"
-        android:textColor="#000"/>
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Número"
+        android:textSize="16sp"
+        android:layout_marginEnd="8dp" />
 
     <ImageView
         android:id="@+id/imageViewEditar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/ic_tool"
-        android:layout_width="40dp"
-        android:layout_height="40dp"/>
+        android:contentDescription="Editar contacto" />
 
     <ImageView
         android:id="@+id/imageViewPriorizar"
-        android:src="@drawable/priorizar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_priorizar"
+        android:contentDescription="Priorizar contacto" />
 </LinearLayout>

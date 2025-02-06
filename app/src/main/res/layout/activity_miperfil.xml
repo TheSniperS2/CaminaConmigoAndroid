@@ -181,7 +181,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="43dp"
-            android:text="Público"
+            android:text="Privado"
             android:textColor="#5B5B5B"
             android:textSize="20dp" />
 

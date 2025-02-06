@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.franco.CaminaConmigo.model_mvvm.inicio.model
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
