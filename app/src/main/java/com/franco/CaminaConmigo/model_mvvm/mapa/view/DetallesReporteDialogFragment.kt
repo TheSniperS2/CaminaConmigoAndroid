@@ -263,7 +263,7 @@ class DetallesReporteDialogFragment : DialogFragment() {
     }
 
     private fun compartirReporte() {
-        val shareText = "Reporte: $type\nDescripción: $description\nPublicado el: ${txtFechaHora.text}"
+        val shareText = "com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte: $type\nDescripción: $description\nPublicado el: ${txtFechaHora.text}"
         val shareIntent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, shareText)

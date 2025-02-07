@@ -145,7 +145,7 @@ class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
         db.collection("reportes")  // Guardar en la colección 'reportes'
             .add(reporte)
             .addOnSuccessListener {
-                Toast.makeText(this, "Reporte agregado exitosamente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte agregado exitosamente", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
                 Log.e("Firestore", "Error al agregar reporte", e)

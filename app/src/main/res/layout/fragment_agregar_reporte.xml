@@ -136,7 +136,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Reporte anónimo -->
+        <!-- com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte anónimo -->
         <CheckBox
             android:id="@+id/chkAnonimo"
             android:layout_width="wrap_content"

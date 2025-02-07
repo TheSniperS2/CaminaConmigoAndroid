@@ -1,0 +1,6 @@
+<!-- dialog_background.xml en la carpeta res/drawable -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#FFFFFF"/> <!-- Color de fondo blanco -->
+    <corners android:radius="10dp"/> <!-- Esquinas redondeadas -->
+    <stroke android:color="#000000" android:width="2dp"/> <!-- Borde negro -->
+</shape>

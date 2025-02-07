@@ -139,7 +139,7 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         db.collection("reportes")
             .add(reporte)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Reporte enviado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte enviado", Toast.LENGTH_SHORT).show()
                 dismiss()
             }
             .addOnFailureListener {

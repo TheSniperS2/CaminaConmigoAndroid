@@ -74,27 +74,21 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
 
 // Configurar el botón para activar y desactivar la alarma de emergencia
         findViewById<Button>(R.id.btnSOS).setOnClickListener {
-            // Si la alarma no está sonando, activamos la alarma
             if (mediaPlayer?.isPlaying == false) {
-                // Subir el volumen al máximo
                 audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 0, 0)
-
-                // Reproducir el sonido de emergencia
                 mediaPlayer?.start()
-
-                // Mostrar un mensaje de emergencia
                 Toast.makeText(this, "¡Emergencia activada!", Toast.LENGTH_SHORT).show()
+
+                // Mostrar el diálogo de emergencia
+                val emergenciaDialog = EmergenciaDialogFragment()
+                emergenciaDialog.show(supportFragmentManager, "EmergenciaDialogFragment")
             } else {
-                // Si la alarma está sonando, desactivarla
                 mediaPlayer?.pause()
-
-                // Restaurar el volumen original
                 audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
-
-                // Mostrar mensaje de desactivación
                 Toast.makeText(this, "¡Emergencia desactivada!", Toast.LENGTH_SHORT).show()
             }
         }
+
 
 
         // Botones de navegación
@@ -245,7 +239,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
                 db.collection(reportsCollection)
                     .add(reporte)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Reporte enviado", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte enviado", Toast.LENGTH_SHORT).show()
                         cargarReportes() // Recargar los marcadores con la nueva imagen
                     }
                     .addOnFailureListener {
