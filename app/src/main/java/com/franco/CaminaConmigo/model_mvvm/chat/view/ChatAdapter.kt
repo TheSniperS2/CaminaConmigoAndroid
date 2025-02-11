@@ -1,31 +1,42 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.view
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
-import com.franco.CaminaConmigo.R
-import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import com.franco.CaminaConmigo.databinding.ItemChatBinding
+import com.franco.CaminaConmigo.model_mvvm.chat.model.Chat
 
-class ChatAdapter(private val messages: List<Message>) :
-    RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
-
-    inner class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val textViewMessage: TextView = itemView.findViewById(R.id.textViewMessage)
-    }
+class ChatAdapter(private val onChatClick: (String) -> Unit) : ListAdapter<Chat, ChatViewHolder>(ChatDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_message, parent, false)
-        return ChatViewHolder(view)
+        val binding = ItemChatBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ChatViewHolder(binding, onChatClick)
     }
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
-        val message = messages[position]
-        holder.textViewMessage.text = message.text
-        // Aquí puedes personalizar el estilo según isSentByUser = true/false
+        val chat = getItem(position)
+        holder.bind(chat)
+    }
+}
+
+class ChatViewHolder(
+    private val binding: ItemChatBinding,
+    private val onChatClick: (String) -> Unit
+) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(chat: Chat) {
+        binding.chatName.text = chat.name  // Asegúrate de que estás mostrando el nombre correctamente
+        binding.root.setOnClickListener { onChatClick(chat.chatId) }  // Usar chatId para abrir el chat
+    }
+}
+
+class ChatDiffCallback : DiffUtil.ItemCallback<Chat>() {
+    override fun areItemsTheSame(oldItem: Chat, newItem: Chat): Boolean {
+        return oldItem.chatId == newItem.chatId  // Comparar por el ID del chat
     }
 
-    override fun getItemCount(): Int = messages.size
+    override fun areContentsTheSame(oldItem: Chat, newItem: Chat): Boolean {
+        return oldItem == newItem
+    }
 }

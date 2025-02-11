@@ -1,0 +1,34 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Campo de correo -->
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Correo del amigo"
+        android:inputType="textEmailAddress"/>
+
+    <!-- Botón para enviar la solicitud -->
+    <Button
+        android:id="@+id/btnSendRequest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etEmail"
+        android:text="Enviar Solicitud"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Mensaje de estado -->
+    <TextView
+        android:id="@+id/textViewStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnSendRequest"
+        android:layout_marginTop="16dp"
+        android:text="Estado: Pendiente"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="14sp"/>
+
+</RelativeLayout>

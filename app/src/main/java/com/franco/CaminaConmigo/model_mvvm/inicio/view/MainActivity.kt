@@ -45,8 +45,10 @@ class MainActivity : AppCompatActivity() {
 
     /* Método para iniciar sesión con Google */
     private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        signInLauncher.launch(signInIntent)
+        googleSignInClient.signOut().addOnCompleteListener {
+            val signInIntent = googleSignInClient.signInIntent
+            signInLauncher.launch(signInIntent)
+        }
     }
 
     private val signInLauncher =

@@ -29,7 +29,6 @@
 
     </androidx.cardview.widget.CardView>
 
-
     <TextView
         android:id="@+id/textView55"
         android:layout_width="wrap_content"
@@ -39,7 +38,7 @@
         android:text="Añadir Amigo"
         android:textColor="#2EB9FF"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/fragmentContainerView2"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerViewChats"
         app:layout_constraintEnd_toStartOf="@+id/imageView46"
         app:layout_constraintTop_toBottomOf="@+id/cardView7"
         app:layout_constraintVertical_bias="0.0" />
@@ -77,154 +76,27 @@
         app:layout_constraintTop_toBottomOf="@+id/cardView7"
         app:srcCompat="@drawable/anadir" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/fragmentContainerView2"
-        android:name="com.Franco.appcamina.ui.dashboard.DashboardFragment"
-        android:layout_width="410dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="56dp"
-        app:cardElevation="1dp"
+    <!-- RecyclerView para chats -->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewChats"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@id/linearLayoutFooter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView7">
-
-        <TextView
-            android:id="@+id/textView14"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="70dp"
-            android:layout_marginTop="15dp"
-            android:text="Victor"
-            android:textColor="#000000"
-            android:textSize="20sp" />
-
-        <ImageView
-            android:id="@+id/imageView24"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
-            android:elevation="1dp"
-            app:srcCompat="@drawable/ic_imagen" />
-
-        <TextView
-            android:id="@+id/textView58"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="70dp"
-            android:layout_marginTop="40dp"
-            android:text="Tu: Ya llegué a mi destino amigo" />
-
-        <TextView
-            android:id="@+id/textView60"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="350dp"
-            android:layout_marginTop="28dp"
-            android:text="10 min" />
-
-
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/fragmentContainerView4"
-        android:name="com.Franco.appcamina.ui.dashboard.DashboardFragment"
-        android:layout_width="410dp"
-        android:layout_height="80dp"
-        app:cardElevation="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fragmentContainerView2">
-
-        <TextView
-            android:id="@+id/textView61"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="70dp"
-            android:layout_marginTop="15dp"
-            android:text="Jane Doe"
-            android:textColor="#000000"
-            android:textSize="20sp" />
-
-        <ImageView
-            android:id="@+id/imageView25"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
-            android:elevation="1dp"
-            app:srcCompat="@drawable/ic_imagen" />
-
-        <TextView
-            android:id="@+id/textView62"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="70dp"
-            android:layout_marginTop="40dp"
-            android:text="Avísame a que hora saldrás hoy" />
-
-        <TextView
-            android:id="@+id/textView59"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="350dp"
-            android:layout_marginTop="28dp"
-            android:text="15 min" />
-
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/fragmentContainerView5"
-        android:name="com.Franco.appcamina.ui.dashboard.DashboardFragment"
-        android:layout_width="410dp"
-        android:layout_height="80dp"
-        app:cardElevation="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fragmentContainerView4">
-
-        <TextView
-            android:id="@+id/textView63"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="70dp"
-            android:layout_marginTop="15dp"
-            android:text="Familia"
-            android:textColor="#000000"
-            android:textSize="20sp" />
-
-        <ImageView
-            android:id="@+id/imageView26"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
-            android:elevation="1dp"
-            app:srcCompat="@drawable/ic_imagen" />
-
-        <TextView
-            android:id="@+id/textView64"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="70dp"
-            android:layout_marginTop="40dp"
-            android:text="Papá: Ya llegaron??" />
-
-        <TextView
-            android:id="@+id/textView65"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="350dp"
-            android:layout_marginTop="28dp"
-            android:text="33 min" />
-
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintTop_toBottomOf="@id/cardView7"
+        app:layout_constraintVertical_bias="1.0" />
 
     <LinearLayout
+        android:id="@+id/linearLayoutFooter"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:layout_alignParentBottom="true"
         android:background="#FA79B6"
         android:orientation="horizontal"
         android:weightSum="5"

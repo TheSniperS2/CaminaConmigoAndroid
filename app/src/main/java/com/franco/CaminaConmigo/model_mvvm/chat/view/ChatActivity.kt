@@ -2,103 +2,84 @@ package com.franco.CaminaConmigo.model_mvvm.chat.view
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageButton
-import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import com.franco.CaminaConmigo.R
-import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
-import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
-import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
-import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.franco.CaminaConmigo.databinding.ActivityChatBinding
+import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ChatActivity : AppCompatActivity() {
 
-    // Ejemplo de CardViews para cada chat
-    private lateinit var cardViewVictor: CardView
-    private lateinit var cardViewJane: CardView
-    private lateinit var cardViewFamilia: CardView
+    private lateinit var binding: ActivityChatBinding
+    private val viewModel: ChatViewModel by viewModels()
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat)
+        binding = ActivityChatBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Inicializamos los CardViews
-        cardViewVictor = findViewById(R.id.fragmentContainerView2)
-        cardViewJane = findViewById(R.id.fragmentContainerView4)
-        cardViewFamilia = findViewById(R.id.fragmentContainerView5)
+        // Configura RecyclerView para mostrar la lista de amigos/chat
+        binding.recyclerViewChats.layoutManager = LinearLayoutManager(this)
+        val adapter = ChatAdapter { chatId -> // Este lambda nos permite manejar el click en el chat
+            openChat(chatId)
+        }
+        binding.recyclerViewChats.adapter = adapter
 
-        // Configuramos clics para cada CardView y redireccionamos al detalle del chat
-        cardViewVictor.setOnClickListener {
-            openChatDetail("Victor")
+        // Verificar si el usuario tiene amigos antes de mostrar los chats
+        verifyFriendship()
+
+        // Cargar los chats cuando la actividad se inicie
+        viewModel.loadChats()
+        try {
+            // Código para cargar chats
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error al cargar chats: ${e.message}", Toast.LENGTH_LONG).show()
         }
 
-        cardViewJane.setOnClickListener {
-            openChatDetail("Jane Doe")
+
+        // Observa los chats disponibles
+        viewModel.chats.observe(this) { chats ->
+            adapter.submitList(chats)
         }
 
-        cardViewFamilia.setOnClickListener {
-            openChatDetail("Familia")
-        }
-
-        // TextViews para "Añadir Amigo" y "Crear Grupo"
-        val textViewAddFriend = findViewById<TextView>(R.id.textView55)
-        val textViewCreateGroup = findViewById<TextView>(R.id.textView57)
-
-        textViewAddFriend.setOnClickListener {
-            // Ejemplo: redireccionar a AddFriendActivity (asegúrate de tenerla creada y declarada en el manifest)
-            //val intent = Intent(this, AddFriendActivity::class.java)
-            //startActivity(intent)
-        }
-
-        textViewCreateGroup.setOnClickListener {
-            // Ejemplo: redireccionar a CreateGroupActivity
-            //val intent = Intent(this, CreateGroupActivity::class.java)
-            //startActivity(intent)
-        }
-
-        // Configuramos la barra de navegación inferior
-        val btnMapa = findViewById<ImageButton>(R.id.imageButton10)
-        val btnNovedad = findViewById<ImageButton>(R.id.imageButton11)
-        val btnChat = findViewById<ImageButton>(R.id.imageButton12)
-        val btnAyuda = findViewById<ImageButton>(R.id.imageButton13)
-        val btnMenu = findViewById<ImageButton>(R.id.imageButton14)
-
-        btnMapa.setOnClickListener {
-            // Ejemplo: redireccionar a MapaActivity
-            val intent = Intent(this, MapaActivity::class.java)
-            startActivity(intent)
-        }
-
-        btnNovedad.setOnClickListener {
-            // Ejemplo: redireccionar a NovedadActivity
-            val intent = Intent(this, NovedadActivity::class.java)
-            startActivity(intent)
-        }
-
-        btnChat.setOnClickListener {
-            // Ya estás en ChatActivity, pero podrías refrescar la pantalla o mostrar un mensaje.
-        }
-
-        btnAyuda.setOnClickListener {
-            // Ejemplo: redireccionar a AyudaActivity
-            val intent = Intent(this, AyudaActivity::class.java)
-            startActivity(intent)
-        }
-
-        btnMenu.setOnClickListener {
-            // Ejemplo: redireccionar a MenuActivity
-            val intent = Intent(this, MenuActivity::class.java)
-            startActivity(intent)
+        // Maneja el click para agregar un amigo
+        binding.textView55.setOnClickListener {
+            startActivity(Intent(this, AddFriendActivity::class.java))
         }
     }
 
-    /**
-     * Método para abrir el detalle del chat.
-     */
-    private fun openChatDetail(chatName: String) {
-        val intent = Intent(this, ChatDetailActivity::class.java)
-        intent.putExtra("CHAT_NAME", chatName)
+    private fun verifyFriendship() {
+        val currentUserId = auth.currentUser?.uid
+        if (currentUserId == null) {
+            Toast.makeText(this, "No estás autenticado", Toast.LENGTH_LONG).show()
+            return
+        }
+        // Verificar si el usuario tiene amigos
+        db.collection("friendRequests")
+            .whereEqualTo("requestTo", currentUserId)
+            .whereEqualTo("status", "accepted")
+            .get()
+            .addOnSuccessListener { result ->
+                if (result.isEmpty) {
+                    // Si no tiene amigos, mostrar un mensaje y no mostrar los chats
+                    Toast.makeText(this, "No tienes amigos. Agrega amigos para iniciar chats.", Toast.LENGTH_LONG).show()
+                    binding.recyclerViewChats.visibility = android.view.View.GONE  // Oculta la lista de chats
+                } else {
+                    binding.recyclerViewChats.visibility = android.view.View.VISIBLE  // Muestra la lista de chats
+                }
+            }
+    }
+
+    // Este método se usa para abrir una conversación con el amigo
+    private fun openChat(chatId: String) {
+        val intent = Intent(this, ChatDetailActivity::class.java).apply {
+            putExtra("CHAT_ID", chatId)
+        }
         startActivity(intent)
     }
 }

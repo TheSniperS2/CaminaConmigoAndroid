@@ -8,16 +8,16 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
-import com.franco.CaminaConmigo.model_mvvm.inicio.view.MainActivity
-import com.franco.CaminaConmigo.model_mvvm.perfil.view.MiPerfilActivity
 import com.franco.CaminaConmigo.model_mvvm.chat.view.ChatActivity
-import com.franco.CaminaConmigo.model_mvvm.notificaciones.view.NotificacionesActivity
-import com.franco.CaminaConmigo.model_mvvm.invitaramigos.view.InvitarAmigosActivity
-import com.franco.CaminaConmigo.model_mvvm.sugerencias.view.SugerenciasActivity
 import com.franco.CaminaConmigo.model_mvvm.configuraciones.view.ConfiguracionActivity
 import com.franco.CaminaConmigo.model_mvvm.contactoemegencia.view.ContactoEmegenciaActivity
+import com.franco.CaminaConmigo.model_mvvm.inicio.view.MainActivity
+import com.franco.CaminaConmigo.model_mvvm.invitaramigos.view.InvitarAmigosActivity
 import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
+import com.franco.CaminaConmigo.model_mvvm.notificaciones.view.NotificationsActivity
 import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
+import com.franco.CaminaConmigo.model_mvvm.perfil.view.MiPerfilActivity
+import com.franco.CaminaConmigo.model_mvvm.sugerencias.view.SugerenciasActivity
 
 
 class MenuActivity : AppCompatActivity() {
@@ -55,7 +55,7 @@ class MenuActivity : AppCompatActivity() {
         }
 
         notificaciones.setOnClickListener {
-            startActivity(Intent(this, NotificacionesActivity::class.java))
+            startActivity(Intent(this, NotificationsActivity::class.java))
         }
 
         invitarAmigos.setOnClickListener {

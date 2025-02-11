@@ -58,6 +58,14 @@
             android:name="com.franco.CaminaConmigo.model_mvvm.chat.view.ChatActivity"
             android:exported="true" />
 
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.chat.view.AddFriendActivity"
+            android:exported="true" />
+
+        <activity
+            android:name="com.franco.CaminaConmigo.model_mvvm.chat.view.ChatDetailActivity"
+            android:exported="true" />
+
         <!-- Actividad de Configuraciones -->
         <activity
             android:name="com.franco.CaminaConmigo.model_mvvm.configuraciones.view.ConfiguracionActivity"
@@ -75,7 +83,7 @@
 
         <!-- Actividad de Notificaciones -->
         <activity
-            android:name="com.franco.CaminaConmigo.model_mvvm.notificaciones.view.NotificacionesActivity"
+            android:name="com.franco.CaminaConmigo.model_mvvm.notificaciones.view.NotificationsActivity"
             android:exported="true" />
 
         <!-- Actividad de Sugerencias -->
