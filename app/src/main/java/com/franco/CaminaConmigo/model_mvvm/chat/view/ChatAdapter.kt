@@ -1,5 +1,6 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.view
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -16,6 +17,7 @@ class ChatAdapter(private val onChatClick: (String) -> Unit) : ListAdapter<Chat,
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val chat = getItem(position)
+        Log.d("ChatAdapter", "Mostrando chat con: ${chat.name} (ID: ${chat.chatId})")
         holder.bind(chat)
     }
 }
@@ -26,14 +28,37 @@ class ChatViewHolder(
 ) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
 
     fun bind(chat: Chat) {
-        binding.chatName.text = chat.name  // Asegúrate de que estás mostrando el nombre correctamente
-        binding.root.setOnClickListener { onChatClick(chat.chatId) }  // Usar chatId para abrir el chat
+        try {
+            // Asignar el nombre del chat
+            val chatName = chat.name ?: "Chat sin nombre"
+            binding.chatName.text = chatName
+
+            // Mostrar el último mensaje si existe
+            binding.lastMessage.text = chat.lastMessage ?: "Sin mensaje"
+
+            // Formatear la fecha del último mensaje si se tiene el timestamp
+            if (chat.lastMessageTimestamp != 0L) {
+                val timestamp = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm").format(java.util.Date(chat.lastMessageTimestamp))
+                binding.lastMessageTimestamp.text = timestamp
+            } else {
+                binding.lastMessageTimestamp.text = "Sin fecha"
+            }
+
+            // Manejar el clic en el chat para abrirlo
+            binding.root.setOnClickListener {
+                chat.chatId?.let {
+                    onChatClick(it)
+                } ?: Log.e("ChatViewHolder", "Chat ID nulo")
+            }
+        } catch (e: Exception) {
+            Log.e("ChatViewHolder", "Error al bindear el chat: ${e.message}")
+        }
     }
 }
 
 class ChatDiffCallback : DiffUtil.ItemCallback<Chat>() {
     override fun areItemsTheSame(oldItem: Chat, newItem: Chat): Boolean {
-        return oldItem.chatId == newItem.chatId  // Comparar por el ID del chat
+        return oldItem.chatId == newItem.chatId
     }
 
     override fun areContentsTheSame(oldItem: Chat, newItem: Chat): Boolean {

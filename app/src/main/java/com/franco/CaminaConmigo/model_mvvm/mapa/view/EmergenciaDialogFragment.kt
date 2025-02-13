@@ -1,6 +1,9 @@
 package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
+import android.content.DialogInterface
 import android.content.Intent
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +19,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 class EmergenciaDialogFragment : DialogFragment() {
 
     private val db = FirebaseFirestore.getInstance()
+
+    // Agrega las referencias a mediaPlayer y audioManager
+    private var mediaPlayer: MediaPlayer? = null
+    private var audioManager: AudioManager? = null
+    private var originalVolume: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_emergencia_dialog, container, false)
@@ -49,7 +57,7 @@ class EmergenciaDialogFragment : DialogFragment() {
                     contactos.add(0, Pair("Carabineros", "133"))
 
                     // Asegurarse de que haya exactamente 3 contactos
-                    if (contactos.size < 3) {
+                    while (contactos.size < 3) {
                         contactos.add(Pair("No disponible", ""))
                     }
 
@@ -91,5 +99,23 @@ class EmergenciaDialogFragment : DialogFragment() {
             val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$numero"))
             startActivity(intent)
         }
+    }
+
+    // Método para detener la alarma cuando se cierra el DialogFragment
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+
+        // Detener la alarma si está sonando
+        mediaPlayer?.pause()
+
+        // Restaurar el volumen original
+        audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
+    }
+
+    // Método para configurar el MediaPlayer y AudioManager antes de que se muestre el DialogFragment
+    fun setMediaPlayer(mediaPlayer: MediaPlayer, audioManager: AudioManager, originalVolume: Int) {
+        this.mediaPlayer = mediaPlayer
+        this.audioManager = audioManager
+        this.originalVolume = originalVolume
     }
 }

@@ -2,12 +2,19 @@ package com.franco.CaminaConmigo.model_mvvm.chat.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ActivityChatBinding
+import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
+import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
+import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
+import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -23,31 +30,56 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Configura RecyclerView para mostrar la lista de amigos/chat
         binding.recyclerViewChats.layoutManager = LinearLayoutManager(this)
-        val adapter = ChatAdapter { chatId -> // Este lambda nos permite manejar el click en el chat
-            openChat(chatId)
-        }
+        val adapter = ChatAdapter { chatId -> openChat(chatId) }
         binding.recyclerViewChats.adapter = adapter
 
-        // Verificar si el usuario tiene amigos antes de mostrar los chats
-        verifyFriendship()
-
-        // Cargar los chats cuando la actividad se inicie
-        viewModel.loadChats()
+        // Agregar manejo de errores en verifyFriendship()
         try {
-            // Código para cargar chats
+            verifyFriendship()
+        } catch (e: Exception) {
+            Log.e("ChatActivity", "Error en verifyFriendship: ${e.message}")
+        }
+
+        // Agregar control de excepciones en loadChats()
+        try {
+            viewModel.loadChats()
         } catch (e: Exception) {
             Toast.makeText(this, "Error al cargar chats: ${e.message}", Toast.LENGTH_LONG).show()
+            Log.e("ChatActivity", "Error en loadChats: ${e.message}")
         }
 
-
-        // Observa los chats disponibles
+        // Observador con control de errores
         viewModel.chats.observe(this) { chats ->
-            adapter.submitList(chats)
+            if (chats != null) {
+                adapter.submitList(chats)
+            } else {
+                Log.w("ChatActivity", "Lista de chats nula")
+            }
         }
 
-        // Maneja el click para agregar un amigo
+        // Funcionalidad de los botones inferiores
+        val btnMapa = findViewById<ImageButton>(R.id.imageButton10)
+        val btnNovedades = findViewById<ImageButton>(R.id.imageButton11)
+        val btnAyuda = findViewById<ImageButton>(R.id.imageButton13)
+        val btnMenu = findViewById<ImageButton>(R.id.imageButton14)
+
+        btnMapa.setOnClickListener {
+            startActivity(Intent(this, MapaActivity::class.java))
+        }
+
+        btnNovedades.setOnClickListener {
+            startActivity(Intent(this, NovedadActivity::class.java))
+        }
+
+        btnAyuda.setOnClickListener {
+            startActivity(Intent(this, AyudaActivity::class.java))
+        }
+
+        btnMenu.setOnClickListener {
+            startActivity(Intent(this, MenuActivity::class.java))
+        }
+
         binding.textView55.setOnClickListener {
             startActivity(Intent(this, AddFriendActivity::class.java))
         }
@@ -59,23 +91,40 @@ class ChatActivity : AppCompatActivity() {
             Toast.makeText(this, "No estás autenticado", Toast.LENGTH_LONG).show()
             return
         }
-        // Verificar si el usuario tiene amigos
-        db.collection("friendRequests")
-            .whereEqualTo("requestTo", currentUserId)
-            .whereEqualTo("status", "accepted")
+
+        // Verifica la subcolección 'friends' del usuario actual
+        db.collection("users")  // Asegúrate de que 'users' es la colección de usuarios
+            .document(currentUserId)  // Obtén el documento del usuario actual
+            .collection("friends")  // Revisa la subcolección 'friends'
             .get()
             .addOnSuccessListener { result ->
                 if (result.isEmpty) {
-                    // Si no tiene amigos, mostrar un mensaje y no mostrar los chats
+                    // No hay amigos en la subcolección
                     Toast.makeText(this, "No tienes amigos. Agrega amigos para iniciar chats.", Toast.LENGTH_LONG).show()
-                    binding.recyclerViewChats.visibility = android.view.View.GONE  // Oculta la lista de chats
+                    binding.recyclerViewChats.visibility = android.view.View.GONE
                 } else {
-                    binding.recyclerViewChats.visibility = android.view.View.VISIBLE  // Muestra la lista de chats
+                    // Hay amigos en la subcolección, puedes mostrar los chats
+                    binding.recyclerViewChats.visibility = android.view.View.VISIBLE
+                    loadChats()
                 }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("ChatActivity", "Error al verificar amigos: ${exception.message}")
+                Toast.makeText(this, "Error al verificar amigos", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // Este método se usa para abrir una conversación con el amigo
+
+    private fun loadChats() {
+        try {
+            viewModel.loadChats()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error al cargar chats: ${e.message}", Toast.LENGTH_LONG).show()
+            Log.e("ChatActivity", "Error en loadChats: ${e.message}")
+        }
+    }
+
+
     private fun openChat(chatId: String) {
         val intent = Intent(this, ChatDetailActivity::class.java).apply {
             putExtra("CHAT_ID", chatId)

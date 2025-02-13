@@ -15,6 +15,7 @@ playServicesLocation = "21.3.0"
 firebaseFirestoreKtx = "25.1.1"
 recyclerview = "1.4.0"
 roomKtx = "2.6.1"
+uiAndroid = "1.7.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,6 +32,7 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
+androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

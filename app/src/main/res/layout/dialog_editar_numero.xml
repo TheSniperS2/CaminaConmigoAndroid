@@ -1,26 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/textViewEditarNumero"
-        android:layout_width="wrap_content"
+    <!-- Editar Nombre -->
+    <EditText
+        android:id="@+id/editTextNuevoNombre"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Ingresa el nuevo número:"
-        android:textSize="16sp"
-        android:textColor="#000000" />
+        android:hint="Nuevo nombre"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="8dp" />
 
+    <!-- Editar Número -->
     <EditText
         android:id="@+id/editTextNuevoNumero"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="Nuevo número"
         android:inputType="phone"
-        android:hint="Nuevo número de teléfono"
-        android:textSize="16sp"
-        android:padding="10dp"
-        android:layout_marginTop="8dp"/>
-
+        android:layout_marginBottom="8dp" />
 </LinearLayout>

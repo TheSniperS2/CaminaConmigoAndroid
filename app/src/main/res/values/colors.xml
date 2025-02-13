@@ -6,4 +6,6 @@
     <color name="colorBackground">#FFFFFF</color>
     <color name="colorText">#000000</color>
     <color name="colorImage">#000000</color>
+    <color name="read_message_background">#E0E0E0</color> <!-- Color para mensajes leídos -->
+    <color name="unread_message_background">#FFFFFF</color> <!-- Color para mensajes no leídos -->
 </resources>

@@ -9,36 +9,35 @@
         android:id="@+id/txtTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="Título de la Notificación" />
+        android:text="Title"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/txtMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mensaje de la Notificación" />
+        android:text="Message"
+        android:textSize="14sp" />
 
-    <!-- Botones para aceptar o rechazar -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/layoutButtons"
+        android:visibility="gone"
         android:orientation="horizontal"
-        android:paddingTop="8dp">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/btnAccept"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Aceptar" />
+            android:text="Accept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/btnReject"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Rechazar"
-            android:backgroundTint="@android:color/holo_red_light"/>
+            android:text="Reject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </LinearLayout>

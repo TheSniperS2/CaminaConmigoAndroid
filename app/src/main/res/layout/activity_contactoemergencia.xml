@@ -1,31 +1,59 @@
-<!-- Archivo: res/layout/activity_contactoemergencia.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- Lista de contactos -->
     <LinearLayout
-        android:id="@+id/contactosLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewContactos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <!-- Encabezado con botón de retroceder y título -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp">
 
-    <!-- Botón para agregar contacto -->
-    <ImageView
+            <!-- Botón de retroceder a la izquierda -->
+            <ImageView
+                android:id="@+id/btnRetroceder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_retroceder"
+                android:contentDescription="Retroceder"
+                android:layout_marginEnd="16dp"
+                android:background="?android:attr/selectableItemBackground" />
+
+            <!-- Título -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contactos de Emergencia"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <!-- Lista de contactos -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewContactos"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingBottom="16dp" />
+
+    </LinearLayout>
+
+    <!-- Botón flotante para agregar contacto -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/imageViewAgregar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_anadir"
         android:contentDescription="Agregar contacto"
-        android:src="@drawable/ic_anadir" />
-</LinearLayout>
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

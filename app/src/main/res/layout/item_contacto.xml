@@ -1,40 +1,72 @@
-<!-- Archivo: res/layout/item_contacto.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:padding="12dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:gravity="center_vertical">
 
+    <!-- Prioridad del contacto -->
     <TextView
-        android:id="@+id/textViewNombre"
+        android:id="@+id/textViewPrioridad"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="12dp"
+        android:gravity="center"
+        android:text="1"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
+
+    <!-- Contenedor para nombre y número -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Nombre"
-        android:textSize="16sp"
-        android:layout_marginEnd="8dp" />
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="8dp">
 
-    <TextView
-        android:id="@+id/textViewNumero"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Número"
-        android:textSize="16sp"
-        android:layout_marginEnd="8dp" />
+        <!-- Nombre del contacto -->
+        <TextView
+            android:id="@+id/textViewNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:layout_marginEnd="8dp" />
 
+        <!-- Número de teléfono con color gris o con opacidad -->
+        <TextView
+            android:id="@+id/textViewNumero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Número"
+            android:textSize="14sp"
+            android:textColor="#888888"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <!-- Icono para editar -->
     <ImageView
         android:id="@+id/imageViewEditar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_tool"
-        android:contentDescription="Editar contacto" />
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:contentDescription="Editar contacto"
+        android:src="@android:drawable/ic_menu_edit"
+        android:layout_marginEnd="12dp" /> <!-- Añadido margen a la derecha -->
 
     <ImageView
-        android:id="@+id/imageViewPriorizar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_priorizar"
-        android:contentDescription="Priorizar contacto" />
+        android:id="@+id/imageViewMoverArriba"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@android:drawable/arrow_up_float"
+        android:layout_marginEnd="12dp" /> <!-- Añadido margen a la derecha -->
+
+    <ImageView
+        android:id="@+id/imageViewMoverAbajo"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@android:drawable/arrow_down_float" />
 </LinearLayout>

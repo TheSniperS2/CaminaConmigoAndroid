@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ItemMessageBinding
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
 
@@ -20,10 +22,25 @@ class MessageAdapter : ListAdapter<Message, MessageViewHolder>(MessageDiffCallba
     }
 }
 
-class MessageViewHolder(private val binding: ItemMessageBinding) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
+class MessageViewHolder(private val binding: ItemMessageBinding) : RecyclerView.ViewHolder(binding.root) {
+
     fun bind(message: Message) {
-        binding.tvMessage.text = message.text
-        // Puedes agregar más lógica aquí si necesitas más campos en el layout
+        binding.tvMessage.text = message.content ?: "No content"
+
+        // Cambiar color de fondo si el mensaje está leído o no
+        if (message.isRead) {
+            binding.root.setBackgroundColor(binding.root.context.getColor(R.color.read_message_background))
+        } else {
+            binding.root.setBackgroundColor(binding.root.context.getColor(R.color.unread_message_background))
+        }
+
+        // Verificar si el timestamp es válido antes de formatearlo
+        if (message.timestamp > 0) {
+            val formattedDate = android.text.format.DateFormat.format("dd/MM/yyyy HH:mm:ss", message.timestamp)
+            binding.tvTimestamp.text = formattedDate
+        } else {
+            binding.tvTimestamp.text = "Fecha no disponible"
+        }
     }
 }
 

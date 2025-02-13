@@ -1,6 +1,7 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,7 +20,15 @@ class ChatDetailActivity : AppCompatActivity() {
         binding = ActivityChatDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val chatId = intent.getStringExtra("CHAT_ID") ?: return
+        val chatId = intent.getStringExtra("CHAT_ID")
+        if (chatId == null) {
+            Log.e("ChatDetailActivity", "Chat ID es nulo, no se pueden cargar mensajes")
+            return
+        }
+
+        Log.d("ChatDetailActivity", "Cargando mensajes para chat ID: $chatId")
+        viewModel.loadMessages(chatId)
+
 
         // Configura RecyclerView para mostrar los mensajes del chat
         binding.recyclerViewMessages.layoutManager = LinearLayoutManager(this)
@@ -29,16 +38,18 @@ class ChatDetailActivity : AppCompatActivity() {
         // Cargar los mensajes cuando la actividad se inicie
         viewModel.loadMessages(chatId)
 
-        // Observa los mensajes disponibles
+        // Observar los cambios en los mensajes
         viewModel.messages.observe(this) { messages ->
+            Log.d("ChatDetailActivity", "Mensajes actualizados en UI: ${messages.size}")
             adapter.submitList(messages)
         }
 
-        // Enviar mensaje
+
+        // Enviar mensaje cuando el usuario lo escriba
         binding.btnSend.setOnClickListener {
-            val messageText = binding.etMessage.text.toString()
-            if (messageText.isNotEmpty()) {
-                viewModel.sendMessage(chatId, messageText)
+            val message = binding.etMessage.text.toString()
+            if (message.isNotEmpty()) {
+                viewModel.sendMessage(chatId, message)
                 binding.etMessage.text.clear()
             }
         }
