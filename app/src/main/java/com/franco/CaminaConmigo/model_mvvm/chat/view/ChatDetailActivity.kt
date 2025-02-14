@@ -27,25 +27,23 @@ class ChatDetailActivity : AppCompatActivity() {
         }
 
         Log.d("ChatDetailActivity", "Cargando mensajes para chat ID: $chatId")
-        viewModel.loadMessages(chatId)
 
-
-        // Configura RecyclerView para mostrar los mensajes del chat
+        // Configura RecyclerView
         binding.recyclerViewMessages.layoutManager = LinearLayoutManager(this)
         val adapter = MessageAdapter()
         binding.recyclerViewMessages.adapter = adapter
 
-        // Cargar los mensajes cuando la actividad se inicie
-        viewModel.loadMessages(chatId)
-
-        // Observar los cambios en los mensajes
+        // Observar los mensajes y actualizar el RecyclerView
         viewModel.messages.observe(this) { messages ->
             Log.d("ChatDetailActivity", "Mensajes actualizados en UI: ${messages.size}")
             adapter.submitList(messages)
+            binding.recyclerViewMessages.scrollToPosition(messages.size - 1) // Desplazar al último mensaje
         }
 
+        // Cargar los mensajes solo una vez
+        viewModel.loadMessages(chatId)
 
-        // Enviar mensaje cuando el usuario lo escriba
+        // Enviar mensaje
         binding.btnSend.setOnClickListener {
             val message = binding.etMessage.text.toString()
             if (message.isNotEmpty()) {

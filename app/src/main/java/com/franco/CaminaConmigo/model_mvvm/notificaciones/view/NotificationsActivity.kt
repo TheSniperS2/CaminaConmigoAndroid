@@ -19,10 +19,14 @@ class NotificationsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.recyclerViewNotifications.layoutManager = LinearLayoutManager(this)
-        val adapter = NotificationsAdapter { notification ->
-            // Llama a la función de aceptar solicitud cuando se presiona un botón
-            viewModel.acceptFriendRequest(notification)
-        }
+        val adapter = NotificationsAdapter(
+            onAcceptClicked = { notification ->
+                viewModel.acceptFriendRequest(notification)
+            },
+            onRejectClicked = { notification ->
+                viewModel.rejectFriendRequest(notification)
+            }
+        )
         binding.recyclerViewNotifications.adapter = adapter
 
         viewModel.notifications.observe(this) { notifications ->

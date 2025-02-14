@@ -73,24 +73,49 @@ class NotificationsViewModel : ViewModel() {
         Log.d("NotificationsViewModel", "Usuario autenticado: ${currentUser.uid}")
         Log.d("NotificationsViewModel", "Aceptando solicitud de amistad de: ${notification.fromUserId}")
 
-        val friendsRef = db.collection("users")
-            .document(currentUser.uid)
-            .collection("friends")
-            .document(notification.fromUserId)
+        val friendRequestRef = db.collection("friendRequests").document(notification.requestId)
+        val friendsRef = db.collection("users").document(currentUser.uid).collection("friends").document(notification.fromUserId)
 
-        val friendData = mapOf(
-            "nickname" to notification.fromUsername,
-            "addedAt" to Date() // Fecha de aceptación
-        )
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(friendRequestRef)
+            if (snapshot.exists()) {
+                transaction.update(friendRequestRef, "status", "accepted")
+                transaction.set(friendsRef, mapOf(
+                    "nickname" to notification.fromUsername,
+                    "addedAt" to Date()
+                ))
+            }
+        }.addOnSuccessListener {
+            Log.d("NotificationsViewModel", "Solicitud de amistad aceptada y amigo añadido")
+            removeNotification(notification)
+        }.addOnFailureListener { e ->
+            Log.e("NotificationsViewModel", "Error al aceptar la solicitud", e)
+        }
+    }
 
-        friendsRef.set(friendData)
-            .addOnSuccessListener {
-                Log.d("NotificationsViewModel", "Solicitud de amistad aceptada")
-                removeNotification(notification)
+    fun rejectFriendRequest(notification: Notification) {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Log.e("NotificationsViewModel", "Usuario no autenticado")
+            return
+        }
+
+        Log.d("NotificationsViewModel", "Usuario autenticado: ${currentUser.uid}")
+        Log.d("NotificationsViewModel", "Rechazando solicitud de amistad de: ${notification.fromUserId}")
+
+        val friendRequestRef = db.collection("friendRequests").document(notification.requestId)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(friendRequestRef)
+            if (snapshot.exists()) {
+                transaction.update(friendRequestRef, "status", "rejected")
             }
-            .addOnFailureListener { e ->
-                Log.e("NotificationsViewModel", "Error al aceptar la solicitud", e)
-            }
+        }.addOnSuccessListener {
+            Log.d("NotificationsViewModel", "Solicitud de amistad rechazada")
+            removeNotification(notification)
+        }.addOnFailureListener { e ->
+            Log.e("NotificationsViewModel", "Error al rechazar la solicitud", e)
+        }
     }
 
     fun removeNotification(notification: Notification) {

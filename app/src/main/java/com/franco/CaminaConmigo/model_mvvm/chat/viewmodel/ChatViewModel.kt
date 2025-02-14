@@ -8,6 +8,7 @@ import com.franco.CaminaConmigo.model_mvvm.chat.model.Chat
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -21,6 +22,8 @@ class ChatViewModel : ViewModel() {
     val chats: LiveData<List<Chat>> get() = _chats
 
     fun loadMessages(chatId: String) {
+        Log.d("ChatViewModel", "Iniciando loadMessages para chatId: $chatId")
+
         db.collection("chats")
             .document(chatId)
             .collection("messages")
@@ -31,22 +34,32 @@ class ChatViewModel : ViewModel() {
                     return@addSnapshotListener
                 }
 
-                val messageList = snapshots?.documents?.mapNotNull { doc ->
+                if (snapshots == null || snapshots.isEmpty) {
+                    Log.w("ChatViewModel", "No hay mensajes en este chat")
+                    _messages.postValue(emptyList())
+                    return@addSnapshotListener
+                }
+
+                Log.d("ChatViewModel", "Mensajes encontrados: ${snapshots.size()}")
+
+                val messageList = snapshots.documents.mapNotNull { doc ->
                     try {
-                        val message = doc.toObject(Message::class.java)
-                        // Convertir Timestamp a Long
-                        val timestamp = doc.getTimestamp("timestamp")?.seconds?.times(1000) ?: 0L
-                        message?.copy(timestamp = timestamp)
+                        val message = doc.toObject(Message::class.java)?.copy(
+                            id = doc.id,
+                            timestamp = doc.getTimestamp("timestamp")?.toDate()?.time ?: 0L
+                        )
+                        Log.d("ChatViewModel", "Mensaje cargado: ${message?.content}, Timestamp: ${message?.timestamp}")
+                        message
                     } catch (ex: Exception) {
                         Log.e("ChatViewModel", "Error al procesar mensaje: ${ex.message}")
                         null
                     }
-                } ?: emptyList()
+                }
 
+                Log.d("ChatViewModel", "Total de mensajes cargados: ${messageList.size}")
                 _messages.postValue(messageList)
             }
     }
-
 
     fun loadChats() {
         val currentUserId = auth.currentUser?.uid ?: return
@@ -59,19 +72,14 @@ class ChatViewModel : ViewModel() {
                     return@addSnapshotListener
                 }
 
-                // Verificar si los snapshots están vacíos
                 if (snapshots == null || snapshots.isEmpty) {
                     Log.w("ChatViewModel", "No hay chats disponibles")
-                    // Actualizar la UI o manejar la lógica de "no hay chats"
-                    // Ejemplo: Notificar que no hay chats.
                     _chats.value = emptyList()
                     return@addSnapshotListener
                 }
 
-                // Depuración: Ver si el tamaño de los snapshots es el esperado
                 Log.d("ChatViewModel", "Se encontraron ${snapshots.size()} chats.")
 
-                // Cargar los chats
                 val chatList = snapshots.documents.mapNotNull { doc ->
                     try {
                         val chatId = doc.id
@@ -84,7 +92,6 @@ class ChatViewModel : ViewModel() {
 
                         val chatName = userNames.filterKeys { it != currentUserId }.values.firstOrNull() ?: "Chat"
 
-                        // Crear el objeto Chat
                         Chat(
                             chatId = chatId,
                             name = chatName,
@@ -97,22 +104,17 @@ class ChatViewModel : ViewModel() {
                     }
                 }
 
-                // Depuración: Ver si chatList tiene elementos
                 Log.d("ChatViewModel", "Se cargaron ${chatList.size} chats.")
 
-                // Solo actualizamos la lista de chats si no está vacía
                 if (chatList.isNotEmpty()) {
                     _chats.value = chatList
                     Log.d("ChatViewModel", "Total de chats cargados: ${chatList.size}")
                 } else {
                     Log.w("ChatViewModel", "La lista de chats está vacía después de procesar los documentos")
-                    // Notificar a la UI que la lista está vacía
                     _chats.value = emptyList()
                 }
             }
     }
-
-
 
     fun createChat(friendId: String, friendName: String) {
         val currentUser = auth.currentUser ?: return
@@ -140,22 +142,19 @@ class ChatViewModel : ViewModel() {
         val chatRef = db.collection("chats").document(chatId)
         val messagesRef = chatRef.collection("messages")
 
-        // Crea un nuevo documento para obtener el ID
         val newMessageRef = messagesRef.document()
 
         val messageData = hashMapOf(
             "senderId" to currentUser.uid,
             "content" to message,
             "isRead" to false,
-            "timestamp" to Timestamp.now() // Se usa un Timestamp real
+            "timestamp" to Timestamp.now()
         )
 
-        // Guarda el mensaje con su propio ID
         newMessageRef.set(messageData)
             .addOnSuccessListener {
                 Log.d("ChatViewModel", "Mensaje enviado con ID: ${newMessageRef.id}")
 
-                // Actualiza el último mensaje del chat
                 chatRef.update(
                     mapOf(
                         "lastMessage" to message,
@@ -168,4 +167,99 @@ class ChatViewModel : ViewModel() {
             .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al enviar mensaje: ${e.message}") }
     }
 
+    private fun markMessagesAsRead(messages: List<Message>, chatId: String) {
+        val currentUser = auth.currentUser ?: return
+        val batch = db.batch()
+
+        val unreadMessages = messages.filter { !it.isRead && it.senderId != currentUser.uid }
+
+        for (message in unreadMessages) {
+            val messageRef = db.collection("chats")
+                .document(chatId)
+                .collection("messages")
+                .document(message.id)
+
+            batch.update(messageRef, "isRead", true)
+        }
+
+        if (unreadMessages.isNotEmpty()) {
+            val chatRef = db.collection("chats").document(chatId)
+            batch.update(chatRef, "unreadCount.${currentUser.uid}", 0)
+
+            batch.commit().addOnFailureListener { e ->
+                Log.e("ChatViewModel", "Error al marcar mensajes como leídos: ${e.message}")
+            }
+        }
+    }
+
+    fun updateNickname(chatId: String, userId: String, newNickname: String) {
+        val chatRef = db.collection("chats").document(chatId)
+        chatRef.update("userNames.$userId", newNickname)
+            .addOnSuccessListener { Log.d("ChatViewModel", "Apodo actualizado con éxito") }
+            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al actualizar apodo: ${e.message}") }
+    }
+
+    fun updateGroupName(chatId: String, newName: String) {
+        val chatRef = db.collection("chats").document(chatId)
+        chatRef.update("name", newName)
+            .addOnSuccessListener { Log.d("ChatViewModel", "Nombre del grupo actualizado con éxito") }
+            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al actualizar nombre del grupo: ${e.message}") }
+    }
+
+    fun addAdmin(chatId: String, userId: String) {
+        val chatRef = db.collection("chats").document(chatId)
+        chatRef.update("adminIds", FieldValue.arrayUnion(userId))
+            .addOnSuccessListener { Log.d("ChatViewModel", "Administrador agregado con éxito") }
+            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al agregar administrador: ${e.message}") }
+    }
+
+    fun removeAdmin(chatId: String, userId: String) {
+        val chatRef = db.collection("chats").document(chatId)
+        chatRef.update("adminIds", FieldValue.arrayRemove(userId))
+            .addOnSuccessListener { Log.d("ChatViewModel", "Administrador removido con éxito") }
+            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al remover administrador: ${e.message}") }
+    }
+
+    fun addParticipants(chatId: String, newParticipants: List<String>) {
+        val chatRef = db.collection("chats").document(chatId)
+        chatRef.update("participants", FieldValue.arrayUnion(*newParticipants.toTypedArray()))
+            .addOnSuccessListener { Log.d("ChatViewModel", "Participantes añadidos con éxito") }
+            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al añadir participantes: ${e.message}") }
+    }
+
+    fun loadChatById(chatId: String, callback: (Chat?) -> Unit) {
+        db.collection("chats").document(chatId).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val chat = document.toObject(Chat::class.java)?.copy(chatId = document.id)
+                    callback(chat)
+                } else {
+                    Log.w("ChatViewModel", "No se encontró el chat con ID: $chatId")
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatViewModel", "Error al cargar chat: ${e.message}")
+                callback(null)
+            }
+    }
+
+    fun markMessagesAsRead(chatId: String) {
+        val currentUser = auth.currentUser ?: return
+        db.collection("chats").document(chatId).collection("messages")
+            .whereEqualTo("isRead", false)
+            .whereNotEqualTo("senderId", currentUser.uid)
+            .get()
+            .addOnSuccessListener { snapshots ->
+                val batch = db.batch()
+                for (document in snapshots.documents) {
+                    val messageRef = document.reference
+                    batch.update(messageRef, "isRead", true)
+                }
+                batch.commit()
+                    .addOnSuccessListener { Log.d("ChatViewModel", "Mensajes marcados como leídos") }
+                    .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al marcar mensajes como leídos: ${e.message}") }
+            }
+            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al obtener mensajes no leídos: ${e.message}") }
+    }
 }

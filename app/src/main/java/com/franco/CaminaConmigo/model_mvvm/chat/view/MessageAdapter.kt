@@ -1,5 +1,6 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.view
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -18,6 +19,7 @@ class MessageAdapter : ListAdapter<Message, MessageViewHolder>(MessageDiffCallba
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val message = getItem(position)
+        Log.d("MessageAdapter", "Mensaje: ${message.content}, Timestamp: ${message.timestamp}")
         holder.bind(message)
     }
 }
@@ -25,14 +27,14 @@ class MessageAdapter : ListAdapter<Message, MessageViewHolder>(MessageDiffCallba
 class MessageViewHolder(private val binding: ItemMessageBinding) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(message: Message) {
-        binding.tvMessage.text = message.content ?: "No content"
+        binding.tvMessage.text = message.content.ifEmpty { "Mensaje vacío" }
 
         // Cambiar color de fondo si el mensaje está leído o no
-        if (message.isRead) {
-            binding.root.setBackgroundColor(binding.root.context.getColor(R.color.read_message_background))
-        } else {
-            binding.root.setBackgroundColor(binding.root.context.getColor(R.color.unread_message_background))
-        }
+        binding.root.setBackgroundColor(
+            binding.root.context.getColor(
+                if (message.isRead) R.color.read_message_background else R.color.unread_message_background
+            )
+        )
 
         // Verificar si el timestamp es válido antes de formatearlo
         if (message.timestamp > 0) {

@@ -1,43 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:id="@+id/txtTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Title"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/txtMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Message"
-        android:textSize="14sp" />
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    android:backgroundTint="@android:color/white">
 
     <LinearLayout
-        android:id="@+id/layoutButtons"
-        android:visibility="gone"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
 
-        <Button
-            android:id="@+id/btnAccept"
-            android:text="Accept"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btnReject"
-            android:text="Reject"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            <!-- Icono de la notificación -->
+            <ImageView
+                android:id="@+id/ivNotificationIcon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="Icono de notificación" />
+
+            <!-- Contenido de la notificación -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Título de la notificación -->
+                <TextView
+                    android:id="@+id/tvNotificationTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Título de la notificación"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black" />
+
+                <!-- Mensaje de la notificación -->
+                <TextView
+                    android:id="@+id/tvNotificationMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mensaje de la notificación"
+                    android:textColor="@android:color/black"
+                    android:layout_marginTop="4dp" />
+
+                <!-- Fecha de la notificación -->
+                <TextView
+                    android:id="@+id/tvNotificationDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha y hora"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Botones de aceptar y rechazar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnAccept"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/colorAccent"
+                android:text="Aceptar"
+                android:textColor="@android:color/white"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnReject"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/colorAccent"
+                android:text="Rechazar"
+                android:textColor="@android:color/white"
+                android:visibility="gone" />
+        </LinearLayout>
     </LinearLayout>
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>
