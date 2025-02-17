@@ -31,6 +31,10 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -45,7 +49,6 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
     private var audioManager: AudioManager? = null
     private var originalVolume: Int = 0
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mapa)
@@ -55,24 +58,47 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        // Inicializa Places
+        Places.initialize(applicationContext, getString(R.string.google_map_api_key))
+
+        // Configura el fragmento de autocompletado
+        val autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autocomplete_fragment)
+                as AutocompleteSupportFragment
+
+        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+
+        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onPlaceSelected(place: Place) {
+                // Mueve la cámara a la ubicación seleccionada
+                place.latLng?.let {
+                    mMap.addMarker(MarkerOptions().position(it).title(place.name))
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(it, 15f))
+                }
+            }
+
+            override fun onError(status: com.google.android.gms.common.api.Status) {
+                // Maneja el error
+                Toast.makeText(this@MapaActivity, "Error al seleccionar el lugar: ${status.statusMessage}", Toast.LENGTH_SHORT).show()
+            }
+        })
+
         findViewById<Button>(R.id.btnReportar).setOnClickListener {
             val dialogFragment = TipoReporteDialogFragment()
             dialogFragment.show(supportFragmentManager, "TipoReporteDialogFragment")
         }
 
-// Inicializar el AudioManager para controlar el volumen
+        // Inicializar el AudioManager para controlar el volumen
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-// Guardar el volumen original
+        // Guardar el volumen original
         originalVolume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: 0
 
-// Inicializar el MediaPlayer para la alarma
+        // Inicializar el MediaPlayer para la alarma
         mediaPlayer = MediaPlayer.create(this, R.raw.emergency_alarm)
         mediaPlayer?.isLooping = true
         mediaPlayer?.setVolume(1.0f, 1.0f)
 
-
-// Configurar el botón para activar y desactivar la alarma de emergencia
+        // Configurar el botón para activar y desactivar la alarma de emergencia
         findViewById<Button>(R.id.btnSOS).setOnClickListener {
             if (mediaPlayer?.isPlaying == false) {
                 audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 0, 0)
@@ -88,8 +114,6 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
                 Toast.makeText(this, "¡Emergencia desactivada!", Toast.LENGTH_SHORT).show()
             }
         }
-
-
 
         // Botones de navegación
         findViewById<ImageButton>(R.id.imageButton11).setOnClickListener {
@@ -148,8 +172,6 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
             true
         }
 
-
-
         /*
         // CÓDIGO COMENTADO PARA GPS EN TIEMPO REAL (Activar cuando sea necesario)
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
@@ -185,21 +207,20 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
             Toast.makeText(this, "Error al cargar reportes", Toast.LENGTH_SHORT).show()
         }
     }
-
     private fun obtenerIconoPorTipo(type: String): BitmapDescriptor {
         val resId = when (type) {
-            "Reunión de Hombres" -> R.drawable.i_reunion_de_hombre
+            "Reunión de hombres" -> R.drawable.i_reunion_de_hombre
             "Poca Iluminación" -> R.drawable.i_poca_iluminacion
-            "Presencia de bares" -> R.drawable.i_presencia_de_bares_y_restobares
+            "Presencia de Bares y Restobares" -> R.drawable.i_presencia_de_bares_y_restobares
             "Veredas en mal estado" -> R.drawable.i_veredas_en_mal_estado
-            "Vegetación abundante" -> R.drawable.i_vegetacion_abundante
+            "Vegetación Abundante" -> R.drawable.i_vegetacion_abundante
             "Espacios Abandonados" -> R.drawable.i_espacios_abandonados
-            "Agresión física" -> R.drawable.i_agresion_fisica
+            "Agresión Física" -> R.drawable.i_agresion_fisica
             "Agresión Sexual" -> R.drawable.i_agresion_sexual
-            "Agresión verbal" -> R.drawable.i_agresion_verbal
+            "Agresión Verbal" -> R.drawable.i_agresion_verbal
             "Falta de Baños Públicos" -> R.drawable.icon_faltabanos
-            "Mobiliario inadecuado" -> R.drawable.i_mobiliario_inadecuado
-            "Puntos ciegos" -> R.drawable.i_puntos_ciegos
+            "Mobiliario Inadecuado" -> R.drawable.i_mobiliario_inadecuado
+            "Puntos Ciegos" -> R.drawable.i_puntos_ciegos
             "Personas en situación de calle" -> R.drawable.i_personas_en_situacion_de_calle
             else -> return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
         }

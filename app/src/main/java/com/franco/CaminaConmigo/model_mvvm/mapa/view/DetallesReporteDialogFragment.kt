@@ -129,18 +129,18 @@ class DetallesReporteDialogFragment : DialogFragment() {
 
         // Asigna el ícono según el tipo de reporte
         when (type) {
-            "Reunión de Hombres" -> imgIconoReporte.setImageResource(R.drawable.icon_reunion)
-            "Puntos ciegos" -> imgIconoReporte.setImageResource(R.drawable.icon_puntosciegos)
-            "Presencia de bares" -> imgIconoReporte.setImageResource(R.drawable.icono_bares)
+            "Reunión de hombres" -> imgIconoReporte.setImageResource(R.drawable.icon_reunion)
+            "Puntos Ciegos" -> imgIconoReporte.setImageResource(R.drawable.icon_puntosciegos)
+            "Presencia de Bares y Restobares" -> imgIconoReporte.setImageResource(R.drawable.icono_bares)
             "Veredas en mal estado" -> imgIconoReporte.setImageResource(R.drawable.icono_veredas)
             "Poca Iluminación" -> imgIconoReporte.setImageResource(R.drawable.icono_iluminacion)
-            "Vegetación abundante" -> imgIconoReporte.setImageResource(R.drawable.icono_vegetacion)
+            "Vegetación Abundante" -> imgIconoReporte.setImageResource(R.drawable.icono_vegetacion)
             "Espacios Abandonados" -> imgIconoReporte.setImageResource(R.drawable.icon_abandonados)
-            "Agresión fisica" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_fisica)
+            "Agresión Fisica" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_fisica)
             "Agresión Sexual" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_sexual)
-            "Agresión verbal" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_verbal)
-            "Falta de baños" -> imgIconoReporte.setImageResource(R.drawable.icon_faltabanos)
-            "Mobiliario inadecuado" -> imgIconoReporte.setImageResource(R.drawable.icon_mobiliario)
+            "Agresión Verbal" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_verbal)
+            "Falta de Baños Públicos" -> imgIconoReporte.setImageResource(R.drawable.icon_faltabanos)
+            "Mobiliario Inadecuado" -> imgIconoReporte.setImageResource(R.drawable.icon_mobiliario)
             "Persona en situación de calle" -> imgIconoReporte.setImageResource(R.drawable.icon_situacioncalle)
             else -> imgIconoReporte.setImageResource(R.drawable.ic_anadir)
         }

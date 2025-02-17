@@ -37,18 +37,18 @@ class TipoReporteDialogFragment : BottomSheetDialogFragment() {
         recyclerView.layoutManager = GridLayoutManager(context, 2)
 
         val tipos = listOf(
-            TipoReporte("Reunión de Hombres", R.drawable.icon_reunion),
-            TipoReporte("Puntos ciegos", R.drawable.icon_puntosciegos),
-            TipoReporte("Presencia de bares", R.drawable.icono_bares),
+            TipoReporte("Reunión de hombres", R.drawable.icon_reunion),
+            TipoReporte("Puntos Ciegos", R.drawable.icon_puntosciegos),
+            TipoReporte("Presencia de Bares y Restobares", R.drawable.icono_bares),
             TipoReporte("Veredas en mal estado", R.drawable.icono_veredas),
             TipoReporte("Poca Iluminación", R.drawable.icono_iluminacion),
-            TipoReporte("Vegetación abundante", R.drawable.icono_vegetacion),
+            TipoReporte("Vegetación Abundante", R.drawable.icono_vegetacion),
             TipoReporte("Espacios Abandonados", R.drawable.icon_abandonados),
-            TipoReporte("Agresión fisica", R.drawable.icon_agre_fisica),
-            TipoReporte("Agresión sexual", R.drawable.icon_agre_sexual),
-            TipoReporte("Agresión verbal", R.drawable.icon_agre_verbal),
-            TipoReporte("Falta de baños", R.drawable.icon_faltabanos),
-            TipoReporte("Mobiliario inadecuado", R.drawable.icon_mobiliario),
+            TipoReporte("Agresión Fisica", R.drawable.icon_agre_fisica),
+            TipoReporte("Agresión Sexual", R.drawable.icon_agre_sexual),
+            TipoReporte("Agresión Verbal", R.drawable.icon_agre_verbal),
+            TipoReporte("Falta de Baños Públicos", R.drawable.icon_faltabanos),
+            TipoReporte("Mobiliario Inadecuado", R.drawable.icon_mobiliario),
             TipoReporte("Persona en situación de calle", R.drawable.icon_situacioncalle)
         )
 

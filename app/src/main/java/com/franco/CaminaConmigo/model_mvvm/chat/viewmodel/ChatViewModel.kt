@@ -21,6 +21,9 @@ class ChatViewModel : ViewModel() {
     private val _chats = MutableLiveData<List<Chat>>()
     val chats: LiveData<List<Chat>> get() = _chats
 
+    private val _userNames = MutableLiveData<Map<String, String>>()
+    val userNames: LiveData<Map<String, String>> get() = _userNames
+
     fun loadMessages(chatId: String) {
         Log.d("ChatViewModel", "Iniciando loadMessages para chatId: $chatId")
 
@@ -45,8 +48,7 @@ class ChatViewModel : ViewModel() {
                 val messageList = snapshots.documents.mapNotNull { doc ->
                     try {
                         val message = doc.toObject(Message::class.java)?.copy(
-                            id = doc.id,
-                            timestamp = doc.getTimestamp("timestamp")?.toDate()?.time ?: 0L
+                            id = doc.id
                         )
                         Log.d("ChatViewModel", "Mensaje cargado: ${message?.content}, Timestamp: ${message?.timestamp}")
                         message
@@ -97,7 +99,9 @@ class ChatViewModel : ViewModel() {
                             name = chatName,
                             lastMessage = lastMessage,
                             lastMessageTimestamp = lastMessageTimestamp
-                        )
+                        ).also {
+                            _userNames.value = userNames
+                        }
                     } catch (e: Exception) {
                         Log.e("ChatViewModel", "Error al convertir documento: ${e.message}")
                         null
@@ -115,6 +119,7 @@ class ChatViewModel : ViewModel() {
                 }
             }
     }
+
 
     fun createChat(friendId: String, friendName: String) {
         val currentUser = auth.currentUser ?: return

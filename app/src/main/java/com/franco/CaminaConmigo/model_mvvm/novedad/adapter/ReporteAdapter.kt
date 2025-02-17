@@ -81,18 +81,18 @@ class ReporteAdapter(
     // Devuelve el icono correspondiente según el tipo de reporte
     private fun obtenerIconoPorTipo(type: String): Int {
         return when (type) {
-            "Reunión de Hombres" -> R.drawable.icon_reunion
-            "Puntos ciegos" -> R.drawable.icon_puntosciegos
-            "Presencia de bares" -> R.drawable.icono_bares
+            "Reunión de hombres" -> R.drawable.icon_reunion
+            "Puntos Ciegos" -> R.drawable.icon_puntosciegos
+            "Presencia de Bares y Restobares" -> R.drawable.icono_bares
             "Veredas en mal estado" -> R.drawable.icono_veredas
             "Poca Iluminación" -> R.drawable.icono_iluminacion
-            "Vegetación abundante" -> R.drawable.icono_vegetacion
+            "Vegetación Abundante" -> R.drawable.icono_vegetacion
             "Espacios Abandonados" -> R.drawable.icon_abandonados
-            "Agresión fisica" -> R.drawable.icon_agre_fisica
+            "Agresión Fisica" -> R.drawable.icon_agre_fisica
             "Agresión Sexual" -> R.drawable.icon_agre_sexual
-            "Agresión verbal" -> R.drawable.icon_agre_verbal
-            "Falta de baños" -> R.drawable.icon_faltabanos
-            "Mobiliario inadecuado" -> R.drawable.icon_mobiliario
+            "Agresión Verbal" -> R.drawable.icon_agre_verbal
+            "Falta de Baños Públicos" -> R.drawable.icon_faltabanos
+            "Mobiliario Inadecuado" -> R.drawable.icon_mobiliario
             "Personas en situación de calle" -> R.drawable.icon_situacioncalle
             else -> R.drawable.ic_anadir
         }

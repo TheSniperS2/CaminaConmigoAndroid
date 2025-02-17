@@ -107,18 +107,18 @@ class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun obtenerIconoPorTipo(type: String): BitmapDescriptor {
         val resId = when (type) {
-            "Reunión de Hombres" -> R.drawable.i_reunion_de_hombre
+            "Reunión de hombres" -> R.drawable.i_reunion_de_hombre
             "Poca Iluminación" -> R.drawable.i_poca_iluminacion
-            "Presencia de bares" -> R.drawable.i_presencia_de_bares_y_restobares
+            "Presencia de Bares y Restobares" -> R.drawable.i_presencia_de_bares_y_restobares
             "Veredas en mal estado" -> R.drawable.i_veredas_en_mal_estado
-            "Vegetación abundante" -> R.drawable.i_vegetacion_abundante
+            "Vegetación Abundante" -> R.drawable.i_vegetacion_abundante
             "Espacios Abandonados" -> R.drawable.i_espacios_abandonados
-            "Agresión física" -> R.drawable.i_agresion_fisica
+            "Agresión Física" -> R.drawable.i_agresion_fisica
             "Agresión Sexual" -> R.drawable.i_agresion_sexual
-            "Agresión verbal" -> R.drawable.i_agresion_verbal
+            "Agresión Verbal" -> R.drawable.i_agresion_verbal
             "Falta de Baños Públicos" -> R.drawable.icon_faltabanos
-            "Mobiliario inadecuado" -> R.drawable.i_mobiliario_inadecuado
-            "Puntos ciegos" -> R.drawable.i_puntos_ciegos
+            "Mobiliario Inadecuado" -> R.drawable.i_mobiliario_inadecuado
+            "Puntos Ciegos" -> R.drawable.i_puntos_ciegos
             "Personas en situación de calle" -> R.drawable.i_personas_en_situacion_de_calle
             else -> return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
         }

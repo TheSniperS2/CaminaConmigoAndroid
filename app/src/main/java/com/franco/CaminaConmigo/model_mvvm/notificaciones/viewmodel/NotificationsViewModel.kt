@@ -30,23 +30,35 @@ class NotificationsViewModel : ViewModel() {
         db.collection("users")
             .document(userId)
             .collection("notifications")
-            .orderBy("createdAt", Query.Direction.DESCENDING) // Ordena de más reciente a más antiguo
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 Log.d("NotificationsViewModel", "Se encontraron ${result.size()} notificaciones")
 
                 val notificationList = result.documents.mapNotNull { document ->
                     try {
+                        val fromUserId = document.getString("fromUserId") ?: ""
+                        val toUserId = document.getString("userId") ?: ""
+                        val fromUsername = document.getString("fromUsername") ?: ""
+                        val requestId = document.getString("requestId") ?: ""
+                        val isRead = document.getBoolean("isRead") ?: false
+                        val message = document.getString("message") ?: ""
+                        val title = document.getString("title") ?: ""
+                        val type = document.getString("type") ?: ""
+                        val createdAt = document.getTimestamp("createdAt")?.toDate()?.time ?: 0L
+
+                        Log.d("NotificationsViewModel", "fromUserId: $fromUserId, toUserId: $toUserId, fromUsername: $fromUsername, requestId: $requestId, isRead: $isRead, message: $message, title: $title, type: $type, createdAt: $createdAt")
+
                         Notification(
-                            createdAt = document.getTimestamp("createdAt")?.toDate()?.time ?: 0L,
-                            fromUserId = document.getString("fromUserId") ?: "",
-                            fromUsername = document.getString("fromUsername") ?: "",
-                            requestId = document.getString("requestId") ?: "",
-                            isRead = document.getBoolean("isRead") ?: false,
-                            message = document.getString("message") ?: "",
-                            title = document.getString("title") ?: "",
-                            type = document.getString("type") ?: "",
-                            userId = document.getString("userId") ?: ""
+                            createdAt = createdAt,
+                            fromUserId = fromUserId,
+                            fromUsername = fromUsername,
+                            requestId = requestId,
+                            isRead = isRead,
+                            message = message,
+                            title = title,
+                            type = type,
+                            userId = toUserId
                         ).also {
                             Log.d("NotificationsViewModel", "Notificación cargada: $it")
                         }
@@ -70,26 +82,48 @@ class NotificationsViewModel : ViewModel() {
             return
         }
 
+        val fromUserId = notification.fromUserId
+        val toUserId = notification.userId
+
+        if (fromUserId.isEmpty() || toUserId.isEmpty()) {
+            Log.e("NotificationsViewModel", "fromUserId o toUserId está vacío")
+            return
+        }
+
         Log.d("NotificationsViewModel", "Usuario autenticado: ${currentUser.uid}")
-        Log.d("NotificationsViewModel", "Aceptando solicitud de amistad de: ${notification.fromUserId}")
+        Log.d("NotificationsViewModel", "Aceptando solicitud de amistad de: $fromUserId")
 
-        val friendRequestRef = db.collection("friendRequests").document(notification.requestId)
-        val friendsRef = db.collection("users").document(currentUser.uid).collection("friends").document(notification.fromUserId)
+        val friendRequestQuery = db.collection("friendRequests")
+            .whereEqualTo("fromUserId", fromUserId)
+            .whereEqualTo("toUserId", toUserId)
+            .whereEqualTo("status", "pending")
 
-        db.runTransaction { transaction ->
-            val snapshot = transaction.get(friendRequestRef)
-            if (snapshot.exists()) {
-                transaction.update(friendRequestRef, "status", "accepted")
-                transaction.set(friendsRef, mapOf(
-                    "nickname" to notification.fromUsername,
-                    "addedAt" to Date()
-                ))
+        friendRequestQuery.get().addOnSuccessListener { querySnapshot ->
+            if (!querySnapshot.isEmpty) {
+                val friendRequestDoc = querySnapshot.documents[0]
+                val friendRequestRef = friendRequestDoc.reference
+                val friendsRef = db.collection("users").document(currentUser.uid).collection("friends").document(fromUserId)
+
+                db.runTransaction { transaction ->
+                    val snapshot = transaction.get(friendRequestRef)
+                    if (snapshot.exists()) {
+                        transaction.update(friendRequestRef, "status", "accepted")
+                        transaction.set(friendsRef, mapOf(
+                            "nickname" to notification.fromUsername,
+                            "addedAt" to Date()
+                        ))
+                    }
+                }.addOnSuccessListener {
+                    Log.d("NotificationsViewModel", "Solicitud de amistad aceptada y amigo añadido")
+                    removeNotification(notification)
+                }.addOnFailureListener { e ->
+                    Log.e("NotificationsViewModel", "Error al aceptar la solicitud", e)
+                }
+            } else {
+                Log.e("NotificationsViewModel", "No se encontró la solicitud de amistad pendiente")
             }
-        }.addOnSuccessListener {
-            Log.d("NotificationsViewModel", "Solicitud de amistad aceptada y amigo añadido")
-            removeNotification(notification)
         }.addOnFailureListener { e ->
-            Log.e("NotificationsViewModel", "Error al aceptar la solicitud", e)
+            Log.e("NotificationsViewModel", "Error al buscar la solicitud de amistad", e)
         }
     }
 
@@ -122,6 +156,11 @@ class NotificationsViewModel : ViewModel() {
         val currentUser = auth.currentUser
         if (currentUser == null) {
             Log.e("NotificationsViewModel", "Usuario no autenticado")
+            return
+        }
+
+        if (notification.requestId.isEmpty()) {
+            Log.e("NotificationsViewModel", "requestId está vacío")
             return
         }
 

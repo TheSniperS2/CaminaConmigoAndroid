@@ -1,10 +1,12 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.model
 
+import com.google.firebase.Timestamp
+
 data class Message(
     val id: String = "",
     val senderId: String = "",
+    val receiverId: String = "",
     val content: String = "",
-    val isRead: Boolean = false,
-    val timestamp: Long = 0L // Mantén esto como Long
+    val timestamp: Timestamp? = null,  // Usa Timestamp en lugar de Long
+    val isRead: Boolean = false  // Asegúrate de que este campo esté presente
 )
-
