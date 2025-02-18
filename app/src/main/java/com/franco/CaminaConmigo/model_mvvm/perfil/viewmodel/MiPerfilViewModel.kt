@@ -1,17 +1,21 @@
 package com.franco.CaminaConmigo.model_mvvm.perfil.viewmodel
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.franco.CaminaConmigo.model_mvvm.perfil.model.User
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 
 class MiPerfilViewModel(private val context: Context) {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 
     fun getUser(callback: (User?) -> Unit) {
         val user = auth.currentUser ?: return callback(null)
@@ -25,8 +29,15 @@ class MiPerfilViewModel(private val context: Context) {
                     val profileType = document.getString("profileType") ?: "Público"
                     val email = document.getString("email") ?: user.email ?: "No Email"
                     val joinDate = document.getTimestamp("joinDate") ?: Timestamp.now()
+                    var photoURL = document.getString("photoURL")
 
-                    callback(User(name, username, profileType, email, id, joinDate))
+                    // Asignar la imagen de Google si no existe una en la base de datos
+                    if (photoURL.isNullOrEmpty()) {
+                        photoURL = user.photoUrl.toString()
+                        saveUserPhotoURL(photoURL)
+                    }
+
+                    callback(User(name, username, profileType, email, id, joinDate, photoURL))
                 } else {
                     val newUser = User(
                         name = user.displayName ?: "Usuario Desconocido",
@@ -34,7 +45,8 @@ class MiPerfilViewModel(private val context: Context) {
                         profileType = "Público",
                         email = user.email ?: "No Email",
                         id = id,
-                        joinDate = Timestamp.now()
+                        joinDate = Timestamp.now(),
+                        photoURL = user.photoUrl.toString()
                     )
                     saveNewUserToFirestore(newUser)
                     callback(newUser)
@@ -62,6 +74,34 @@ class MiPerfilViewModel(private val context: Context) {
         userRef.update("username", username)
             .addOnSuccessListener { Log.d("Firestore", "Username actualizado a: $username") }
             .addOnFailureListener { e -> Log.e("Firestore", "Error al actualizar username", e) }
+    }
+
+    fun saveUserPhotoURL(photoURL: String) {
+        val user = auth.currentUser ?: return
+
+        val userRef = firestore.collection("users").document(user.uid)
+        userRef.update("photoURL", photoURL)
+            .addOnSuccessListener { Log.d("Firestore", "PhotoURL actualizado a: $photoURL") }
+            .addOnFailureListener { e -> Log.e("Firestore", "Error al actualizar photoURL", e) }
+    }
+
+    fun uploadProfileImage(imageUri: Uri, callback: (String?) -> Unit) {
+        val user = auth.currentUser ?: return
+        val userId = user.uid
+        val imageRef: StorageReference = storage.reference.child("profile_images/$userId.jpg")
+
+        imageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                imageRef.downloadUrl.addOnSuccessListener { uri ->
+                    val photoURL = uri.toString()
+                    saveUserPhotoURL(photoURL)
+                    callback(photoURL)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Storage", "Error al subir la imagen", e)
+                callback(null)
+            }
     }
 
     private fun saveNewUserToFirestore(user: User) {

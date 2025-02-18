@@ -49,6 +49,13 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.google.firebase:firebase-auth:23.1.0")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+    implementation ("com.google.firebase:firebase-storage:19.2.2")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation ("jp.wasabeef:glide-transformations:4.3.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
+
+    implementation ("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation ("com.google.code.gson:gson:2.8.6")
 
     // Dependencias para ViewModel y LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")

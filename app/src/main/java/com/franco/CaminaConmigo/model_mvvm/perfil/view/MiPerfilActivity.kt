@@ -7,9 +7,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.franco.CaminaConmigo.databinding.ActivityMiperfilBinding
 import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
 import com.franco.CaminaConmigo.model_mvvm.perfil.viewmodel.MiPerfilViewModel
+import jp.wasabeef.glide.transformations.CropCircleTransformation
 
 class MiPerfilActivity : AppCompatActivity() {
 
@@ -33,6 +35,11 @@ class MiPerfilActivity : AppCompatActivity() {
                     binding.textView14.text = user.name
                     binding.textView16.text = user.username ?: ""  // Permite que esté vacío
                     binding.textView18.text = user.profileType
+                    // Usar Glide para cargar la imagen desde la URL y hacerla circular
+                    Glide.with(this)
+                        .load(user.photoURL)
+                        .transform(CropCircleTransformation())
+                        .into(binding.imageView23)
 
                     // Recuperar el estado del switch sin activar el listener
                     isUpdatingSwitch = true
@@ -63,6 +70,40 @@ class MiPerfilActivity : AppCompatActivity() {
                 Toast.makeText(this, "Modo cambiado a $newProfileType", Toast.LENGTH_SHORT).show()
             }
         }
+
+        binding.imageView23.setOnClickListener {
+            // Lógica para cambiar la imagen de perfil
+            selectImageFromGallery()
+        }
+
+        binding.textView26.setOnClickListener {
+            // Lógica para cambiar la imagen de perfil
+            selectImageFromGallery()
+        }
+    }
+
+    private fun selectImageFromGallery() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, REQUEST_IMAGE_PICK)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK) {
+            val imageUri = data?.data ?: return
+            binding.imageView23.setImageURI(imageUri)
+            viewModel.uploadProfileImage(imageUri) { photoURL ->
+                if (photoURL != null) {
+                    Glide.with(this)
+                        .load(photoURL)
+                        .transform(CropCircleTransformation())
+                        .into(binding.imageView23)
+                } else {
+                    Toast.makeText(this, "Error al subir la imagen", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun showEditDialog(title: String, textView: TextView, onSave: (String) -> Unit) {
@@ -83,5 +124,9 @@ class MiPerfilActivity : AppCompatActivity() {
         }
 
         builder.show()
+    }
+
+    companion object {
+        private const val REQUEST_IMAGE_PICK = 1
     }
 }

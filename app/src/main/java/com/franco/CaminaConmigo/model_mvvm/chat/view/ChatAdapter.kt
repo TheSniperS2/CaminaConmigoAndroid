@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.bumptech.glide.Glide
 import com.franco.CaminaConmigo.databinding.ItemChatBinding
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Chat
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ChatAdapter(private val onChatClick: (String) -> Unit) : ListAdapter<Chat, ChatViewHolder>(ChatDiffCallback()) {
 
@@ -27,6 +29,8 @@ class ChatViewHolder(
     private val onChatClick: (String) -> Unit
 ) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
 
+    private val db = FirebaseFirestore.getInstance()
+
     fun bind(chat: Chat) {
         try {
             // Asignar el nombre del chat
@@ -42,6 +46,24 @@ class ChatViewHolder(
                 binding.lastMessageTimestamp.text = timestamp
             } else {
                 binding.lastMessageTimestamp.text = "Sin fecha"
+            }
+
+            // Recuperar y mostrar la imagen de perfil del usuario
+            if (chat.userIds.isNotEmpty()) {
+                val userId = chat.userIds[0] // Asumiendo que el primer ID es el del usuario con el que se está chateando
+                db.collection("users").document(userId).get()
+                    .addOnSuccessListener { document ->
+                        val photoURL = document.getString("photoURL")
+                        if (!photoURL.isNullOrEmpty()) {
+                            Glide.with(binding.root.context)
+                                .load(photoURL)
+                                .circleCrop()
+                                .into(binding.profileImage)
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("ChatViewHolder", "Error al obtener la imagen de perfil: ${e.message}")
+                    }
             }
 
             // Manejar el clic en el chat para abrirlo

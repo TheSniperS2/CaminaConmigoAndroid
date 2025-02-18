@@ -1,5 +1,6 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.view
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,11 +11,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ActivityChatBinding
+import com.franco.CaminaConmigo.databinding.DialogCreateGroupBinding
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
+import com.franco.CaminaConmigo.model_mvvm.chat.model.Friend
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
 import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
 import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
 import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -83,6 +87,10 @@ class ChatActivity : AppCompatActivity() {
         binding.textView55.setOnClickListener {
             startActivity(Intent(this, AddFriendActivity::class.java))
         }
+
+        binding.textView57.setOnClickListener {
+            showCreateGroupDialog()
+        }
     }
 
     private fun verifyFriendship() {
@@ -114,7 +122,6 @@ class ChatActivity : AppCompatActivity() {
             }
     }
 
-
     private fun loadChats() {
         try {
             viewModel.loadChats()
@@ -124,11 +131,74 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-
     private fun openChat(chatId: String) {
         val intent = Intent(this, ChatDetailActivity::class.java).apply {
             putExtra("CHAT_ID", chatId)
         }
         startActivity(intent)
+    }
+
+    private fun showCreateGroupDialog() {
+        val dialogBinding = DialogCreateGroupBinding.inflate(layoutInflater)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        val friendsAdapter = FriendsAdapter(emptyList()) { friend ->
+            // Lógica para manejar la selección de amigos
+        }
+        dialogBinding.recyclerViewFriends.layoutManager = LinearLayoutManager(this)
+        dialogBinding.recyclerViewFriends.adapter = friendsAdapter
+
+        // Cargar amigos del usuario actual
+        val currentUserId = auth.currentUser?.uid ?: return
+        db.collection("users").document(currentUserId).collection("friends").get()
+            .addOnSuccessListener { result ->
+                val friends = result.map { document ->
+                    Friend(
+                        id = document.id,
+                        name = document.getString("nickname") ?: "Amigo sin nombre"
+                    )
+                }
+                friendsAdapter.updateFriends(friends)
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatActivity", "Error al cargar amigos: ${e.message}")
+            }
+
+        dialogBinding.buttonCreateGroup.setOnClickListener {
+            val selectedFriends = friendsAdapter.getSelectedFriends()
+            if (selectedFriends.size < 2) {
+                Toast.makeText(this, "Debes seleccionar al menos 2 amigos para crear un grupo.", Toast.LENGTH_SHORT).show()
+            } else {
+                createGroup(selectedFriends)
+                dialog.dismiss()
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun createGroup(selectedFriends: List<Friend>) {
+        val currentUserId = auth.currentUser?.uid ?: return
+        val groupUserIds = selectedFriends.map { it.id } + currentUserId
+
+        val groupData = mapOf(
+            "adminIds" to listOf(currentUserId),
+            "lastMessage" to "Hola",
+            "lastMessageTimestamp" to Timestamp.now(),
+            "name" to "Nuevo Grupo",
+            "participants" to groupUserIds,
+            "unreadCount" to groupUserIds.associateWith { 0 }
+        )
+
+        db.collection("chats").add(groupData)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Grupo creado exitosamente.", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatActivity", "Error al crear el grupo: ${e.message}")
+                Toast.makeText(this, "Error al crear el grupo.", Toast.LENGTH_SHORT).show()
+            }
     }
 }
