@@ -2,6 +2,7 @@ package com.franco.CaminaConmigo.model_mvvm.novedad.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageButton
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,18 @@ class NovedadActivity : AppCompatActivity() {
                 abrirDetalles(reporte)
             }
             recyclerView.adapter = adapter
+        }
+
+        // Configuración de los botones de filtro
+        val btnFilterTendencias = findViewById<Button>(R.id.btnFilterTendencias)
+        val btnFilterRecientes = findViewById<Button>(R.id.btnFilterRecientes)
+
+        btnFilterTendencias.setOnClickListener {
+            viewModel.filtrarPorTendencias()
+        }
+
+        btnFilterRecientes.setOnClickListener {
+            viewModel.cargarReportes()
         }
 
         // Funcionalidad de los botones inferiores

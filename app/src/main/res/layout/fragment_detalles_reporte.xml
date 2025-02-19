@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -18,7 +18,7 @@
             android:text="Detalles del Reporte"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/btnCerrar"
@@ -27,17 +27,10 @@
             android:text="Cerrar"
             android:textColor="@android:color/holo_blue_dark"
             android:textSize="14sp"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
-    <!-- Mapa -->
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_margin="8dp"/>
-
-    <!-- Tipo del reporte con icono -->
+    <!-- Tipo del reporte con icono y fecha -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,11 +43,12 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:scaleType="centerCrop"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -63,17 +57,24 @@
                 android:layout_height="wrap_content"
                 android:text="Poca Iluminación"
                 android:textStyle="bold"
-                android:textSize="18sp"/>
-
-            <TextView
-                android:id="@+id/txtFechaHora"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="31-01-2025 at 6:05 PM"
-                android:textSize="12sp"
-                android:textColor="@android:color/darker_gray"/>
+                android:textSize="18sp" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtFechaHora"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="31-01-2025 at 6:05 PM"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray" />
     </LinearLayout>
+
+    <!-- Mapa -->
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="8dp" />
 
     <!-- Descripción -->
     <TextView
@@ -82,34 +83,57 @@
         android:layout_height="wrap_content"
         android:text="No se ve"
         android:textSize="16sp"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="8dp"/>
+        android:paddingBottom="8dp" />
 
     <!-- Botones de interacción -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp">
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical">
 
-        <Button
-            android:id="@+id/btnLike"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <!-- Contenedor para el ícono de like y el contador de likes -->
+        <LinearLayout
+            android:id="@+id/likeContainer"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Me gusta"
-            android:drawableStart="@drawable/ic_corazon"
-            android:background="@null"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <Button
-            android:id="@+id/btnCompartir"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            <ImageView
+                android:id="@+id/imgLike"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_corazon_vacio"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/txtLikes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 Me gusta"
+                android:textSize="14sp"
+                android:layout_marginEnd="16dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtCompartir"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Compartir"
             android:drawableStart="@drawable/ic_compartir"
-            android:background="@null"/>
+            android:drawablePadding="8dp"
+            android:text="Compartir"
+            android:textSize="14sp" />
     </LinearLayout>
+
+    <!-- Línea de separación -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="3dp"/>
 
     <TextView
         android:id="@+id/txtComentarios"
@@ -118,14 +142,14 @@
         android:text="Comentarios"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:padding="16dp"/>
+        android:padding="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerComentarios"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingHorizontal="16dp"/>
+        android:paddingHorizontal="16dp" />
 
     <!-- Campo para escribir comentarios -->
     <LinearLayout
@@ -140,13 +164,14 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:hint="Añadir un comentario..."
-            android:background="@android:drawable/edit_text"/>
+            android:background="@android:drawable/edit_text" />
 
         <!-- Botón para enviar el comentario -->
         <Button
             android:id="@+id/btnEnviarComentario"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enviar" />
+            android:text="Enviar"
+            android:textColor="@android:color/holo_blue_dark" />
     </LinearLayout>
 </LinearLayout>

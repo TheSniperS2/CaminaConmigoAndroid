@@ -1,5 +1,6 @@
 package com.franco.CaminaConmigo.model_mvvm.novedad.adapter
 
+import android.location.Geocoder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.Timestamp
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class ReporteAdapter(
     private val reportes: List<Reporte>,
@@ -25,6 +29,8 @@ class ReporteAdapter(
         private val mapView: MapView = itemView.findViewById(R.id.mapView)
         private val likes: TextView = itemView.findViewById(R.id.txtLikes)
         private val comentarios: TextView = itemView.findViewById(R.id.txtComments)
+        private val tiempo: TextView = itemView.findViewById(R.id.txtTiempoReporte)
+        private val ubicacion: TextView = itemView.findViewById(R.id.txtUbicacionReporte)
 
         fun bind(reporte: Reporte) {
             // Inicialización del MapView
@@ -42,10 +48,27 @@ class ReporteAdapter(
             descripcion.text = reporte.description
 
             // Mostrar cantidad de likes
-            likes.text = reporte.likes.toString()
+            likes.text = "${reporte.likes} Me gusta"
 
-            // Se necesita una consulta para obtener el número de comentarios
-            comentarios.text = "0" // Reemplazar por la cantidad real de comentarios
+            // Mostrar cantidad de comentarios
+            comentarios.text = "${reporte.comentarios} Comentarios"
+
+            // Mostrar el tiempo transcurrido desde que se publicó el reporte
+            tiempo.text = getTimeAgo(reporte.timestamp)
+
+            // Obtener y mostrar la ubicación
+            val geocoder = Geocoder(itemView.context, Locale.getDefault())
+            try {
+                val addresses = geocoder.getFromLocation(reporte.latitude, reporte.longitude, 1)
+                if (addresses != null && addresses.isNotEmpty()) {
+                    val address = addresses[0]
+                    ubicacion.text = "${address.locality}, ${address.adminArea}"
+                } else {
+                    ubicacion.text = "Ubicación desconocida"
+                }
+            } catch (e: Exception) {
+                ubicacion.text = "Error al obtener ubicación"
+            }
 
             // Cargar el icono según el tipo de reporte
             val iconoRes = obtenerIconoPorTipo(reporte.type)
@@ -64,6 +87,26 @@ class ReporteAdapter(
 
         fun onPause() {
             mapView.onPause()
+        }
+
+        private fun getTimeAgo(timestamp: Timestamp): String {
+            val now = System.currentTimeMillis()
+            val diff = now - timestamp.toDate().time
+
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(diff)
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
+            val hours = TimeUnit.MILLISECONDS.toHours(diff)
+            val days = TimeUnit.MILLISECONDS.toDays(diff)
+
+            return when {
+                seconds < 60 -> "hace un momento"
+                minutes < 60 -> "hace $minutes ${if (minutes == 1L) "minuto" else "minutos"}"
+                hours < 24 -> "hace $hours ${if (hours == 1L) "hora" else "horas"}"
+                days < 7 -> "hace $days ${if (days == 1L) "día" else "días"}"
+                days < 30 -> "hace ${days / 7} ${if (days / 7 == 1L) "semana" else "semanas"}"
+                days < 365 -> "hace ${days / 30} ${if (days / 30 == 1L) "mes" else "meses"}"
+                else -> "hace ${days / 365} ${if (days / 365 == 1L) "año" else "años"}"
+            }
         }
     }
 

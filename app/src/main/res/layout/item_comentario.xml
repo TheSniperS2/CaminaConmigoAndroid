@@ -5,26 +5,35 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <TextView
-        android:id="@+id/txtAutor"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="14sp"
-        android:text="Autor" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/txtAutor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:text="Autor" />
+
+        <TextView
+            android:id="@+id/txtFecha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:text="Fecha y hora"
+            android:layout_gravity="end" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/txtComentario"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:text="Comentario aquí" />
-
-    <TextView
-        android:id="@+id/txtFecha"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textColor="@android:color/darker_gray"
-        android:text="Fecha y hora" />
 </LinearLayout>

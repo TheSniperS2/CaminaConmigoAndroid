@@ -2,17 +2,19 @@ package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
 import android.app.Dialog
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.franco.CaminaConmigo.R
@@ -20,26 +22,31 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @Suppress("DEPRECATION")
-class DetallesReporteDialogFragment : DialogFragment() {
+class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
 
     // Declaración de variables para la vista
     private lateinit var txtTipo: TextView
     private lateinit var txtDescripcion: TextView
     private lateinit var txtFechaHora: TextView
-    private lateinit var btnLike: Button
-    private lateinit var btnCompartir: Button
+    private lateinit var txtLikes: TextView
+    private lateinit var txtCompartir: TextView
     private lateinit var recyclerComentarios: RecyclerView
     private lateinit var edtComentario: EditText
     private lateinit var btnEnviarComentario: Button
     private lateinit var mapView: MapView
+    private lateinit var imgLike: ImageView
     private lateinit var imgIconoReporte: ImageView
+    private lateinit var likeContainer: LinearLayout
 
     // Firebase
     private val db = FirebaseFirestore.getInstance()
@@ -52,6 +59,8 @@ class DetallesReporteDialogFragment : DialogFragment() {
     private lateinit var description: String
     private var timestamp: Date? = null
     private var likes: Int = 0
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>
 
     companion object {
         fun newInstance(reportId: String, type: String, description: String, timestamp: Date?, likes: Int): DetallesReporteDialogFragment {
@@ -67,7 +76,8 @@ class DetallesReporteDialogFragment : DialogFragment() {
         }
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         arguments?.let {
             reportId = it.getString("reportId") ?: ""
             type = it.getString("type") ?: ""
@@ -75,28 +85,36 @@ class DetallesReporteDialogFragment : DialogFragment() {
             timestamp = it.getSerializable("timestamp") as Date?
             likes = it.getInt("likes")
         }
+    }
 
-        val builder = AlertDialog.Builder(requireContext())
-        val inflater = requireActivity().layoutInflater
-        val view = inflater.inflate(R.layout.fragment_detalles_reporte, null)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_detalles_reporte, container, false)
 
         // Inicialización de vistas
         txtTipo = view.findViewById(R.id.txtTipo)
         txtDescripcion = view.findViewById(R.id.txtDescripcion)
         txtFechaHora = view.findViewById(R.id.txtFechaHora)
-        btnLike = view.findViewById(R.id.btnLike)
-        btnCompartir = view.findViewById(R.id.btnCompartir)
+        txtLikes = view.findViewById(R.id.txtLikes)
+        txtCompartir = view.findViewById(R.id.txtCompartir)
         recyclerComentarios = view.findViewById(R.id.recyclerComentarios)
         edtComentario = view.findViewById(R.id.edtComentario)
         btnEnviarComentario = view.findViewById(R.id.btnEnviarComentario)
         mapView = view.findViewById(R.id.mapView)
         imgIconoReporte = view.findViewById(R.id.imgIconoReporte)
+        imgLike = view.findViewById(R.id.imgLike)
+        likeContainer = view.findViewById(R.id.likeContainer)
 
         // Asigna los valores a los elementos de la vista
         txtTipo.text = type
         txtDescripcion.text = description
-        txtFechaHora.text = timestamp?.let { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(it) } ?: "Fecha desconocida"
-        btnLike.text = "Me gusta ($likes)"
+        txtFechaHora.text = timestamp?.let { getTimeAgo(Timestamp(it)) } ?: "Fecha desconocida"
+        txtLikes.text = "$likes Me gusta"
+
+        // Verificar el estado del "like" al cargar el reporte
+        verificarEstadoLike()
 
         // Configuración del RecyclerView
         recyclerComentarios.layoutManager = LinearLayoutManager(requireContext())
@@ -105,7 +123,6 @@ class DetallesReporteDialogFragment : DialogFragment() {
 
         // Configuración del MapView
         mapView.onCreate(savedInstanceState)
-        // Asegúrate de que mapView esté inicializado en el método onCreateDialog
         mapView.getMapAsync { googleMap ->
             val reportRef = db.collection("reportes").document(reportId)
 
@@ -126,7 +143,6 @@ class DetallesReporteDialogFragment : DialogFragment() {
             }
         }
 
-
         // Asigna el ícono según el tipo de reporte
         when (type) {
             "Reunión de hombres" -> imgIconoReporte.setImageResource(R.drawable.icon_reunion)
@@ -145,10 +161,9 @@ class DetallesReporteDialogFragment : DialogFragment() {
             else -> imgIconoReporte.setImageResource(R.drawable.ic_anadir)
         }
 
-
         // Configuración de los botones
-        btnLike.setOnClickListener { darLike() }
-        btnCompartir.setOnClickListener { compartirReporte() }
+        likeContainer.setOnClickListener { darLike() }
+        txtCompartir.setOnClickListener { compartirReporte() }
         btnEnviarComentario.setOnClickListener { enviarComentario() }
 
         // Botón cerrar
@@ -160,10 +175,29 @@ class DetallesReporteDialogFragment : DialogFragment() {
         // Cargar los comentarios
         cargarComentarios()
 
-        builder.setView(view)
-        return builder.create()
+        return view
     }
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        dialog.setOnShowListener { dialogInterface ->
+            val bottomSheetDialog = dialogInterface as BottomSheetDialog
+            val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let {
+                val layoutParams = it.layoutParams as CoordinatorLayout.LayoutParams
+                layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                layoutParams.topMargin = 50 // Ajusta este valor según el margen que desees
+                it.layoutParams = layoutParams
+
+                bottomSheetBehavior = BottomSheetBehavior.from(it)
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                bottomSheetBehavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels - layoutParams.topMargin
+                bottomSheetBehavior.isFitToContents = true
+                bottomSheetBehavior.skipCollapsed = true
+            }
+        }
+        return dialog
+    }
     private fun cargarComentarios() {
         db.collection("reportes").document(reportId).collection("comentarios")
             .orderBy("timestamp")
@@ -236,13 +270,11 @@ class DetallesReporteDialogFragment : DialogFragment() {
             .document(userId)
             .set(hashMapOf("userId" to userId))
             .addOnSuccessListener {
-                // Actualizar el contador de likes
-                db.collection("reportes").document(reportId)
-                    .update("likes", likes + 1)
-                    .addOnSuccessListener {
-                        likes++
-                        btnLike.text = "Me gusta ($likes)"
-                    }
+                // Actualizar el contador de likes y cambiar el ícono del corazón
+                likes++
+                txtLikes.text = "$likes Me gusta"
+                imgLike.setImageResource(R.drawable.ic_corazon_lleno)
+                actualizarContadorLikes()
             }
     }
 
@@ -252,14 +284,37 @@ class DetallesReporteDialogFragment : DialogFragment() {
             .document(userId)
             .delete()
             .addOnSuccessListener {
-                // Actualizar el contador de likes
-                db.collection("reportes").document(reportId)
-                    .update("likes", likes - 1)
-                    .addOnSuccessListener {
-                        likes--
-                        btnLike.text = "Me gusta ($likes)"
-                    }
+                // Actualizar el contador de likes y cambiar el ícono del corazón
+                likes--
+                txtLikes.text = "$likes Me gusta"
+                imgLike.setImageResource(R.drawable.ic_corazon_vacio)
+                actualizarContadorLikes()
             }
+    }
+
+    private fun actualizarContadorLikes() {
+        db.collection("reportes").document(reportId)
+            .update("likes", likes)
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "Error al actualizar el contador de likes", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun verificarEstadoLike() {
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        if (user != null) {
+            db.collection("reportes").document(reportId).collection("likes")
+                .document(user.uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        imgLike.setImageResource(R.drawable.ic_corazon_lleno)
+                    } else {
+                        imgLike.setImageResource(R.drawable.ic_corazon_vacio)
+                    }
+                }
+        }
     }
 
     private fun compartirReporte() {
@@ -270,6 +325,26 @@ class DetallesReporteDialogFragment : DialogFragment() {
             type = "text/plain"
         }
         startActivity(Intent.createChooser(shareIntent, "Compartir reporte"))
+    }
+
+    private fun getTimeAgo(timestamp: Timestamp): String {
+        val now = System.currentTimeMillis()
+        val diff = now - timestamp.toDate().time
+
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(diff)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
+        val hours = TimeUnit.MILLISECONDS.toHours(diff)
+        val days = TimeUnit.MILLISECONDS.toDays(diff)
+
+        return when {
+            seconds < 60 -> "hace un momento"
+            minutes < 60 -> "hace $minutes ${if (minutes == 1L) "minuto" else "minutos"}"
+            hours < 24 -> "hace $hours ${if (hours == 1L) "hora" else "horas"}"
+            days < 7 -> "hace $days ${if (days == 1L) "día" else "días"}"
+            days < 30 -> "hace ${days / 7} ${if (days / 7 == 1L) "semana" else "semanas"}"
+            days < 365 -> "hace ${days / 30} ${if (days / 30 == 1L) "mes" else "meses"}"
+            else -> "hace ${days / 365} ${if (days / 365 == 1L) "año" else "años"}"
+        }
     }
 }
 
@@ -304,8 +379,28 @@ class ComentariosAdapter(private val comentarios: MutableList<Comentario>) : Rec
             txtAutor.text = comentario.authorName
             txtComentario.text = comentario.text
             txtFecha.text = comentario.timestamp?.let {
-                SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(it)
+                getTimeAgo(Timestamp(it))
             } ?: "Fecha desconocida"
+        }
+
+        private fun getTimeAgo(timestamp: Timestamp): String {
+            val now = System.currentTimeMillis()
+            val diff = now - timestamp.toDate().time
+
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(diff)
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
+            val hours = TimeUnit.MILLISECONDS.toHours(diff)
+            val days = TimeUnit.MILLISECONDS.toDays(diff)
+
+            return when {
+                seconds < 60 -> "hace un momento"
+                minutes < 60 -> "hace $minutes ${if (minutes == 1L) "minuto" else "minutos"}"
+                hours < 24 -> "hace $hours ${if (hours == 1L) "hora" else "horas"}"
+                days < 7 -> "hace $days ${if (days == 1L) "día" else "días"}"
+                days < 30 -> "hace ${days / 7} ${if (days / 7 == 1L) "semana" else "semanas"}"
+                days < 365 -> "hace ${days / 30} ${if (days / 30 == 1L) "mes" else "meses"}"
+                else -> "hace ${days / 365} ${if (days / 365 == 1L) "año" else "años"}"
+            }
         }
     }
 }

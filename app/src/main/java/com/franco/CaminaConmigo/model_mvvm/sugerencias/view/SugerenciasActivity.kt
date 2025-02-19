@@ -96,7 +96,7 @@ class SugerenciasActivity : AppCompatActivity() {
 
     private fun enviarSugerencia(nombre: String, numero: String, razon: String, mensaje: String, esAnonimo: Boolean) {
         try {
-            MailerSendService().sendSuggestion(nombre, numero, razon, mensaje, esAnonimo)
+            MailerSendService(this).sendSuggestion(nombre, numero, razon, mensaje, esAnonimo)
             runOnUiThread {
                 Toast.makeText(this, "Sugerencia enviada correctamente.", Toast.LENGTH_SHORT).show()
             }
