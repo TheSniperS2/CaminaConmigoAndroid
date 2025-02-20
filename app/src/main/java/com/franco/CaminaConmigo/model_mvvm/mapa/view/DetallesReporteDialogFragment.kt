@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.model_mvvm.mapa.model.Comentario
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -48,6 +49,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
     private lateinit var imgLike: ImageView
     private lateinit var imgIconoReporte: ImageView
     private lateinit var likeContainer: LinearLayout
+    private lateinit var imgReporte: ImageView
 
     // Firebase
     private val db = FirebaseFirestore.getInstance()
@@ -107,6 +109,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
         imgIconoReporte = view.findViewById(R.id.imgIconoReporte)
         imgLike = view.findViewById(R.id.imgLike)
         likeContainer = view.findViewById(R.id.likeContainer)
+        imgReporte = view.findViewById(R.id.imgReporte)
 
         // Asigna los valores a los elementos de la vista
         txtTipo.text = type
@@ -122,7 +125,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
         comentariosAdapter = ComentariosAdapter(requireContext(), comentarios)
         recyclerComentarios.adapter = comentariosAdapter
 
-        // Configuración del MapView
+        // Inicializar el mapa
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync { googleMap ->
             val reportRef = db.collection("reportes").document(reportId)
@@ -140,6 +143,24 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
 
                     // Agregar un marcador en la ubicación del reporte
                     googleMap.addMarker(MarkerOptions().position(location).title("Ubicación del reporte"))
+                }
+            }
+        }
+
+        // Verificar si el reporte tiene imágenes
+        val reportRef = db.collection("reportes").document(reportId)
+        reportRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val imageUrls = document.get("imageUrls") as? List<String>
+                if (!imageUrls.isNullOrEmpty()) {
+                    // Mostrar la imagen
+                    imgReporte.visibility = View.VISIBLE
+                    mapView.visibility = View.GONE
+                    Glide.with(this).load(imageUrls[0]).into(imgReporte)
+                } else {
+                    // Mostrar el mapa
+                    imgReporte.visibility = View.GONE
+                    mapView.visibility = View.VISIBLE
                 }
             }
         }
@@ -199,6 +220,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
         }
         return dialog
     }
+
     private fun cargarComentarios() {
         db.collection("reportes").document(reportId).collection("comentarios")
             .orderBy("timestamp")
