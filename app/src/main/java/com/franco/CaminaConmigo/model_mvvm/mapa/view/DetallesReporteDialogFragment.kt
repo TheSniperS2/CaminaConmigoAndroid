@@ -1,13 +1,13 @@
 package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -18,6 +18,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.franco.CaminaConmigo.R
+import com.franco.CaminaConmigo.model_mvvm.mapa.model.Comentario
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
@@ -42,7 +43,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
     private lateinit var txtCompartir: TextView
     private lateinit var recyclerComentarios: RecyclerView
     private lateinit var edtComentario: EditText
-    private lateinit var btnEnviarComentario: Button
+    private lateinit var btnEnviarComentario: TextView
     private lateinit var mapView: MapView
     private lateinit var imgLike: ImageView
     private lateinit var imgIconoReporte: ImageView
@@ -118,7 +119,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
 
         // Configuración del RecyclerView
         recyclerComentarios.layoutManager = LinearLayoutManager(requireContext())
-        comentariosAdapter = ComentariosAdapter(comentarios)
+        comentariosAdapter = ComentariosAdapter(requireContext(), comentarios)
         recyclerComentarios.adapter = comentariosAdapter
 
         // Configuración del MapView
@@ -204,11 +205,13 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
             .addSnapshotListener { snapshot, _ ->
                 if (snapshot != null) {
                     val nuevosComentarios = snapshot.documents.map { document ->
-                        Comentario(
+                        com.franco.CaminaConmigo.model_mvvm.mapa.model.Comentario(
+                            id = document.id, // Asegúrate de obtener el ID del documento
                             authorId = document.getString("authorId") ?: "",
                             authorName = document.getString("authorName") ?: "Anónimo",
                             text = document.getString("text") ?: "",
-                            timestamp = document.getDate("timestamp")
+                            timestamp = document.getDate("timestamp"),
+                            reportId = reportId // Asegúrate de pasar el reportId
                         )
                     }
                     comentariosAdapter.actualizarLista(nuevosComentarios)
@@ -350,7 +353,10 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
 
 data class Comentario(val authorId: String, val authorName: String, val text: String, val timestamp: Date?)
 
-class ComentariosAdapter(private val comentarios: MutableList<Comentario>) : RecyclerView.Adapter<ComentariosAdapter.ComentarioViewHolder>() {
+class ComentariosAdapter(
+    private val context: Context,
+    private val comentarios: MutableList<Comentario>
+) : RecyclerView.Adapter<ComentariosAdapter.ComentarioViewHolder>() {
 
     fun actualizarLista(nuevosComentarios: List<Comentario>) {
         comentarios.clear()
@@ -366,6 +372,11 @@ class ComentariosAdapter(private val comentarios: MutableList<Comentario>) : Rec
     override fun onBindViewHolder(holder: ComentarioViewHolder, position: Int) {
         val comentario = comentarios[position]
         holder.bind(comentario)
+
+        // Configurar el botón de borrar
+        holder.imgBorrar.setOnClickListener {
+            borrarComentario(comentario)
+        }
     }
 
     override fun getItemCount() = comentarios.size
@@ -374,6 +385,7 @@ class ComentariosAdapter(private val comentarios: MutableList<Comentario>) : Rec
         private val txtAutor: TextView = itemView.findViewById(R.id.txtAutor)
         private val txtComentario: TextView = itemView.findViewById(R.id.txtComentario)
         private val txtFecha: TextView = itemView.findViewById(R.id.txtFecha)
+        val imgBorrar: ImageView = itemView.findViewById(R.id.imgBorrar)
 
         fun bind(comentario: Comentario) {
             txtAutor.text = comentario.authorName
@@ -402,5 +414,21 @@ class ComentariosAdapter(private val comentarios: MutableList<Comentario>) : Rec
                 else -> "hace ${days / 365} ${if (days / 365 == 1L) "año" else "años"}"
             }
         }
+    }
+
+    private fun borrarComentario(comentario: Comentario) {
+        // Lógica para borrar el comentario de la base de datos
+        val db = FirebaseFirestore.getInstance()
+        db.collection("reportes").document(comentario.reportId).collection("comentarios")
+            .document(comentario.id)
+            .delete()
+            .addOnSuccessListener {
+                comentarios.remove(comentario)
+                notifyDataSetChanged()
+                Toast.makeText(context, "Comentario borrado", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Error al borrar comentario", Toast.LENGTH_SHORT).show()
+            }
     }
 }

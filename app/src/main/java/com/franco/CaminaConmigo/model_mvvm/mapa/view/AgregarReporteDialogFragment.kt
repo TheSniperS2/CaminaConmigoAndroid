@@ -20,11 +20,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import java.io.ByteArrayOutputStream
+import java.util.UUID
 
 class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
 
     private lateinit var tipoReporte: String
     private val db = FirebaseFirestore.getInstance()
+    private val storage = FirebaseStorage.getInstance()
     private var selectedImageUri: Uri? = null
     private var selectedLatitude: Double? = null
     private var selectedLongitude: Double? = null
@@ -123,6 +127,9 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
             return
         }
 
+        // Deshabilitar el botón de enviar para evitar múltiples clics
+        btnEnviarReporte.isEnabled = false
+
         val reporte = hashMapOf(
             "description" to descripcion,
             "type" to tipoReporte,
@@ -131,19 +138,46 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
             "timestamp" to FieldValue.serverTimestamp(),
             "userId" to (FirebaseAuth.getInstance().currentUser?.uid ?: "Anónimo"),
             "isAnonymous" to isAnonimo,
-            "likes" to 0
+            "likes" to 0,
+            "imageUrls" to listOf<String>()
         )
-
-        selectedImageUri?.let { uri -> reporte["imageUri"] = uri.toString() }
 
         db.collection("reportes")
             .add(reporte)
-            .addOnSuccessListener {
-                Toast.makeText(requireContext(), "com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte enviado", Toast.LENGTH_SHORT).show()
+            .addOnSuccessListener { documentReference ->
+                Toast.makeText(requireContext(), "Reporte enviado", Toast.LENGTH_SHORT).show()
+                selectedImageUri?.let { uri ->
+                    val storageRef = storage.reference.child("report_images/${UUID.randomUUID()}")
+                    storageRef.putFile(uri)
+                        .addOnSuccessListener {
+                            storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                                documentReference.update("imageUrls", FieldValue.arrayUnion(downloadUri.toString()))
+                            }
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(requireContext(), "Error al subir imagen", Toast.LENGTH_SHORT).show()
+                        }
+                }
                 dismiss()
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Error al enviar reporte", Toast.LENGTH_SHORT).show()
+                // Rehabilitar el botón de enviar en caso de error
+                btnEnviarReporte.isEnabled = true
+            }
+    }
+
+    private fun saveReportToFirestore(reporte: HashMap<String, Any?>) {
+        db.collection("reportes")
+            .add(reporte)
+            .addOnSuccessListener {
+                Toast.makeText(requireContext(), "Reporte enviado", Toast.LENGTH_SHORT).show()
+                dismiss()
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "Error al enviar reporte", Toast.LENGTH_SHORT).show()
+                // Rehabilitar el botón de enviar en caso de error
+                btnEnviarReporte.isEnabled = true
             }
     }
 
@@ -167,6 +201,8 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
                 }
                 CAMERA_REQUEST_CODE -> {
                     val photo: Bitmap = data?.extras?.get("data") as Bitmap
+                    val uri = getImageUriFromBitmap(photo)
+                    selectedImageUri = uri
                     Toast.makeText(requireContext(), "Foto tomada", Toast.LENGTH_SHORT).show()
                 }
                 LOCATION_PICKER_REQUEST -> {
@@ -176,5 +212,12 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+    }
+
+    private fun getImageUriFromBitmap(bitmap: Bitmap): Uri {
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val path = MediaStore.Images.Media.insertImage(requireContext().contentResolver, bitmap, "Title", null)
+        return Uri.parse(path)
     }
 }

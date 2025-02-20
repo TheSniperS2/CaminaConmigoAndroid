@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -20,14 +21,31 @@
             android:textSize="14sp"
             android:text="Autor" />
 
-        <TextView
-            android:id="@+id/txtFecha"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"
-            android:text="Fecha y hora"
-            android:layout_gravity="end" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/txtFecha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray"
+                android:text="Fecha y hora" />
+
+            <!-- ImageView para el botón de borrar -->
+            <ImageView
+                android:id="@+id/imgBorrar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_delete"
+                android:contentDescription="Borrar comentario"
+                android:padding="8dp"
+                app:tint="@android:color/holo_red_dark" />
+        </LinearLayout>
     </LinearLayout>
 
     <TextView
