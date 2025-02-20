@@ -223,7 +223,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
 
     private fun cargarComentarios() {
         db.collection("reportes").document(reportId).collection("comentarios")
-            .orderBy("timestamp")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING) // Ordenar en orden descendente
             .addSnapshotListener { snapshot, _ ->
                 if (snapshot != null) {
                     val nuevosComentarios = snapshot.documents.map { document ->
@@ -416,7 +416,6 @@ class ComentariosAdapter(
                 getTimeAgo(Timestamp(it))
             } ?: "Fecha desconocida"
         }
-
         private fun getTimeAgo(timestamp: Timestamp): String {
             val now = System.currentTimeMillis()
             val diff = now - timestamp.toDate().time

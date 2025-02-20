@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -31,14 +32,25 @@ class ReporteAdapter(
         private val comentarios: TextView = itemView.findViewById(R.id.txtComments)
         private val tiempo: TextView = itemView.findViewById(R.id.txtTiempoReporte)
         private val ubicacion: TextView = itemView.findViewById(R.id.txtUbicacionReporte)
+        private val imgReporte: ImageView = itemView.findViewById(R.id.imgReporte)
 
         fun bind(reporte: Reporte) {
-            // Inicialización del MapView
-            mapView.onCreate(null)
-            mapView.getMapAsync { googleMap ->
-                val latLng = LatLng(reporte.latitude, reporte.longitude)
-                googleMap.addMarker(MarkerOptions().position(latLng))
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+            // Verificar si el reporte tiene imágenes
+            if (!reporte.imageUrls.isNullOrEmpty()) {
+                // Mostrar la imagen
+                imgReporte.visibility = View.VISIBLE
+                mapView.visibility = View.GONE
+                Glide.with(itemView.context).load(reporte.imageUrls[0]).into(imgReporte)
+            } else {
+                // Mostrar el mapa
+                imgReporte.visibility = View.GONE
+                mapView.visibility = View.VISIBLE
+                mapView.onCreate(null)
+                mapView.getMapAsync { googleMap ->
+                    val latLng = LatLng(reporte.latitude, reporte.longitude)
+                    googleMap.addMarker(MarkerOptions().position(latLng))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+                }
             }
 
             // El título del reporte es el tipo almacenado en la base de datos
