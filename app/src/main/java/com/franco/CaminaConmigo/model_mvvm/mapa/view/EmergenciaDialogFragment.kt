@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.franco.CaminaConmigo.R
 import com.google.firebase.auth.FirebaseAuth
@@ -101,15 +102,42 @@ class EmergenciaDialogFragment : DialogFragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        val params = dialog?.window?.attributes
+        params?.width = ViewGroup.LayoutParams.WRAP_CONTENT
+        params?.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        dialog?.window?.attributes = params
+    }
+
     // Método para detener la alarma cuando se cierra el DialogFragment
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
+        detenerAlarma()
+    }
 
-        // Detener la alarma si está sonando
-        mediaPlayer?.pause()
+    // Método para detener la alarma cuando se destruye la vista del DialogFragment
+    override fun onDestroyView() {
+        super.onDestroyView()
+        detenerAlarma()
+    }
 
-        // Restaurar el volumen original
-        audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
+    // Método para detener la alarma cuando el fragmento ya no está visible
+    override fun onStop() {
+        super.onStop()
+        detenerAlarma()
+    }
+
+    // Método para detener la alarma y restaurar el volumen original
+    private fun detenerAlarma() {
+        if (mediaPlayer != null) {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
+            audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
+            Toast.makeText(context, "¡Emergencia desactivada!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     // Método para configurar el MediaPlayer y AudioManager antes de que se muestre el DialogFragment

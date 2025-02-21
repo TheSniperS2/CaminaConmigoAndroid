@@ -93,25 +93,40 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         // Guardar el volumen original
         originalVolume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: 0
 
-        // Inicializar el MediaPlayer para la alarma
-        mediaPlayer = MediaPlayer.create(this, R.raw.emergency_alarm)
-        mediaPlayer?.isLooping = true
-        mediaPlayer?.setVolume(1.0f, 1.0f)
-
-        // Configurar el botón para activar y desactivar la alarma de emergencia
+// Configurar el botón para activar la alarma de emergencia
         findViewById<Button>(R.id.btnSOS).setOnClickListener {
-            if (mediaPlayer?.isPlaying == false) {
-                audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 0, 0)
-                mediaPlayer?.start()
-                Toast.makeText(this, "¡Emergencia activada!", Toast.LENGTH_SHORT).show()
+            try {
+                // Liberar el MediaPlayer si ya existe
+                mediaPlayer?.release()
+                mediaPlayer = null
 
-                // Mostrar el diálogo de emergencia
-                val emergenciaDialog = EmergenciaDialogFragment()
-                emergenciaDialog.show(supportFragmentManager, "EmergenciaDialogFragment")
-            } else {
-                mediaPlayer?.pause()
-                audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
-                Toast.makeText(this, "¡Emergencia desactivada!", Toast.LENGTH_SHORT).show()
+                // Crear una nueva instancia del MediaPlayer
+                mediaPlayer = MediaPlayer.create(this, R.raw.emergency_alarm).apply {
+                    isLooping = true
+                    setVolume(1.0f, 1.0f)
+                }
+
+                // Verificar si mediaPlayer no es nulo antes de llamar a isPlaying
+                mediaPlayer?.let { player ->
+                    if (!player.isPlaying) {
+                        audioManager?.setStreamVolume(
+                            AudioManager.STREAM_MUSIC,
+                            audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 0,
+                            0
+                        )
+                        player.start()
+                        Toast.makeText(this, "¡Emergencia activada!", Toast.LENGTH_SHORT).show()
+
+                        // Mostrar el diálogo de emergencia
+                        val emergenciaDialog = EmergenciaDialogFragment().apply {
+                            setMediaPlayer(player, audioManager!!, originalVolume)
+                        }
+                        emergenciaDialog.show(supportFragmentManager, "EmergenciaDialogFragment")
+                    }
+                }
+            } catch (e: IllegalStateException) {
+                // Manejar la excepción y mostrar un mensaje de error
+                Toast.makeText(this, "Error al activar la emergencia: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -228,11 +243,11 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         return BitmapDescriptorFactory.fromBitmap(redimensionarIcono(resId, 100, 100))
     }
 
+
     private fun redimensionarIcono(resId: Int, width: Int, height: Int): Bitmap {
         val imageBitmap = BitmapFactory.decodeResource(resources, resId)
         return Bitmap.createScaledBitmap(imageBitmap, width, height, false)
     }
-
 
     private fun reportarUbicacion(tipo: String, descripcion: String, imageUrl: String?) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -260,7 +275,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
                 db.collection(reportsCollection)
                     .add(reporte)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte enviado", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Reporte enviado", Toast.LENGTH_SHORT).show()
                         cargarReportes() // Recargar los marcadores con la nueva imagen
                     }
                     .addOnFailureListener {
@@ -281,13 +296,8 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
     }
 
-
-
     override fun onTipoReporteSeleccionado(tipoReporte: String) {
         val descripcionEditText = findViewById<EditText>(R.id.edtDescripcion)
         descripcionEditText.setText(tipoReporte) // Establece el tipo de reporte como descripción
     }
-
-
-
 }

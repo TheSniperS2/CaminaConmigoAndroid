@@ -1,104 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@drawable/dialog_background"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="20dp"
+    android:elevation="8dp"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:layout_margin="0dp">
 
+    <!-- Título -->
     <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Llamada de emergencia"
+        android:textSize="33sp"
         android:textStyle="bold"
-        android:textSize="18sp"
-        android:layout_gravity="center" />
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_marginBottom="20dp" />
 
+    <!-- Contenedor de botones e iconos -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingTop="10dp">
+        android:gravity="center">
 
+        <!-- Carabineros -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_margin="10dp">
+            android:layout_margin="12dp">
 
             <ImageButton
                 android:id="@+id/btnCarabineros"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/policia" />
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/policia"
+                android:contentDescription="Llamar a Carabineros" />
 
             <TextView
                 android:id="@+id/txtCarabineros"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Carabineros"
-                android:textSize="14sp"
-                android:gravity="center" />
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:gravity="center"
+                android:layout_marginTop="8dp" />
         </LinearLayout>
 
+        <!-- Contacto 1 -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_margin="10dp">
+            android:layout_margin="12dp">
 
             <ImageButton
                 android:id="@+id/btnContacto1"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_sos" />
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/ic_sos"
+                android:contentDescription="Llamar a Contacto 1" />
 
             <TextView
                 android:id="@+id/txtContacto1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cargando..."
-                android:textSize="14sp"
-                android:gravity="center" />
+                android:text="Papá"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:gravity="center"
+                android:layout_marginTop="8dp" />
         </LinearLayout>
 
+        <!-- Contacto 2 -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_margin="10dp">
+            android:layout_margin="12dp">
 
             <ImageButton
                 android:id="@+id/btnContacto2"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_sos" />
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/ic_sos"
+                android:contentDescription="Llamar a Contacto 2" />
 
             <TextView
                 android:id="@+id/txtContacto2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cargando..."
-                android:textSize="14sp"
-                android:gravity="center" />
+                android:text="Mamá"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:gravity="center"
+                android:layout_marginTop="8dp" />
         </LinearLayout>
+
     </LinearLayout>
 
+    <!-- Botón Cerrar -->
     <TextView
         android:id="@+id/btnCerrar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cerrar"
         android:textSize="16sp"
-        android:textColor="@android:color/holo_red_dark"
-        android:layout_gravity="center"
-        android:paddingTop="10dp"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:paddingTop="16dp"
+        android:gravity="center"
         android:clickable="true"
+        android:layout_marginTop="9dp"
         android:focusable="true" />
 </LinearLayout>
