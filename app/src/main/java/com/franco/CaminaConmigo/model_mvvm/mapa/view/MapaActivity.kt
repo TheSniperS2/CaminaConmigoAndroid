@@ -30,6 +30,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -48,6 +49,8 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
     private var mediaPlayer: MediaPlayer? = null
     private var audioManager: AudioManager? = null
     private var originalVolume: Int = 0
+    private val markersList = mutableListOf<Marker>()
+    private var searchMarker: Marker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,8 +74,14 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
             override fun onPlaceSelected(place: Place) {
                 // Mueve la cámara a la ubicación seleccionada
                 place.latLng?.let {
-                    mMap.addMarker(MarkerOptions().position(it).title(place.name))
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(it, 15f))
+                    // Eliminar el marcador de búsqueda anterior si existe
+                    searchMarker?.remove()
+
+                    if (!mostrarMarcadorExistente(it)) {
+                        // Agregar un nuevo marcador de búsqueda
+                        searchMarker = mMap.addMarker(MarkerOptions().position(it).title(place.name))
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(it, 12f))
+                    }
                 }
             }
 
@@ -93,7 +102,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         // Guardar el volumen original
         originalVolume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: 0
 
-// Configurar el botón para activar la alarma de emergencia
+        // Configurar el botón para activar la alarma de emergencia
         findViewById<Button>(R.id.btnSOS).setOnClickListener {
             try {
                 // Liberar el MediaPlayer si ya existe
@@ -216,12 +225,14 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
                         .snippet(description)
                         .icon(icon)
                 )
+                marker?.let { markersList.add(it) }
                 marker?.tag = document.id
             }
         }.addOnFailureListener {
             Toast.makeText(this, "Error al cargar reportes", Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun obtenerIconoPorTipo(type: String): BitmapDescriptor {
         val resId = when (type) {
             "Reunión de hombres" -> R.drawable.i_reunion_de_hombre
@@ -243,10 +254,20 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         return BitmapDescriptorFactory.fromBitmap(redimensionarIcono(resId, 100, 100))
     }
 
-
     private fun redimensionarIcono(resId: Int, width: Int, height: Int): Bitmap {
         val imageBitmap = BitmapFactory.decodeResource(resources, resId)
         return Bitmap.createScaledBitmap(imageBitmap, width, height, false)
+    }
+
+    private fun mostrarMarcadorExistente(latLng: LatLng): Boolean {
+        for (marker in markersList) {
+            if (marker.position == latLng) {
+                marker.showInfoWindow()
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                return true
+            }
+        }
+        return false
     }
 
     private fun reportarUbicacion(tipo: String, descripcion: String, imageUrl: String?) {
