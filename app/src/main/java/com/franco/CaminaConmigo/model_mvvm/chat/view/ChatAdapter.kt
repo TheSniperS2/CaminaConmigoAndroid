@@ -41,9 +41,10 @@ class ChatViewHolder(
             binding.lastMessage.text = chat.lastMessage ?: "Sin mensaje"
 
             // Formatear la fecha del último mensaje si se tiene el timestamp
-            if (chat.lastMessageTimestamp != 0L) {
-                val timestamp = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm").format(java.util.Date(chat.lastMessageTimestamp))
-                binding.lastMessageTimestamp.text = timestamp
+            val timestamp = chat.lastMessageTimestamp
+            if (timestamp != null) {
+                val formattedDate = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm").format(timestamp.toDate())
+                binding.lastMessageTimestamp.text = formattedDate
             } else {
                 binding.lastMessageTimestamp.text = "Sin fecha"
             }

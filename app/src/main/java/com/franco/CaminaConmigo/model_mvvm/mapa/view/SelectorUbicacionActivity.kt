@@ -18,6 +18,10 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.firebase.firestore.FirebaseFirestore
 
 class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -25,10 +29,15 @@ class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private var selectedLatLng: LatLng? = null
     private val db = FirebaseFirestore.getInstance() // Instancia de Firestore
+    private lateinit var placesClient: PlacesClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_selector_ubicacion)
+
+        // Inicializar Places
+        Places.initialize(applicationContext, getString(R.string.google_map_api_key))
+        placesClient = Places.createClient(this)
 
         try {
             val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -41,12 +50,15 @@ class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
 
         findViewById<Button>(R.id.btnConfirmarUbicacion).setOnClickListener {
             selectedLatLng?.let {
-                val intent = Intent().apply {
-                    putExtra("latitude", it.latitude)
-                    putExtra("longitude", it.longitude)
+                obtenerNombreUbicacion(it) { locationName ->
+                    val intent = Intent().apply {
+                        putExtra("latitude", it.latitude)
+                        putExtra("longitude", it.longitude)
+                        putExtra("locationName", locationName)
+                    }
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
                 }
-                setResult(Activity.RESULT_OK, intent)
-                finish()
             } ?: run {
                 Toast.makeText(this, "Por favor selecciona una ubicación en el mapa", Toast.LENGTH_SHORT).show()
             }
@@ -129,6 +141,19 @@ class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun redimensionarIcono(resId: Int, width: Int, height: Int): Bitmap {
         val imageBitmap = BitmapFactory.decodeResource(resources, resId)
         return Bitmap.createScaledBitmap(imageBitmap, width, height, false)
+    }
+
+    private fun obtenerNombreUbicacion(latLng: LatLng, callback: (String) -> Unit) {
+        val placeFields = listOf(Place.Field.NAME)
+        val request = FetchPlaceRequest.newInstance(latLng.toString(), placeFields)
+
+        placesClient.fetchPlace(request).addOnSuccessListener { response ->
+            val place = response.place
+            callback(place.name ?: "Ubicación seleccionada")
+        }.addOnFailureListener { exception ->
+            Log.e("SelectorUbicacionActivity", "Error al obtener el nombre de la ubicación", exception)
+            callback("Ubicación seleccionada")
+        }
     }
 
     // Método para agregar un nuevo reporte a la base de datos

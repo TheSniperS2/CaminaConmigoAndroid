@@ -32,6 +32,7 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
     private var selectedImageUri: Uri? = null
     private var selectedLatitude: Double? = null
     private var selectedLongitude: Double? = null
+    private var selectedLocationName: String? = null
 
     private lateinit var txtUbicacion: TextView
     private lateinit var edtDescripcion: EditText
@@ -208,7 +209,8 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
                 LOCATION_PICKER_REQUEST -> {
                     selectedLatitude = data?.getDoubleExtra("latitude", 0.0)
                     selectedLongitude = data?.getDoubleExtra("longitude", 0.0)
-                    txtUbicacion.text = "Ubicación seleccionada"
+                    selectedLocationName = data?.getStringExtra("locationName")
+                    txtUbicacion.text = selectedLocationName ?: "Ubicación seleccionada"
                 }
             }
         }

@@ -29,6 +29,14 @@
       </SelectionState>
       <SelectionState runConfigName="ChatActivity">
         <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-02-21T20:48:39.866041800Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Franco\.android\avd\Pixel_9_API_35_2.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
       </SelectionState>
       <SelectionState runConfigName="MiPerfilActivity">
         <option name="selectionMode" value="DROPDOWN" />

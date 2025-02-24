@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Chat
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -63,6 +62,37 @@ class ChatViewModel : ViewModel() {
             }
     }
 
+    fun loadLocationMessages(chatId: String) {
+        val locationSharingRef = db.collection("chats").document(chatId).collection("locationSharing")
+
+        locationSharingRef.orderBy("timestamp", Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    Log.e("ChatViewModel", "Error al obtener mensajes de ubicación: ${e.message}")
+                    return@addSnapshotListener
+                }
+
+                if (snapshots == null || snapshots.isEmpty) {
+                    Log.w("ChatViewModel", "No hay mensajes de ubicación en este chat")
+                    return@addSnapshotListener
+                }
+
+                val locationMessages = snapshots.documents.mapNotNull { doc ->
+                    try {
+                        val message = doc.toObject(Message::class.java)?.copy(id = doc.id)
+                        Log.d("ChatViewModel", "Mensaje de ubicación cargado: ${message?.content}, Timestamp: ${message?.timestamp}")
+                        message
+                    } catch (ex: Exception) {
+                        Log.e("ChatViewModel", "Error al procesar mensaje de ubicación: ${ex.message}")
+                        null
+                    }
+                }
+
+                val combinedMessages = _messages.value.orEmpty() + locationMessages
+                _messages.postValue(combinedMessages.sortedBy { it.timestamp })
+            }
+    }
+
     fun loadChats() {
         val currentUserId = auth.currentUser?.uid ?: return
 
@@ -88,7 +118,7 @@ class ChatViewModel : ViewModel() {
                         val participants = doc.get("participants") as? List<String> ?: emptyList()
                         val userNames = doc.get("userNames") as? Map<String, String> ?: emptyMap()
                         val lastMessage = doc.getString("lastMessage") ?: ""
-                        val lastMessageTimestamp = doc.getTimestamp("lastMessageTimestamp")?.toDate()?.time ?: 0L
+                        val lastMessageTimestamp = doc.getTimestamp("lastMessageTimestamp")
 
                         Log.d("ChatViewModel", "Chat encontrado - ID: $chatId, Participantes: $participants")
 
@@ -120,7 +150,6 @@ class ChatViewModel : ViewModel() {
             }
     }
 
-
     fun createChat(friendId: String, friendName: String) {
         val currentUser = auth.currentUser ?: return
 
@@ -142,28 +171,34 @@ class ChatViewModel : ViewModel() {
             .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al crear chat: ${e.message}") }
     }
 
-    fun sendMessage(chatId: String, message: String) {
+    fun sendLocationMessage(chatId: String, locationMessage: Map<String, Any>) {
+        val chatRef = db.collection("chats").document(chatId)
+        val locationSharingRef = chatRef.collection("locationSharing")
+
+        val newLocationMessageRef = locationSharingRef.document()
+
+        newLocationMessageRef.set(locationMessage)
+            .addOnSuccessListener {
+                Log.d("ChatViewModel", "Mensaje de ubicación enviado con ID: ${newLocationMessageRef.id}")
+            }
+            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al enviar mensaje de ubicación: ${e.message}") }
+    }
+
+    fun sendMessage(chatId: String, message: Message) {
         val currentUser = auth.currentUser ?: return
         val chatRef = db.collection("chats").document(chatId)
         val messagesRef = chatRef.collection("messages")
 
         val newMessageRef = messagesRef.document()
 
-        val messageData = hashMapOf(
-            "senderId" to currentUser.uid,
-            "content" to message,
-            "isRead" to false,
-            "timestamp" to Timestamp.now()
-        )
-
-        newMessageRef.set(messageData)
+        newMessageRef.set(message)
             .addOnSuccessListener {
                 Log.d("ChatViewModel", "Mensaje enviado con ID: ${newMessageRef.id}")
 
                 chatRef.update(
                     mapOf(
-                        "lastMessage" to message,
-                        "lastMessageTimestamp" to Timestamp.now()
+                        "lastMessage" to message.content,
+                        "lastMessageTimestamp" to message.timestamp
                     )
                 ).addOnFailureListener { e ->
                     Log.e("ChatViewModel", "Error al actualizar el último mensaje: ${e.message}")
@@ -199,9 +234,40 @@ class ChatViewModel : ViewModel() {
 
     fun updateNickname(chatId: String, userId: String, newNickname: String) {
         val chatRef = db.collection("chats").document(chatId)
-        chatRef.update("userNames.$userId", newNickname)
-            .addOnSuccessListener { Log.d("ChatViewModel", "Apodo actualizado con éxito") }
-            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al actualizar apodo: ${e.message}") }
+
+        chatRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val nicknames = document.get("nicknames") as? MutableMap<String, String> ?: mutableMapOf()
+                nicknames[userId] = newNickname
+
+                chatRef.update("nicknames", nicknames)
+                    .addOnSuccessListener {
+                        Log.d("ChatViewModel", "Apodo actualizado con éxito en la base de datos")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("ChatViewModel", "Error al actualizar apodo en la base de datos: ${e.message}")
+                    }
+            } else {
+                Log.e("ChatViewModel", "El documento del chat no existe")
+            }
+        }.addOnFailureListener { e ->
+            Log.e("ChatViewModel", "Error al obtener el documento del chat: ${e.message}")
+        }
+    }
+
+    fun isGroupChat(chatId: String, callback: (Boolean) -> Unit) {
+        val chatRef = db.collection("chats").document(chatId)
+        chatRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val participants = document.get("participants") as? List<String> ?: emptyList()
+                val isGroup = participants.size > 2 // Si hay más de 2 personas, es grupo
+                callback(isGroup)
+            } else {
+                callback(false)
+            }
+        }.addOnFailureListener {
+            callback(false)
+        }
     }
 
     fun updateGroupName(chatId: String, newName: String) {
@@ -216,6 +282,19 @@ class ChatViewModel : ViewModel() {
         chatRef.update("adminIds", FieldValue.arrayUnion(userId))
             .addOnSuccessListener { Log.d("ChatViewModel", "Administrador agregado con éxito") }
             .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al agregar administrador: ${e.message}") }
+    }
+
+    fun removeParticipant(chatId: String, userId: String) {
+        isGroupChat(chatId) { isGroup ->
+            if (isGroup) {
+                val chatRef = db.collection("chats").document(chatId)
+                chatRef.update("participants", FieldValue.arrayRemove(userId))
+                    .addOnSuccessListener { Log.d("ChatViewModel", "Participante eliminado con éxito") }
+                    .addOnFailureListener { Log.e("ChatViewModel", "Error al eliminar participante: ${it.message}") }
+            } else {
+                Log.e("ChatViewModel", "No se pueden eliminar participantes en un chat individual")
+            }
+        }
     }
 
     fun removeAdmin(chatId: String, userId: String) {

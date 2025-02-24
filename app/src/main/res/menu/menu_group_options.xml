@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_edit_group_name"
+        android:title="Editar nombre del grupo"/>
+    <item
+        android:id="@+id/action_add_participants"
+        android:title="Añadir participantes"/>
+    <item
+        android:id="@+id/action_manage_members"
+        android:title="Administrar miembros"/>
+</menu>

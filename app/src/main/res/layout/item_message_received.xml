@@ -17,36 +17,36 @@
         android:orientation="vertical"
         android:padding="12dp">
 
-        <!-- Nombre del remitente -->
-        <TextView
-            android:id="@+id/tvSender"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Remitente"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"/>
+    <!-- Nombre del remitente -->
+    <TextView
+        android:id="@+id/tvSender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remitente"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"/>
 
-        <!-- Contenido del mensaje -->
-        <TextView
-            android:id="@+id/tvMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Este es el contenido del mensaje"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"/>
+    <!-- Contenido del mensaje -->
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Este es el contenido del mensaje"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"/>
 
-        <!-- Fecha del mensaje -->
-        <TextView
-            android:id="@+id/tvTimestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fecha y hora"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="12sp"
-            android:layout_marginTop="4dp"/>
+    <!-- Fecha del mensaje -->
+    <TextView
+        android:id="@+id/tvTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fecha y hora"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"
+        android:layout_marginTop="4dp"/>
 
-    </LinearLayout>
+</LinearLayout>
 
-</androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView>
