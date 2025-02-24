@@ -131,6 +131,8 @@ class ChatDetailActivity : AppCompatActivity() {
             }
         }
 
+
+
         // Configurar el botón para compartir ubicación
         btnCall.setOnClickListener {
             showLocationSharingDialog()
@@ -175,49 +177,51 @@ class ChatDetailActivity : AppCompatActivity() {
 
     private fun showPopupMenu(view: View, chatId: String) {
         val popupMenu = PopupMenu(this, view)
-        if (isGroupChat) {
-            popupMenu.menuInflater.inflate(R.menu.menu_group_options, popupMenu.menu)
-        } else {
-            popupMenu.menuInflater.inflate(R.menu.menu_options, popupMenu.menu)
-        }
-        popupMenu.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.action_change_nickname -> {
-                    if (!isGroupChat) {
-                        showChangeNicknameDialog(chatId)
-                    } else {
-                        Toast.makeText(this, "Esta opción no está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                    }
-                    true
-                }
-                R.id.action_edit_group_name -> {
-                    if (isGroupChat) {
-                        showEditGroupNameDialog(chatId)
-                    } else {
-                        Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                    }
-                    true
-                }
-                R.id.action_add_participants -> {
-                    if (isGroupChat) {
-                        showAddParticipantsDialog(chatId)
-                    } else {
-                        Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                    }
-                    true
-                }
-                R.id.action_manage_members -> {
-                    if (isGroupChat) {
-                        showManageMembersDialog(chatId)
-                    } else {
-                        Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                    }
-                    true
-                }
-                else -> false
+        viewModel.isGroupChat(chatId) { isGroup ->
+            if (isGroup) {
+                popupMenu.menuInflater.inflate(R.menu.menu_group_options, popupMenu.menu)
+            } else {
+                popupMenu.menuInflater.inflate(R.menu.menu_options, popupMenu.menu)
             }
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_change_nickname -> {
+                        if (!isGroup) {
+                            showChangeNicknameDialog(chatId)
+                        } else {
+                            Toast.makeText(this, "Esta opción no está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
+                        }
+                        true
+                    }
+                    R.id.action_edit_group_name -> {
+                        if (isGroup) {
+                            showEditGroupNameDialog(chatId)
+                        } else {
+                            Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
+                        }
+                        true
+                    }
+                    R.id.action_add_participants -> {
+                        if (isGroup) {
+                            showAddParticipantsDialog(chatId)
+                        } else {
+                            Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
+                        }
+                        true
+                    }
+                    R.id.action_manage_members -> {
+                        if (isGroup) {
+                            showManageMembersDialog(chatId)
+                        } else {
+                            Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
+                        }
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popupMenu.show()
         }
-        popupMenu.show()
     }
 
     private fun showEditGroupNameDialog(chatId: String) {
@@ -382,15 +386,15 @@ class ChatDetailActivity : AppCompatActivity() {
         db.collection("chats").document(chatId).get()
             .addOnSuccessListener { document ->
                 if (document != null) {
-                    val participants = document.get("participants") as? List<String> ?: emptyList()
-                    val currentUserId = auth.currentUser?.uid ?: return@addOnSuccessListener
-                    val isGroup = participants.size > 2
+                    val isGroup = document.getBoolean("isGroup") ?: false
 
                     if (isGroup) {
                         val groupName = document.getString("name") ?: "Grupo"
                         binding.tvContactName.text = groupName
                         binding.profileImage.setImageResource(R.drawable.ic_imagen) // Imagen de grupo predeterminada
                     } else {
+                        val participants = document.get("participants") as? List<String> ?: emptyList()
+                        val currentUserId = auth.currentUser?.uid ?: return@addOnSuccessListener
                         val friendId = participants.firstOrNull { it != currentUserId } ?: return@addOnSuccessListener
                         db.collection("users").document(friendId).get()
                             .addOnSuccessListener { userDocument ->
@@ -418,7 +422,8 @@ class ChatDetailActivity : AppCompatActivity() {
             }
     }
 
-    private fun showChangeNicknameDialog(chatId: String) {
+
+    private fun showChangeNicknameDialog(friendId: String) {
         val editText = EditText(this)
         val dialog = AlertDialog.Builder(this)
             .setTitle("Cambiar apodo")
@@ -426,9 +431,7 @@ class ChatDetailActivity : AppCompatActivity() {
             .setPositiveButton("Guardar") { _, _ ->
                 val newNickname = editText.text.toString()
                 if (newNickname.isNotEmpty()) {
-                    val chatId = intent.getStringExtra("CHAT_ID") ?: return@setPositiveButton
-                    val userId = auth.currentUser?.uid ?: return@setPositiveButton
-                    viewModel.updateNickname(chatId, userId, newNickname)
+                    viewModel.updateNickname(friendId, newNickname)
                     binding.tvContactName.text = newNickname
                 }
             }

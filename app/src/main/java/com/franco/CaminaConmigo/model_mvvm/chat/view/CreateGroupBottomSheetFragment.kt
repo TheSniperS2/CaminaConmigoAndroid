@@ -99,11 +99,12 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
 
         val groupData = mapOf(
             "adminIds" to listOf(currentUserId),
-            "lastMessage" to "Hola",
+            "lastMessage" to "Has sido añadido al grupo $groupName",
             "lastMessageTimestamp" to com.google.firebase.Timestamp.now(),
             "name" to groupName,
             "participants" to groupUserIds,
-            "unreadCount" to groupUserIds.associateWith { 0 }
+            "unreadCount" to groupUserIds.associateWith { 0 },
+            "isGroup" to true // Agregar el campo isGroup para identificar que es un grupo
         )
 
         db.collection("chats").add(groupData)

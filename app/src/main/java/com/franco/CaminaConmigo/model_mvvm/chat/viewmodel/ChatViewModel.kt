@@ -125,6 +125,7 @@ class ChatViewModel : ViewModel() {
                             // Si no hay un nombre de grupo, construye un nombre basado en los amigos
                             userNames.filterKeys { it != currentUserId }.values.joinToString(", ")
                         }
+                        val isGroup = doc.getBoolean("isGroup") ?: false // Obtener el campo isGroup
 
                         Log.d("ChatViewModel", "Chat encontrado - ID: $chatId, Participantes: $participants")
 
@@ -133,7 +134,8 @@ class ChatViewModel : ViewModel() {
                             name = chatName,
                             lastMessage = lastMessage,
                             lastMessageTimestamp = lastMessageTimestamp,
-                            participants = participants
+                            participants = participants,
+                            isGroup = isGroup // Asegurarse de pasar el valor de isGroup
                         ).also {
                             _userNames.value = userNames
                         }
@@ -253,26 +255,25 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    fun updateNickname(chatId: String, userId: String, newNickname: String) {
-        val chatRef = db.collection("chats").document(chatId)
+    fun updateNickname(friendId: String, newNickname: String) {
+        val currentUser = auth.currentUser ?: return
+        val userRef = db.collection("users").document(currentUser.uid)
+        val friendRef = userRef.collection("friends").document(friendId)
 
-        chatRef.get().addOnSuccessListener { document ->
+        friendRef.get().addOnSuccessListener { document ->
             if (document != null && document.exists()) {
-                val nicknames = document.get("nicknames") as? MutableMap<String, String> ?: mutableMapOf()
-                nicknames[userId] = newNickname
-
-                chatRef.update("nicknames", nicknames)
+                friendRef.update("nickname", newNickname)
                     .addOnSuccessListener {
-                        Log.d("ChatViewModel", "Apodo actualizado con éxito en la base de datos")
+                        Log.d("ChatViewModel", "Apodo actualizado con éxito en la subcolección friends")
                     }
                     .addOnFailureListener { e ->
-                        Log.e("ChatViewModel", "Error al actualizar apodo en la base de datos: ${e.message}")
+                        Log.e("ChatViewModel", "Error al actualizar apodo en la subcolección friends: ${e.message}")
                     }
             } else {
-                Log.e("ChatViewModel", "El documento del chat no existe")
+                Log.e("ChatViewModel", "El documento del amigo no existe")
             }
         }.addOnFailureListener { e ->
-            Log.e("ChatViewModel", "Error al obtener el documento del chat: ${e.message}")
+            Log.e("ChatViewModel", "Error al obtener el documento del amigo: ${e.message}")
         }
     }
 
@@ -280,8 +281,7 @@ class ChatViewModel : ViewModel() {
         val chatRef = db.collection("chats").document(chatId)
         chatRef.get().addOnSuccessListener { document ->
             if (document != null && document.exists()) {
-                val participants = document.get("participants") as? List<String> ?: emptyList()
-                val isGroup = participants.size > 2 // Si hay más de 2 personas, es grupo
+                val isGroup = document.getBoolean("isGroup") ?: false // Usar el campo isGroup
                 callback(isGroup)
             } else {
                 callback(false)
@@ -320,31 +320,25 @@ class ChatViewModel : ViewModel() {
             }
     }
 
-    fun removeParticipant(chatId: String, username: String) {
-        isGroupChat(chatId) { isGroup ->
-            if (isGroup) {
-                db.collection("users")
-                    .whereEqualTo("username", username)
-                    .get()
-                    .addOnSuccessListener { documents ->
-                        if (documents.isEmpty) {
-                            Log.e("ChatViewModel", "No se encontró usuario con el nombre de usuario: $username")
-                            return@addOnSuccessListener
+    fun removeParticipant(chatId: String, userId: String) {
+        val chatRef = db.collection("chats").document(chatId)
+        chatRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val participants = document.get("participants") as? List<String> ?: return@addOnSuccessListener
+                chatRef.update("participants", FieldValue.arrayRemove(userId))
+                    .addOnSuccessListener {
+                        Log.d("ChatViewModel", "Participante eliminado con éxito")
+                        // Mantener la configuración de grupo basada en el campo isGroup
+                        if (document.getBoolean("isGroup") == true) {
+                            chatRef.update("isGroup", true)
+                                .addOnSuccessListener { Log.d("ChatViewModel", "Configuración de grupo mantenida exitosamente") }
+                                .addOnFailureListener { Log.e("ChatViewModel", "Error al mantener la configuración de grupo: ${it.message}") }
                         }
-
-                        val userId = documents.documents.first().id
-
-                        val chatRef = db.collection("chats").document(chatId)
-                        chatRef.update("participants", FieldValue.arrayRemove(userId))
-                            .addOnSuccessListener { Log.d("ChatViewModel", "Participante eliminado con éxito") }
-                            .addOnFailureListener { Log.e("ChatViewModel", "Error al eliminar participante: ${it.message}") }
                     }
-                    .addOnFailureListener { e ->
-                        Log.e("ChatViewModel", "Error al buscar usuario: ${e.message}")
-                    }
-            } else {
-                Log.e("ChatViewModel", "No se pueden eliminar participantes en un chat individual")
+                    .addOnFailureListener { Log.e("ChatViewModel", "Error al eliminar participante: ${it.message}") }
             }
+        }.addOnFailureListener { e ->
+            Log.e("ChatViewModel", "Error al obtener el documento del chat: ${e.message}")
         }
     }
 
