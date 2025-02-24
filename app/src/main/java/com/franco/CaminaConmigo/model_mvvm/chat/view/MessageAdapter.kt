@@ -13,8 +13,9 @@ import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.FirebaseFirestore
 
-class MessageAdapter(private val userNames: Map<String, String>, private val currentUserId: String) : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiffCallback()) {
+class MessageAdapter(private val currentUserId: String) : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
     companion object {
         private const val VIEW_TYPE_SENT = 1
@@ -39,7 +40,7 @@ class MessageAdapter(private val userNames: Map<String, String>, private val cur
             }
             VIEW_TYPE_RECEIVED -> {
                 val binding = ItemMessageReceivedBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                ReceivedMessageViewHolder(binding, userNames)
+                ReceivedMessageViewHolder(binding)
             }
             VIEW_TYPE_LOCATION -> {
                 val binding = ItemLocationMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -75,14 +76,23 @@ class SentMessageViewHolder(private val binding: ItemMessageSentBinding) : Recyc
     }
 }
 
-class ReceivedMessageViewHolder(private val binding: ItemMessageReceivedBinding, private val userNames: Map<String, String>) : RecyclerView.ViewHolder(binding.root) {
+class ReceivedMessageViewHolder(private val binding: ItemMessageReceivedBinding) : RecyclerView.ViewHolder(binding.root) {
+
+    private val db = FirebaseFirestore.getInstance()
 
     fun bind(message: Message) {
         binding.tvMessage.text = message.content.ifEmpty { "Mensaje vacío" }
 
-        // Mostrar el nombre del remitente usando userNames
-        val senderName = userNames[message.senderId] ?: "Remitente desconocido"
-        binding.tvSender.text = senderName
+        // Recuperar y mostrar el nombre del remitente usando senderId
+        db.collection("users").document(message.senderId).get()
+            .addOnSuccessListener { document ->
+                val senderName = document.getString("username") ?: "Remitente desconocido"
+                binding.tvSender.text = senderName
+            }
+            .addOnFailureListener { e ->
+                Log.e("ReceivedMessageViewHolder", "Error al obtener nombre de usuario: ${e.message}")
+                binding.tvSender.text = "Remitente desconocido"
+            }
 
         // Verificar si el timestamp es válido antes de formatearlo
         message.timestamp?.let {

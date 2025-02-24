@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
@@ -20,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ActivityChatDetailBinding
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
@@ -57,6 +59,9 @@ class ChatDetailActivity : AppCompatActivity() {
         // Configura RecyclerView
         binding.recyclerViewMessages.layoutManager = LinearLayoutManager(this)
 
+        // Actualizar la imagen y el nombre del contacto
+        updateContactInfo(chatId)
+
         val currentUserId = auth.currentUser?.uid ?: return
         val btnMapa = findViewById<ImageButton>(R.id.imageButton10)
         val btnNovedades = findViewById<ImageButton>(R.id.imageButton11)
@@ -81,17 +86,17 @@ class ChatDetailActivity : AppCompatActivity() {
         }
 
         // Observa los userNames y crea el adaptador cuando estén disponibles
-        viewModel.userNames.observe(this, Observer { userNames ->
-            val adapter = MessageAdapter(userNames, currentUserId)
-            binding.recyclerViewMessages.adapter = adapter
+
 
             // Observa los mensajes y actualiza el adaptador
             viewModel.messages.observe(this, Observer { messages ->
                 Log.d("ChatDetailActivity", "Mensajes actualizados en UI: ${messages.size}")
+                val adapter = MessageAdapter(auth.currentUser?.uid ?: "")
+                binding.recyclerViewMessages.adapter = adapter
                 adapter.submitList(messages)
                 binding.recyclerViewMessages.scrollToPosition(messages.size - 1) // Desplazar al último mensaje
             })
-        })
+
 
         // Carga los mensajes y los userNames
         viewModel.loadMessages(chatId)
@@ -344,13 +349,21 @@ class ChatDetailActivity : AppCompatActivity() {
             private val viewModel: ChatViewModel
         ) : RecyclerView.ViewHolder(itemView) {
             private val memberNameTextView: TextView = itemView.findViewById(R.id.memberNameTextView)
+            private val memberImageView: ImageView = itemView.findViewById(R.id.memberImageView)
             private val removeButton: Button = itemView.findViewById(R.id.removeButton)
 
             fun bind(memberId: String) {
                 db.collection("users").document(memberId).get()
                     .addOnSuccessListener { document ->
                         val username = document.getString("username") ?: memberId
+                        val photoURL = document.getString("photoURL")
                         memberNameTextView.text = username
+                        if (!photoURL.isNullOrEmpty()) {
+                            Glide.with(itemView.context)
+                                .load(photoURL)
+                                .circleCrop()
+                                .into(memberImageView)
+                        }
                     }
                     .addOnFailureListener { e ->
                         Log.e("MembersAdapter", "Error al obtener nombre de usuario: ${e.message}")
@@ -362,6 +375,47 @@ class ChatDetailActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    // Método para actualizar la imagen y el nombre del contacto
+    private fun updateContactInfo(chatId: String) {
+        db.collection("chats").document(chatId).get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val participants = document.get("participants") as? List<String> ?: emptyList()
+                    val currentUserId = auth.currentUser?.uid ?: return@addOnSuccessListener
+                    val isGroup = participants.size > 2
+
+                    if (isGroup) {
+                        val groupName = document.getString("name") ?: "Grupo"
+                        binding.tvContactName.text = groupName
+                        binding.profileImage.setImageResource(R.drawable.ic_imagen) // Imagen de grupo predeterminada
+                    } else {
+                        val friendId = participants.firstOrNull { it != currentUserId } ?: return@addOnSuccessListener
+                        db.collection("users").document(friendId).get()
+                            .addOnSuccessListener { userDocument ->
+                                val contactName = userDocument.getString("username") ?: "Desconocido"
+                                val photoURL = userDocument.getString("photoURL")
+
+                                binding.tvContactName.text = contactName
+                                if (!photoURL.isNullOrEmpty()) {
+                                    Glide.with(this)
+                                        .load(photoURL)
+                                        .circleCrop()
+                                        .into(binding.profileImage)
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("ChatDetailActivity", "Error al obtener información del usuario: ${e.message}")
+                            }
+                    }
+                } else {
+                    Log.e("ChatDetailActivity", "No se encontró el documento del chat")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatDetailActivity", "Error al obtener información del chat: ${e.message}")
+            }
     }
 
     private fun showChangeNicknameDialog(chatId: String) {

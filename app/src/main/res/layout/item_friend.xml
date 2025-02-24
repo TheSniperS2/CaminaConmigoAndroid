@@ -11,7 +11,7 @@
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_anadir" />
+        android:src="@drawable/ic_imagen" />
 
     <TextView
         android:id="@+id/friendName"

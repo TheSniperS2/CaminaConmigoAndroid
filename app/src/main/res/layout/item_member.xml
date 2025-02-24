@@ -5,19 +5,26 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
+    <ImageView
+        android:id="@+id/memberImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerCrop"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/ic_imagen" />
+
     <TextView
         android:id="@+id/memberNameTextView"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="Member Name"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        android:layout_weight="1" />
 
     <Button
         android:id="@+id/removeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Eliminar"
-        android:textColor="@android:color/white"
-        android:background="?attr/colorPrimary"/>
+        android:text="Remove"
+        android:textColor="@android:color/holo_red_light" />
 </LinearLayout>

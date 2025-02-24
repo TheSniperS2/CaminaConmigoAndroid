@@ -93,6 +93,8 @@ class ChatViewModel : ViewModel() {
             }
     }
 
+
+
     fun loadChats() {
         val currentUserId = auth.currentUser?.uid ?: return
 
@@ -130,7 +132,8 @@ class ChatViewModel : ViewModel() {
                             chatId = chatId,
                             name = chatName,
                             lastMessage = lastMessage,
-                            lastMessageTimestamp = lastMessageTimestamp
+                            lastMessageTimestamp = lastMessageTimestamp,
+                            participants = participants
                         ).also {
                             _userNames.value = userNames
                         }

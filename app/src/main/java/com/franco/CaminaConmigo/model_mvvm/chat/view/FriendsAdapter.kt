@@ -54,7 +54,7 @@ class FriendsAdapter(
             friendName.text = friend.name
             Glide.with(itemView.context)
                 .load(friend.imageUrl)
-                .placeholder(R.drawable.ic_anadir)
+                .placeholder(R.drawable.ic_imagen)
                 .into(friendImage)
         }
     }

@@ -6,11 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.bumptech.glide.Glide
+import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ItemChatBinding
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Chat
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ChatAdapter(private val onChatClick: (String) -> Unit) : ListAdapter<Chat, ChatViewHolder>(ChatDiffCallback()) {
+
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
         val binding = ItemChatBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -30,6 +34,7 @@ class ChatViewHolder(
 ) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
 
     private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     fun bind(chat: Chat) {
         try {
@@ -50,9 +55,9 @@ class ChatViewHolder(
             }
 
             // Recuperar y mostrar la imagen de perfil del usuario
-            if (chat.userIds.isNotEmpty()) {
-                val userId = chat.userIds[0] // Asumiendo que el primer ID es el del usuario con el que se está chateando
-                db.collection("users").document(userId).get()
+            if (chat.participants.size == 2) {
+                val friendId = chat.participants.first { it != auth.currentUser?.uid }
+                db.collection("users").document(friendId).get()
                     .addOnSuccessListener { document ->
                         val photoURL = document.getString("photoURL")
                         if (!photoURL.isNullOrEmpty()) {
@@ -65,6 +70,8 @@ class ChatViewHolder(
                     .addOnFailureListener { e ->
                         Log.e("ChatViewHolder", "Error al obtener la imagen de perfil: ${e.message}")
                     }
+            } else {
+                binding.profileImage.setImageResource(R.drawable.ic_imagen)
             }
 
             // Manejar el clic en el chat para abrirlo
