@@ -119,10 +119,12 @@ class ChatViewModel : ViewModel() {
                         val userNames = doc.get("userNames") as? Map<String, String> ?: emptyMap()
                         val lastMessage = doc.getString("lastMessage") ?: ""
                         val lastMessageTimestamp = doc.getTimestamp("lastMessageTimestamp")
+                        val chatName = doc.getString("name") ?: run {
+                            // Si no hay un nombre de grupo, construye un nombre basado en los amigos
+                            userNames.filterKeys { it != currentUserId }.values.joinToString(", ")
+                        }
 
                         Log.d("ChatViewModel", "Chat encontrado - ID: $chatId, Participantes: $participants")
-
-                        val chatName = userNames.filterKeys { it != currentUserId }.values.firstOrNull() ?: "Chat"
 
                         Chat(
                             chatId = chatId,
@@ -150,25 +152,41 @@ class ChatViewModel : ViewModel() {
             }
     }
 
-    fun createChat(friendId: String, friendName: String) {
+    fun createChat(friendUsername: String) {
         val currentUser = auth.currentUser ?: return
 
-        val chatRef = db.collection("chats").document()
-        val userNames = mapOf(
-            currentUser.uid to "Tú",
-            friendId to friendName
-        )
+        db.collection("users")
+            .whereEqualTo("username", friendUsername)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Log.e("ChatViewModel", "No se encontró usuario con el nombre de usuario: $friendUsername")
+                    return@addOnSuccessListener
+                }
 
-        val newChat = hashMapOf(
-            "participants" to listOf(currentUser.uid, friendId),
-            "userNames" to userNames,
-            "lastMessage" to "",
-            "lastMessageTimestamp" to null
-        )
+                val friendId = documents.documents.first().id
+                val friendName = documents.documents.first().getString("name") ?: ""
 
-        chatRef.set(newChat)
-            .addOnSuccessListener { Log.d("ChatViewModel", "Chat creado con éxito: ${chatRef.id}") }
-            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al crear chat: ${e.message}") }
+                val chatRef = db.collection("chats").document()
+                val userNames = mapOf(
+                    currentUser.uid to "Tú",
+                    friendId to friendName
+                )
+
+                val newChat = hashMapOf(
+                    "participants" to listOf(currentUser.uid, friendId),
+                    "userNames" to userNames,
+                    "lastMessage" to "",
+                    "lastMessageTimestamp" to null
+                )
+
+                chatRef.set(newChat)
+                    .addOnSuccessListener { Log.d("ChatViewModel", "Chat creado con éxito: ${chatRef.id}") }
+                    .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al crear chat: ${e.message}") }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatViewModel", "Error al buscar usuario: ${e.message}")
+            }
     }
 
     fun sendLocationMessage(chatId: String, locationMessage: Map<String, Any>) {
@@ -277,38 +295,107 @@ class ChatViewModel : ViewModel() {
             .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al actualizar nombre del grupo: ${e.message}") }
     }
 
-    fun addAdmin(chatId: String, userId: String) {
-        val chatRef = db.collection("chats").document(chatId)
-        chatRef.update("adminIds", FieldValue.arrayUnion(userId))
-            .addOnSuccessListener { Log.d("ChatViewModel", "Administrador agregado con éxito") }
-            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al agregar administrador: ${e.message}") }
+    fun addAdmin(chatId: String, username: String) {
+        db.collection("users")
+            .whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Log.e("ChatViewModel", "No se encontró usuario con el nombre de usuario: $username")
+                    return@addOnSuccessListener
+                }
+
+                val userId = documents.documents.first().id
+
+                val chatRef = db.collection("chats").document(chatId)
+                chatRef.update("adminIds", FieldValue.arrayUnion(userId))
+                    .addOnSuccessListener { Log.d("ChatViewModel", "Administrador agregado con éxito") }
+                    .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al agregar administrador: ${e.message}") }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatViewModel", "Error al buscar usuario: ${e.message}")
+            }
     }
 
-    fun removeParticipant(chatId: String, userId: String) {
+    fun removeParticipant(chatId: String, username: String) {
         isGroupChat(chatId) { isGroup ->
             if (isGroup) {
-                val chatRef = db.collection("chats").document(chatId)
-                chatRef.update("participants", FieldValue.arrayRemove(userId))
-                    .addOnSuccessListener { Log.d("ChatViewModel", "Participante eliminado con éxito") }
-                    .addOnFailureListener { Log.e("ChatViewModel", "Error al eliminar participante: ${it.message}") }
+                db.collection("users")
+                    .whereEqualTo("username", username)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        if (documents.isEmpty) {
+                            Log.e("ChatViewModel", "No se encontró usuario con el nombre de usuario: $username")
+                            return@addOnSuccessListener
+                        }
+
+                        val userId = documents.documents.first().id
+
+                        val chatRef = db.collection("chats").document(chatId)
+                        chatRef.update("participants", FieldValue.arrayRemove(userId))
+                            .addOnSuccessListener { Log.d("ChatViewModel", "Participante eliminado con éxito") }
+                            .addOnFailureListener { Log.e("ChatViewModel", "Error al eliminar participante: ${it.message}") }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("ChatViewModel", "Error al buscar usuario: ${e.message}")
+                    }
             } else {
                 Log.e("ChatViewModel", "No se pueden eliminar participantes en un chat individual")
             }
         }
     }
 
-    fun removeAdmin(chatId: String, userId: String) {
-        val chatRef = db.collection("chats").document(chatId)
-        chatRef.update("adminIds", FieldValue.arrayRemove(userId))
-            .addOnSuccessListener { Log.d("ChatViewModel", "Administrador removido con éxito") }
-            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al remover administrador: ${e.message}") }
+    fun removeAdmin(chatId: String, username: String) {
+        db.collection("users")
+            .whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Log.e("ChatViewModel", "No se encontró usuario con el nombre de usuario: $username")
+                    return@addOnSuccessListener
+                }
+
+                val userId = documents.documents.first().id
+
+                val chatRef = db.collection("chats").document(chatId)
+                chatRef.update("adminIds", FieldValue.arrayRemove(userId))
+                    .addOnSuccessListener { Log.d("ChatViewModel", "Administrador removido con éxito") }
+                    .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al remover administrador: ${e.message}") }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatViewModel", "Error al buscar usuario: ${e.message}")
+            }
     }
 
     fun addParticipants(chatId: String, newParticipants: List<String>) {
-        val chatRef = db.collection("chats").document(chatId)
-        chatRef.update("participants", FieldValue.arrayUnion(*newParticipants.toTypedArray()))
-            .addOnSuccessListener { Log.d("ChatViewModel", "Participantes añadidos con éxito") }
-            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al añadir participantes: ${e.message}") }
+        db.collection("users")
+            .whereIn("username", newParticipants)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Log.e("ChatViewModel", "No se encontraron usuarios con los nombres de usuario proporcionados")
+                    return@addOnSuccessListener
+                }
+
+                val userIds = documents.documents.map { it.id }
+                val batch = db.batch()
+                val chatRef = db.collection("chats").document(chatId)
+
+                // Actualizar la lista de participantes
+                batch.update(chatRef, "participants", FieldValue.arrayUnion(*userIds.toTypedArray()))
+
+                // Actualizar el contador de mensajes no leídos para los nuevos participantes
+                userIds.forEach { userId ->
+                    batch.update(chatRef, "unreadCount.$userId", 0)
+                }
+
+                batch.commit()
+                    .addOnSuccessListener { Log.d("ChatViewModel", "Participantes añadidos con éxito") }
+                    .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al añadir participantes: ${e.message}") }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatViewModel", "Error al buscar usuarios: ${e.message}")
+            }
     }
 
     fun loadChatById(chatId: String, callback: (Chat?) -> Unit) {

@@ -1,6 +1,5 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.view
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ActivityChatBinding
-import com.franco.CaminaConmigo.databinding.DialogCreateGroupBinding
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Friend
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
@@ -89,7 +87,7 @@ class ChatActivity : AppCompatActivity() {
         }
 
         binding.textView57.setOnClickListener {
-            showCreateGroupDialog()
+            showCreateGroupBottomSheet()
         }
     }
 
@@ -138,45 +136,9 @@ class ChatActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun showCreateGroupDialog() {
-        val dialogBinding = DialogCreateGroupBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogBinding.root)
-            .create()
-
-        val friendsAdapter = FriendsAdapter(emptyList()) { friend ->
-            // Lógica para manejar la selección de amigos
-        }
-        dialogBinding.recyclerViewFriends.layoutManager = LinearLayoutManager(this)
-        dialogBinding.recyclerViewFriends.adapter = friendsAdapter
-
-        // Cargar amigos del usuario actual
-        val currentUserId = auth.currentUser?.uid ?: return
-        db.collection("users").document(currentUserId).collection("friends").get()
-            .addOnSuccessListener { result ->
-                val friends = result.map { document ->
-                    Friend(
-                        id = document.id,
-                        name = document.getString("nickname") ?: "Amigo sin nombre"
-                    )
-                }
-                friendsAdapter.updateFriends(friends)
-            }
-            .addOnFailureListener { e ->
-                Log.e("ChatActivity", "Error al cargar amigos: ${e.message}")
-            }
-
-        dialogBinding.buttonCreateGroup.setOnClickListener {
-            val selectedFriends = friendsAdapter.getSelectedFriends()
-            if (selectedFriends.size < 2) {
-                Toast.makeText(this, "Debes seleccionar al menos 2 amigos para crear un grupo.", Toast.LENGTH_SHORT).show()
-            } else {
-                createGroup(selectedFriends)
-                dialog.dismiss()
-            }
-        }
-
-        dialog.show()
+    private fun showCreateGroupBottomSheet() {
+        val createGroupBottomSheetFragment = CreateGroupBottomSheetFragment()
+        createGroupBottomSheetFragment.show(supportFragmentManager, createGroupBottomSheetFragment.tag)
     }
 
     private fun createGroup(selectedFriends: List<Friend>) {

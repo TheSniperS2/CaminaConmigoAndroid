@@ -70,6 +70,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.libraries.places:places:3.1.0") // Nueva dependencia para Places SDK
     implementation(libs.play.services.location)
+    implementation("androidx.fragment:fragment-ktx:1.5.7")
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.room.ktx)

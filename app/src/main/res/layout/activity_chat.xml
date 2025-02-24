@@ -225,4 +225,11 @@
 
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/cardView7"
+        app:layout_constraintBottom_toTopOf="@id/linearLayoutFooter" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

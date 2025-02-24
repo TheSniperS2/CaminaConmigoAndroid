@@ -116,7 +116,7 @@ class ChatDetailActivity : AppCompatActivity() {
             }
         }
 
-// Configurar el menú desplegable para btnOptions
+        // Configurar el menú desplegable para btnOptions
         val btnOptions = findViewById<ImageButton>(R.id.btnOptions)
         btnOptions.setOnClickListener { view ->
             val chatId = intent.getStringExtra("CHAT_ID") ?: return@setOnClickListener
@@ -268,7 +268,7 @@ class ChatDetailActivity : AppCompatActivity() {
         val listView = dialogView.findViewById<RecyclerView>(R.id.recyclerViewMembers)
         listView.layoutManager = LinearLayoutManager(this)
 
-        val adapter = MembersAdapter(viewModel, chatId)
+        val adapter = MembersAdapter(viewModel, db, chatId)
         listView.adapter = adapter
 
         viewModel.loadChatById(chatId) { chat ->
@@ -283,9 +283,9 @@ class ChatDetailActivity : AppCompatActivity() {
                 .setTitle("Añadir administrador")
                 .setView(editText)
                 .setPositiveButton("Añadir") { _, _ ->
-                    val userId = editText.text.toString().trim()
-                    if (userId.isNotEmpty()) {
-                        viewModel.addAdmin(chatId, userId)
+                    val username = editText.text.toString().trim()
+                    if (username.isNotEmpty()) {
+                        viewModel.addAdmin(chatId, username)
                     }
                 }
                 .setNegativeButton("Cancelar", null)
@@ -299,9 +299,9 @@ class ChatDetailActivity : AppCompatActivity() {
                 .setTitle("Remover administrador")
                 .setView(editText)
                 .setPositiveButton("Remover") { _, _ ->
-                    val userId = editText.text.toString().trim()
-                    if (userId.isNotEmpty()) {
-                        viewModel.removeAdmin(chatId, userId)
+                    val username = editText.text.toString().trim()
+                    if (username.isNotEmpty()) {
+                        viewModel.removeAdmin(chatId, username)
                     }
                 }
                 .setNegativeButton("Cancelar", null)
@@ -314,6 +314,7 @@ class ChatDetailActivity : AppCompatActivity() {
 
     class MembersAdapter(
         private val viewModel: ChatViewModel,
+        private val db: FirebaseFirestore,
         private val chatId: String
     ) : RecyclerView.Adapter<MembersAdapter.MemberViewHolder>() {
 
@@ -326,7 +327,7 @@ class ChatDetailActivity : AppCompatActivity() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemberViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_member, parent, false)
-            return MemberViewHolder(view)
+            return MemberViewHolder(view, db, chatId, viewModel)
         }
 
         override fun onBindViewHolder(holder: MemberViewHolder, position: Int) {
@@ -336,12 +337,26 @@ class ChatDetailActivity : AppCompatActivity() {
 
         override fun getItemCount(): Int = membersList.size
 
-        inner class MemberViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        inner class MemberViewHolder(
+            itemView: View,
+            private val db: FirebaseFirestore,
+            private val chatId: String,
+            private val viewModel: ChatViewModel
+        ) : RecyclerView.ViewHolder(itemView) {
             private val memberNameTextView: TextView = itemView.findViewById(R.id.memberNameTextView)
             private val removeButton: Button = itemView.findViewById(R.id.removeButton)
 
             fun bind(memberId: String) {
-                memberNameTextView.text = memberId // Aquí puedes obtener el nombre del miembro si tienes un mapa de nombres
+                db.collection("users").document(memberId).get()
+                    .addOnSuccessListener { document ->
+                        val username = document.getString("username") ?: memberId
+                        memberNameTextView.text = username
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("MembersAdapter", "Error al obtener nombre de usuario: ${e.message}")
+                        memberNameTextView.text = memberId
+                    }
+
                 removeButton.setOnClickListener {
                     viewModel.removeParticipant(chatId, memberId)
                 }
