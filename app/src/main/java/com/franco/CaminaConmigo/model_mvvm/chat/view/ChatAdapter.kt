@@ -55,9 +55,16 @@ class ChatViewHolder(
                 binding.lastMessageTimestamp.text = "Sin fecha"
             }
 
-            // Recuperar y mostrar la imagen de perfil del usuario
+            // Recuperar y mostrar la imagen de perfil del usuario o del grupo
             if (chat.isGroup) {
-                binding.profileImage.setImageResource(R.drawable.ic_imagen) // Imagen de grupo predeterminada
+                if (chat.groupURL.isNotEmpty()) {
+                    Glide.with(binding.root.context)
+                        .load(chat.groupURL)
+                        .circleCrop()
+                        .into(binding.profileImage)
+                } else {
+                    binding.profileImage.setImageResource(R.drawable.ic_imagen) // Imagen de grupo predeterminada
+                }
             } else if (chat.participants.size == 2) {
                 val friendId = chat.participants.first { it != auth.currentUser?.uid }
                 db.collection("users").document(friendId).get()

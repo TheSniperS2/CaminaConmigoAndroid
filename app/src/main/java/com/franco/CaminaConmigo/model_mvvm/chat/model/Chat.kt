@@ -10,5 +10,6 @@ data class Chat(
     val lastMessage: String = "",
     val lastMessageTimestamp: Timestamp? = null, // Cambiar a Timestamp
     val userIds: List<String> = emptyList(),
-    val isGroup: Boolean = false // Añadir este campo para indicar si es un grupo
+    val isGroup: Boolean = false, // Añadir este campo para indicar si es un grupo
+    val groupURL: String = "" // Añadir este campo para la URL de la imagen del grupo
 )

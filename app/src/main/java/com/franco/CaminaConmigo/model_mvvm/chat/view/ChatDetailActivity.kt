@@ -1,7 +1,9 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.view
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -42,6 +44,8 @@ class ChatDetailActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private var isSharingLocation = false
     private var isGroupChat = false
+    private var selectedChatId: String? = null
+    private var groupImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,17 +90,13 @@ class ChatDetailActivity : AppCompatActivity() {
         }
 
         // Observa los userNames y crea el adaptador cuando estén disponibles
-
-
-            // Observa los mensajes y actualiza el adaptador
-            viewModel.messages.observe(this, Observer { messages ->
-                Log.d("ChatDetailActivity", "Mensajes actualizados en UI: ${messages.size}")
-                val adapter = MessageAdapter(auth.currentUser?.uid ?: "")
-                binding.recyclerViewMessages.adapter = adapter
-                adapter.submitList(messages)
-                binding.recyclerViewMessages.scrollToPosition(messages.size - 1) // Desplazar al último mensaje
-            })
-
+        viewModel.messages.observe(this, Observer { messages ->
+            Log.d("ChatDetailActivity", "Mensajes actualizados en UI: ${messages.size}")
+            val adapter = MessageAdapter(auth.currentUser?.uid ?: "")
+            binding.recyclerViewMessages.adapter = adapter
+            adapter.submitList(messages)
+            binding.recyclerViewMessages.scrollToPosition(messages.size - 1) // Desplazar al último mensaje
+        })
 
         // Carga los mensajes y los userNames
         viewModel.loadMessages(chatId)
@@ -130,8 +130,6 @@ class ChatDetailActivity : AppCompatActivity() {
                 showPopupMenu(view, chatId)
             }
         }
-
-
 
         // Configurar el botón para compartir ubicación
         btnCall.setOnClickListener {
@@ -179,49 +177,128 @@ class ChatDetailActivity : AppCompatActivity() {
         val popupMenu = PopupMenu(this, view)
         viewModel.isGroupChat(chatId) { isGroup ->
             if (isGroup) {
-                popupMenu.menuInflater.inflate(R.menu.menu_group_options, popupMenu.menu)
+                viewModel.isAdmin(chatId) { isAdmin ->
+                    if (isAdmin) {
+                        popupMenu.menuInflater.inflate(R.menu.menu_group_options, popupMenu.menu)
+                    }
+                    // Agregar opción para cambiar la imagen del grupo solo para administradores
+                    if (isAdmin) {
+                        popupMenu.menu.add(0, R.id.action_change_group_image, 1, "Cambiar imagen del grupo")
+                    }
+                    // Agregar opción para salir del grupo siempre
+                    popupMenu.menu.add(0, R.id.action_leave_group, 2, "Salir del grupo")
+                    popupMenu.setOnMenuItemClickListener { menuItem ->
+                        when (menuItem.itemId) {
+                            R.id.action_change_nickname -> {
+                                if (!isGroup) {
+                                    showChangeNicknameDialog(chatId)
+                                } else {
+                                    Toast.makeText(this, "Esta opción no está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
+                                }
+                                true
+                            }
+                            R.id.action_edit_group_name -> {
+                                if (isGroup) {
+                                    showEditGroupNameDialog(chatId)
+                                } else {
+                                    Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
+                                }
+                                true
+                            }
+                            R.id.action_add_participants -> {
+                                if (isGroup) {
+                                    showAddParticipantsDialog(chatId)
+                                } else {
+                                    Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
+                                }
+                                true
+                            }
+                            R.id.action_manage_members -> {
+                                if (isGroup) {
+                                    showManageMembersDialog(chatId)
+                                } else {
+                                    Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
+                                }
+                                true
+                            }
+                            R.id.action_change_group_image -> {
+                                selectGroupImage(chatId)
+                                true
+                            }
+                            R.id.action_leave_group -> {
+                                leaveGroup(chatId)
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                    popupMenu.show()
+                }
             } else {
                 popupMenu.menuInflater.inflate(R.menu.menu_options, popupMenu.menu)
-            }
-            popupMenu.setOnMenuItemClickListener { menuItem ->
-                when (menuItem.itemId) {
-                    R.id.action_change_nickname -> {
-                        if (!isGroup) {
+                popupMenu.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_change_nickname -> {
                             showChangeNicknameDialog(chatId)
-                        } else {
-                            Toast.makeText(this, "Esta opción no está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
+                            true
                         }
-                        true
+                        else -> false
                     }
-                    R.id.action_edit_group_name -> {
-                        if (isGroup) {
-                            showEditGroupNameDialog(chatId)
-                        } else {
-                            Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                        }
-                        true
+                }
+                popupMenu.show()
+            }
+        }
+    }
+
+    private fun selectGroupImage(chatId: String) {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, 2)
+        selectedChatId = chatId
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            groupImageUri = data?.data
+            binding.profileImage.setImageURI(groupImageUri)
+        } else if (requestCode == 2 && resultCode == Activity.RESULT_OK) {
+            val imageUri = data?.data
+            if (imageUri != null && selectedChatId != null) {
+                viewModel.uploadGroupImage(selectedChatId!!, imageUri) { success ->
+                    if (success) {
+                        Toast.makeText(this, "Imagen del grupo actualizada exitosamente.", Toast.LENGTH_SHORT).show()
+                        // Recuperar y actualizar la URL de la imagen del grupo desde Firestore
+                        db.collection("chats").document(selectedChatId!!).get()
+                            .addOnSuccessListener { document ->
+                                val groupURL = document.getString("groupURL") ?: ""
+                                if (groupURL.isNotEmpty()) {
+                                    Glide.with(this)
+                                        .load(groupURL)
+                                        .circleCrop()
+                                        .into(binding.profileImage)
+                                }
+                            }
+                    } else {
+                        Toast.makeText(this, "Error al subir la imagen del grupo.", Toast.LENGTH_SHORT).show()
                     }
-                    R.id.action_add_participants -> {
-                        if (isGroup) {
-                            showAddParticipantsDialog(chatId)
-                        } else {
-                            Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                        }
-                        true
-                    }
-                    R.id.action_manage_members -> {
-                        if (isGroup) {
-                            showManageMembersDialog(chatId)
-                        } else {
-                            Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                        }
-                        true
-                    }
-                    else -> false
                 }
             }
-            popupMenu.show()
         }
+    }
+
+
+    private fun leaveGroup(chatId: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Salir del grupo")
+            .setMessage("¿Estás seguro de que deseas salir del grupo?")
+            .setPositiveButton("Salir") { _, _ ->
+                viewModel.leaveGroup(chatId)
+                finish() // Cerrar la actividad después de salir del grupo
+            }
+            .setNegativeButton("Cancelar", null)
+            .create()
+            .show()
     }
 
     private fun showEditGroupNameDialog(chatId: String) {
@@ -391,7 +468,15 @@ class ChatDetailActivity : AppCompatActivity() {
                     if (isGroup) {
                         val groupName = document.getString("name") ?: "Grupo"
                         binding.tvContactName.text = groupName
-                        binding.profileImage.setImageResource(R.drawable.ic_imagen) // Imagen de grupo predeterminada
+                        val groupURL = document.getString("groupURL") ?: ""
+                        if (groupURL.isNotEmpty()) {
+                            Glide.with(this)
+                                .load(groupURL)
+                                .circleCrop()
+                                .into(binding.profileImage)
+                        } else {
+                            binding.profileImage.setImageResource(R.drawable.ic_imagen) // Imagen de grupo predeterminada
+                        }
                     } else {
                         val participants = document.get("participants") as? List<String> ?: emptyList()
                         val currentUserId = auth.currentUser?.uid ?: return@addOnSuccessListener

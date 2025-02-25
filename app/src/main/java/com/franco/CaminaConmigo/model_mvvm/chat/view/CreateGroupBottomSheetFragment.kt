@@ -104,7 +104,8 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
             "name" to groupName,
             "participants" to groupUserIds,
             "unreadCount" to groupUserIds.associateWith { 0 },
-            "isGroup" to true // Agregar el campo isGroup para identificar que es un grupo
+            "isGroup" to true, // Agregar el campo isGroup para identificar que es un grupo
+            "groupURL" to "" // Inicializar con un valor vacío
         )
 
         db.collection("chats").add(groupData)

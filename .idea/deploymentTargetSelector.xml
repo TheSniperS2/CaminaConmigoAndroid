@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="MapaActivity">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-02-17T20:15:25.218274Z">
+        <DropdownSelection timestamp="2025-02-25T02:55:09.247671300Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Franco\.android\avd\Pixel_9_API_35_2.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Franco\.android\avd\Pixel_9_Pro_XL_API_29.avd" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -29,10 +29,10 @@
       </SelectionState>
       <SelectionState runConfigName="ChatActivity">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-02-21T20:48:39.866041800Z">
+        <DropdownSelection timestamp="2025-02-25T02:55:22.139942100Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Franco\.android\avd\Pixel_9_API_35_2.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Franco\.android\avd\Pixel_9_Pro_XL_API_29.avd" />
             </handle>
           </Target>
         </DropdownSelection>

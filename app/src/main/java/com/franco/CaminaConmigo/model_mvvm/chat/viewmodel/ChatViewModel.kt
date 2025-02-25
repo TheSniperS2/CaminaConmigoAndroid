@@ -1,5 +1,6 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.viewmodel
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +11,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
 class ChatViewModel : ViewModel() {
     private val _messages = MutableLiveData<List<Message>>()
@@ -126,6 +129,7 @@ class ChatViewModel : ViewModel() {
                             userNames.filterKeys { it != currentUserId }.values.joinToString(", ")
                         }
                         val isGroup = doc.getBoolean("isGroup") ?: false // Obtener el campo isGroup
+                        val groupURL = doc.getString("groupURL") ?: "" // Obtener el campo groupURL
 
                         Log.d("ChatViewModel", "Chat encontrado - ID: $chatId, Participantes: $participants")
 
@@ -135,7 +139,8 @@ class ChatViewModel : ViewModel() {
                             lastMessage = lastMessage,
                             lastMessageTimestamp = lastMessageTimestamp,
                             participants = participants,
-                            isGroup = isGroup // Asegurarse de pasar el valor de isGroup
+                            isGroup = isGroup, // Asegurarse de pasar el valor de isGroup
+                            groupURL = groupURL // Asegurarse de pasar el valor de groupURL
                         ).also {
                             _userNames.value = userNames
                         }
@@ -291,6 +296,39 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+    fun leaveGroup(chatId: String) {
+        val currentUser = auth.currentUser ?: return
+        val currentUserId = currentUser.uid
+
+        db.collection("chats").document(chatId).get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val participants = document.get("participants") as? List<String> ?: emptyList()
+                val adminIds = document.get("adminIds") as? List<String> ?: emptyList()
+
+                if (adminIds.contains(currentUserId) && adminIds.size == 1) {
+                    // Si el usuario es el único admin, pasar el rol de admin a otro participante
+                    val remainingParticipants = participants.filter { it != currentUserId }
+                    if (remainingParticipants.isNotEmpty()) {
+                        val newAdminId = remainingParticipants.random()
+                        db.collection("chats").document(chatId).update("adminIds", FieldValue.arrayUnion(newAdminId))
+                            .addOnSuccessListener {
+                                Log.d("ChatViewModel", "Nuevo administrador asignado: $newAdminId")
+                                removeParticipant(chatId, currentUserId)
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("ChatViewModel", "Error al asignar nuevo administrador: ${e.message}")
+                            }
+                    }
+                } else {
+                    // Si el usuario no es el único admin, simplemente salir del grupo
+                    removeParticipant(chatId, currentUserId)
+                }
+            }
+        }.addOnFailureListener { e ->
+            Log.e("ChatViewModel", "Error al obtener el documento del chat: ${e.message}")
+        }
+    }
+
     fun updateGroupName(chatId: String, newName: String) {
         val chatRef = db.collection("chats").document(chatId)
         chatRef.update("name", newName)
@@ -334,12 +372,56 @@ class ChatViewModel : ViewModel() {
                                 .addOnSuccessListener { Log.d("ChatViewModel", "Configuración de grupo mantenida exitosamente") }
                                 .addOnFailureListener { Log.e("ChatViewModel", "Error al mantener la configuración de grupo: ${it.message}") }
                         }
+                        // Eliminar el usuario de adminIds y unreadCount
+                        chatRef.update("adminIds", FieldValue.arrayRemove(userId))
+                        chatRef.update("unreadCount.$userId", FieldValue.delete())
                     }
                     .addOnFailureListener { Log.e("ChatViewModel", "Error al eliminar participante: ${it.message}") }
             }
         }.addOnFailureListener { e ->
             Log.e("ChatViewModel", "Error al obtener el documento del chat: ${e.message}")
         }
+    }
+
+    fun isAdmin(chatId: String, callback: (Boolean) -> Unit) {
+        val currentUser = auth.currentUser ?: return
+        val currentUserId = currentUser.uid
+
+        db.collection("chats").document(chatId).get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val adminIds = document.get("adminIds") as? List<String> ?: emptyList()
+                callback(adminIds.contains(currentUserId))
+            } else {
+                callback(false)
+            }
+        }.addOnFailureListener {
+            callback(false)
+        }
+    }
+
+    fun uploadGroupImage(chatId: String, imageUri: Uri, callback: (Boolean) -> Unit) {
+        val storageRef = FirebaseStorage.getInstance().reference.child("group_images/${UUID.randomUUID()}")
+        storageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { uri ->
+                    updateGroupImageUrl(chatId, uri.toString(), callback)
+                }.addOnFailureListener {
+                    callback(false)
+                }
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
+    }
+
+    private fun updateGroupImageUrl(chatId: String, imageUrl: String, callback: (Boolean) -> Unit) {
+        db.collection("chats").document(chatId).update("groupURL", imageUrl)
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener {
+                callback(false)
+            }
     }
 
     fun removeAdmin(chatId: String, username: String) {
