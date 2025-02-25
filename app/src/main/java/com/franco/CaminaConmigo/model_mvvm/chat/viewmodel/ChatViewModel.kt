@@ -152,9 +152,12 @@ class ChatViewModel : ViewModel() {
 
                 Log.d("ChatViewModel", "Se cargaron ${chatList.size} chats.")
 
-                if (chatList.isNotEmpty()) {
-                    _chats.value = chatList
-                    Log.d("ChatViewModel", "Total de chats cargados: ${chatList.size}")
+                // Ordenar los chats por la fecha del último mensaje en orden descendente
+                val sortedChatList = chatList.sortedByDescending { it.lastMessageTimestamp }
+
+                if (sortedChatList.isNotEmpty()) {
+                    _chats.value = sortedChatList
+                    Log.d("ChatViewModel", "Total de chats cargados: ${sortedChatList.size}")
                 } else {
                     Log.w("ChatViewModel", "La lista de chats está vacía después de procesar los documentos")
                     _chats.value = emptyList()
