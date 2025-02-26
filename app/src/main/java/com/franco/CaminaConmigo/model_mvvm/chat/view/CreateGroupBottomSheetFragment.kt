@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -136,6 +137,8 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
                 if (groupImageUri != null) {
                     uploadGroupImage(documentReference.id, groupImageUri)
                 }
+                // Notificar a los usuarios del nuevo grupo
+                notifyGroupMembers(groupUserIds, documentReference.id, currentUserId, groupName)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(requireContext(), "Error al crear el grupo: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -156,6 +159,38 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+    }
+
+    private fun notifyGroupMembers(groupUserIds: List<String>, chatId: String, createdBy: String, groupName: String) {
+        for (userId in groupUserIds) {
+            if (userId != createdBy) {
+                createGroupInviteNotification(chatId, createdBy, userId, groupName)
+            }
+        }
+    }
+
+    private fun createGroupInviteNotification(chatId: String, createdBy: String, userId: String, groupName: String) {
+        val dataMap = mapOf(
+            "chatId" to chatId,
+            "createdBy" to createdBy,
+            "groupName" to groupName
+        )
+        val notificationData = mapOf(
+            "data" to dataMap,
+            "userId" to userId,
+            "isRead" to false,
+            "message" to "Has sido añadido al grupo '$groupName'",
+            "title" to "Nuevo grupo",
+            "type" to "groupInvite",
+            "createdAt" to com.google.firebase.Timestamp.now()
+        )
+        db.collection("users").document(userId).collection("notifications").add(notificationData)
+            .addOnSuccessListener {
+                Log.d("CreateGroupBottomSheetFragment", "Notificación de invitación a grupo creada para $userId")
+            }
+            .addOnFailureListener { e ->
+                Log.e("CreateGroupBottomSheetFragment", "Error al crear notificación de invitación a grupo para $userId", e)
+            }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

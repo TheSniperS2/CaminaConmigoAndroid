@@ -131,13 +131,14 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         // Deshabilitar el botón de enviar para evitar múltiples clics
         btnEnviarReporte.isEnabled = false
 
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val reporte = hashMapOf(
             "description" to descripcion,
             "type" to tipoReporte,
             "latitude" to selectedLatitude,
             "longitude" to selectedLongitude,
             "timestamp" to FieldValue.serverTimestamp(),
-            "userId" to (FirebaseAuth.getInstance().currentUser?.uid ?: "Anónimo"),
+            "userId" to userId,
             "isAnonymous" to isAnonimo,
             "likes" to 0,
             "imageUrls" to listOf<String>()
@@ -159,6 +160,9 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
                             Toast.makeText(requireContext(), "Error al subir imagen", Toast.LENGTH_SHORT).show()
                         }
                 }
+                if (!isAnonimo) {
+                    notifyFriendsAboutReport(userId, documentReference.id, tipoReporte)
+                }
                 dismiss()
             }
             .addOnFailureListener {
@@ -166,6 +170,49 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
                 // Rehabilitar el botón de enviar en caso de error
                 btnEnviarReporte.isEnabled = true
             }
+    }
+
+    private fun notifyFriendsAboutReport(userId: String, reportId: String, reportType: String) {
+        db.collection("users").document(userId).collection("friends").get()
+            .addOnSuccessListener { querySnapshot ->
+                for (document in querySnapshot.documents) {
+                    val friendId = document.id
+                    createFriendReportNotification(userId, friendId, reportId, reportType)
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Error al notificar a los amigos: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun createFriendReportNotification(userId: String, friendId: String, reportId: String, reportType: String) {
+        db.collection("users").document(userId).get().addOnSuccessListener { document ->
+            val friendName = document.getString("username") ?: "unknown"
+            val dataMap = mapOf(
+                "friendId" to userId,
+                "friendName" to friendName,
+                "reportId" to reportId,
+                "reportType" to reportType
+            )
+            val notificationData = mapOf(
+                "data" to dataMap,
+                "isRead" to false,
+                "message" to "$friendName ha reportado un incidente de $reportType",
+                "title" to "Nuevo reporte de amigo",
+                "type" to "friendReport",
+                "userId" to friendId,
+                "createdAt" to FieldValue.serverTimestamp()
+            )
+            db.collection("users").document(friendId).collection("notifications").add(notificationData)
+                .addOnSuccessListener {
+                    Toast.makeText(requireContext(), "Notificación de reporte enviada a $friendId", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(requireContext(), "Error al crear notificación de reporte: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }.addOnFailureListener { e ->
+            Toast.makeText(requireContext(), "Error al obtener el nombre de usuario: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun saveReportToFirestore(reporte: HashMap<String, Any?>) {

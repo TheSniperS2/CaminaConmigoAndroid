@@ -29,6 +29,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -260,9 +261,48 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
             .addOnSuccessListener {
                 edtComentario.text.clear()
                 Toast.makeText(requireContext(), "Comentario agregado", Toast.LENGTH_SHORT).show()
+                // Enviar notificación
+                user?.let {
+                    db.collection("reportes").document(reportId).get().addOnSuccessListener { document ->
+                        val reportOwnerId = document.getString("userId") ?: ""
+                        db.collection("users").document(it.uid).get().addOnSuccessListener { userDoc ->
+                            val commentAuthorUsername = userDoc.getString("username") ?: "Anónimo"
+                            createCommentNotification(it.uid, commentAuthorUsername, text, reportId, reportOwnerId)
+                        }
+                    }
+                }
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Error al agregar comentario", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun createCommentNotification(commentAuthorId: String, commentAuthorName: String, commentText: String, reportId: String, reportOwnerId: String) {
+        val dataMap = mapOf(
+            "commentAuthorId" to commentAuthorId,
+            "commentAuthorName" to commentAuthorName,
+            "commentText" to commentText,
+            "reportId" to reportId
+        )
+        val notificationData = mapOf(
+            "data" to dataMap,
+            "isRead" to false,
+            "message" to "$commentAuthorName comentó en tu reporte: $commentText",
+            "title" to "Nuevo comentario",
+            "type" to "reportComment",
+            "userId" to reportOwnerId,
+            "createdAt" to FieldValue.serverTimestamp()
+        )
+        db.collection("users").document(reportOwnerId).collection("notifications").add(notificationData)
+            .addOnSuccessListener {
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "Notificación de comentario enviada a $reportOwnerId", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "Error al crear notificación de comentario: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
