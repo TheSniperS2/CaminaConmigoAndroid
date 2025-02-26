@@ -8,10 +8,10 @@ data class Message(
     val senderId: String = "",
     val content: String = "",
     val timestamp: Timestamp = Timestamp.now(),
-    @PropertyName("isActive")
+    @get:PropertyName("isActive") @set:PropertyName("isActive")
     var isActive: Boolean = false,
     val latitude: Double? = null,
     val longitude: Double? = null,
-    @PropertyName("isRead")
+    @get:PropertyName("isRead") @set:PropertyName("isRead")
     var isRead: Boolean = false
 )

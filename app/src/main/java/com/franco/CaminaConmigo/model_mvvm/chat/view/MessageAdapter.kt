@@ -107,7 +107,9 @@ class ReceivedMessageViewHolder(private val binding: ItemMessageReceivedBinding)
 class LocationMessageViewHolder(private val binding: ItemLocationMessageBinding) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(message: Message) {
+        binding.tvLocationMessage.text = message.content
         val mapView = binding.mapView
+
         mapView.onCreate(null)
         mapView.getMapAsync { googleMap ->
             val location = LatLng(message.latitude!!, message.longitude!!)

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvRequestTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Solicitud de Amistad"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tvRequestMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Mensaje de solicitud de amistad"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/tvRequestTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tvRequestDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Fecha de solicitud"
+        android:textSize="12sp"
+        android:textColor="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/tvRequestMessage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btnAccept"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Aceptar"
+        app:layout_constraintTop_toBottomOf="@id/tvRequestDate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnReject"
+        app:layout_constraintWidth_percent="0.5"
+        android:layout_marginEnd="8dp" />
+
+    <Button
+        android:id="@+id/btnReject"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Rechazar"
+        app:layout_constraintTop_toBottomOf="@id/tvRequestDate"
+        app:layout_constraintStart_toEndOf="@id/btnAccept"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.5"
+        android:layout_marginStart="8dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

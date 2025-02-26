@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Chat
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -202,18 +203,19 @@ class ChatViewModel : ViewModel() {
             }
     }
 
-    fun sendLocationMessage(chatId: String, locationMessage: Map<String, Any>) {
-        val chatRef = db.collection("chats").document(chatId)
-        val locationSharingRef = chatRef.collection("locationSharing")
-
-        val newLocationMessageRef = locationSharingRef.document()
-
-        newLocationMessageRef.set(locationMessage)
-            .addOnSuccessListener {
-                Log.d("ChatViewModel", "Mensaje de ubicación enviado con ID: ${newLocationMessageRef.id}")
-            }
-            .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al enviar mensaje de ubicación: ${e.message}") }
+    fun sendLocationMessage(chatId: String, messageContent: String, latitude: Double, longitude: Double) {
+        val currentUser = auth.currentUser ?: return
+        val message = Message(
+            senderId = currentUser.uid,
+            content = messageContent,
+            timestamp = Timestamp.now(),
+            isActive = true,
+            latitude = latitude,
+            longitude = longitude
+        )
+        sendMessage(chatId, message)
     }
+
 
     fun sendMessage(chatId: String, message: Message) {
         val currentUser = auth.currentUser ?: return
@@ -237,6 +239,7 @@ class ChatViewModel : ViewModel() {
             }
             .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al enviar mensaje: ${e.message}") }
     }
+
 
     private fun markMessagesAsRead(messages: List<Message>, chatId: String) {
         val currentUser = auth.currentUser ?: return

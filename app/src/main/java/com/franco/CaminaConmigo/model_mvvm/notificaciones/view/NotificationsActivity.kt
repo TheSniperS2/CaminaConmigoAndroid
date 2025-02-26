@@ -18,16 +18,30 @@ class NotificationsActivity : AppCompatActivity() {
         binding = ActivityNotificationsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.recyclerViewNotifications.layoutManager = LinearLayoutManager(this)
-        val adapter = NotificationsAdapter(
-            onAcceptClicked = { notification ->
-                viewModel.acceptFriendRequest(notification)
+        binding.recyclerViewFriendRequests.layoutManager = LinearLayoutManager(this)
+        val friendRequestsAdapter = FriendRequestsAdapter(
+            onAcceptClicked = { request ->
+                viewModel.acceptFriendRequest(request)
             },
-            onRejectClicked = { notification ->
-                viewModel.rejectFriendRequest(notification)
+            onRejectClicked = { request ->
+                viewModel.rejectFriendRequest(request)
             }
         )
-        binding.recyclerViewNotifications.adapter = adapter
+        binding.recyclerViewFriendRequests.adapter = friendRequestsAdapter
+
+        binding.recyclerViewNotifications.layoutManager = LinearLayoutManager(this)
+        val notificationsAdapter = NotificationsAdapter()
+        binding.recyclerViewNotifications.adapter = notificationsAdapter
+
+        viewModel.friendRequests.observe(this) { friendRequests ->
+            Log.d("NotificationsActivity", "Se han recibido ${friendRequests.size} solicitudes de amistad")
+
+            if (friendRequests.isEmpty()) {
+                Log.d("NotificationsActivity", "No hay solicitudes de amistad para mostrar.")
+            }
+
+            friendRequestsAdapter.submitList(friendRequests)
+        }
 
         viewModel.notifications.observe(this) { notifications ->
             Log.d("NotificationsActivity", "Se han recibido ${notifications.size} notificaciones")
@@ -36,9 +50,10 @@ class NotificationsActivity : AppCompatActivity() {
                 Log.d("NotificationsActivity", "No hay notificaciones para mostrar.")
             }
 
-            adapter.submitList(notifications)
+            notificationsAdapter.submitList(notifications)
         }
 
+        viewModel.loadFriendRequests()
         viewModel.loadNotifications()
     }
 }
