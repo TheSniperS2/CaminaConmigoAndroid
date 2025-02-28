@@ -6,28 +6,36 @@
     android:layout_height="match_parent"
     tools:context="com.franco.CaminaConmigo.model_mvvm.chat.view.ChatActivity">
 
+    <!-- Título en CardView -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView7"
-        android:layout_width="410dp"
-        android:layout_height="110dp"
-        android:layout_margin="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="160dp"
-            android:layout_marginTop="56dp"
-            android:text="Chats"
-            android:textColor="#000000"
-            android:textSize="34sp"
-            android:textStyle="bold" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
 
+            <!-- Título -->
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chats"
+                android:textColor="#000000"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
     <TextView
@@ -78,12 +86,11 @@
         app:srcCompat="@drawable/anadir" />
 
     <!-- RecyclerView para chats -->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewChats"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="13dp"
         android:layout_marginTop="50dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="12dp"
@@ -224,12 +231,4 @@
         </LinearLayout>
 
     </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/cardView7"
-        app:layout_constraintBottom_toTopOf="@id/linearLayoutFooter" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

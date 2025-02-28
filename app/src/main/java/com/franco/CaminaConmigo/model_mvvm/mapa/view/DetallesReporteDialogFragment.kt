@@ -180,7 +180,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
             "Agresión Verbal" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_verbal)
             "Falta de Baños Públicos" -> imgIconoReporte.setImageResource(R.drawable.icon_faltabanos)
             "Mobiliario Inadecuado" -> imgIconoReporte.setImageResource(R.drawable.icon_mobiliario)
-            "Persona en situación de calle" -> imgIconoReporte.setImageResource(R.drawable.icon_situacioncalle)
+            "Personas en situación de calle" -> imgIconoReporte.setImageResource(R.drawable.icon_situacioncalle)
             else -> imgIconoReporte.setImageResource(R.drawable.ic_anadir)
         }
 

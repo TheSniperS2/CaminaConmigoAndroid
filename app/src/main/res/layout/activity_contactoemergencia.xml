@@ -1,40 +1,60 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- Título en CardView -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="90dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Encabezado con botón de retroceder y título -->
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingBottom="16dp">
+            android:layout_height="match_parent"
+            android:padding="16dp">
 
-            <!-- Botón de retroceder a la izquierda -->
+            <!-- Botón de retroceder a la izquierda del título -->
             <ImageView
                 android:id="@+id/btnRetroceder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_retroceder"
                 android:contentDescription="Retroceder"
-                android:layout_marginEnd="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:background="?android:attr/selectableItemBackground" />
 
             <!-- Título -->
             <TextView
+                android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Contactos de Emergencia"
-                android:textSize="24sp"
+                android:layout_gravity="center"
+                android:text="Contactos de emergencia"
+                android:textColor="#000000"
+                android:textSize="28sp"
                 android:textStyle="bold"
-                android:layout_marginStart="16dp" />
-        </LinearLayout>
+                app:layout_constraintStart_toEndOf="@id/btnRetroceder"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Botón flotante para agregar contacto -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="90dp"
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <!-- Lista de contactos -->
         <androidx.recyclerview.widget.RecyclerView
@@ -46,7 +66,6 @@
 
     </LinearLayout>
 
-    <!-- Botón flotante para agregar contacto -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/imageViewAgregar"
         android:layout_width="wrap_content"

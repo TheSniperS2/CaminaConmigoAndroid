@@ -103,7 +103,7 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
             "Agresión Verbal" -> R.drawable.icon_agre_verbal
             "Falta de Baños Públicos" -> R.drawable.icon_faltabanos
             "Mobiliario Inadecuado" -> R.drawable.icon_mobiliario
-            "Persona en situación de calle" -> R.drawable.icon_situacioncalle
+            "Personas en situación de calle" -> R.drawable.icon_situacioncalle
             else -> R.drawable.ic_anadir
         }
         imgTipoReporte.setImageResource(imageRes)

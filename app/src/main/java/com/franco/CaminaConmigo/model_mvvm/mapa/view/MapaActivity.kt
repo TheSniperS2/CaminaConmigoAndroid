@@ -244,7 +244,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
             "Agresión Física" -> R.drawable.i_agresion_fisica
             "Agresión Sexual" -> R.drawable.i_agresion_sexual
             "Agresión Verbal" -> R.drawable.i_agresion_verbal
-            "Falta de Baños Públicos" -> R.drawable.icon_faltabanos
+            "Falta de Baños Públicos" -> R.drawable.i_falta_de_banos_publicos
             "Mobiliario Inadecuado" -> R.drawable.i_mobiliario_inadecuado
             "Puntos Ciegos" -> R.drawable.i_puntos_ciegos
             "Personas en situación de calle" -> R.drawable.i_personas_en_situacion_de_calle

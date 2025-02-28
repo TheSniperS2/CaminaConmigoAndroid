@@ -13,7 +13,6 @@ android {
         viewBinding = true
     }
 
-
     defaultConfig {
         applicationId = "com.franco.CaminaConmigo"
         minSdk = 28
@@ -35,12 +34,22 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
     }
 }
 
@@ -48,14 +57,15 @@ dependencies {
     // Google Sign-In y Firebase Authentication
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.google.firebase:firebase-auth:23.1.0")
+    implementation("com.google.firebase:firebase-firestore:24.0.0")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
-    implementation ("com.google.firebase:firebase-storage:19.2.2")
-    implementation ("com.github.bumptech.glide:glide:4.12.0")
-    implementation ("jp.wasabeef:glide-transformations:4.3.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
+    implementation("com.google.firebase:firebase-storage:19.2.2")
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    implementation("jp.wasabeef:glide-transformations:4.3.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
 
-    implementation ("com.squareup.okhttp3:okhttp:4.9.1")
-    implementation ("com.google.code.gson:gson:2.8.6")
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("com.google.code.gson:gson:2.8.6")
 
     // Dependencias para ViewModel y LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
@@ -85,6 +95,22 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
+
+    // Dependencias de prueba
+    testImplementation("androidx.test.ext:junit:1.1.3")
+    testImplementation("androidx.test:core:1.4.0")
+    testImplementation("androidx.test:rules:1.4.0")
+    testImplementation("androidx.test:runner:1.4.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test:runner:1.4.0")
+    androidTestImplementation("androidx.test:rules:1.4.0")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:3.11.2")
+    testImplementation("org.mockito:mockito-inline:3.11.2")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
+    testImplementation("org.robolectric:robolectric:4.9")
 }
-
-

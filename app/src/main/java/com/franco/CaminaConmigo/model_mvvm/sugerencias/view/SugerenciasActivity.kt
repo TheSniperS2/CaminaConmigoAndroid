@@ -9,15 +9,24 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.franco.CaminaConmigo.R
+import com.franco.CaminaConmigo.model_mvvm.sugerencias.model.SugerenciasModel
+import com.franco.CaminaConmigo.model_mvvm.sugerencias.viewmodel.SugerenciasViewModel
+import com.franco.CaminaConmigo.model_mvvm.sugerencias.viewmodel.SugerenciasViewModelFactory
 import com.franco.CaminaConmigo.utils.MailerSendService
-import kotlin.concurrent.thread
 
 class SugerenciasActivity : AppCompatActivity() {
+
+    private lateinit var viewModel: SugerenciasViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sugerencias)
+
+        // Inicializamos el ViewModel
+        val mailerSendService = MailerSendService(applicationContext)
+        viewModel = ViewModelProvider(this, SugerenciasViewModelFactory(mailerSendService)).get(SugerenciasViewModel::class.java)
 
         // Inicializamos los elementos de la UI
         val imageViewBack = findViewById<ImageView>(R.id.imageView)
@@ -76,10 +85,8 @@ class SugerenciasActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Enviamos la sugerencia en un hilo separado para no bloquear la UI
-            thread {
-                enviarSugerencia(nombre, numeroStr, razon, mensaje, cbAnonimo.isChecked)
-            }
+            val suggestionModel = SugerenciasModel(nombre, numeroStr, razon, mensaje, cbAnonimo.isChecked)
+            viewModel.enviarSugerencia(suggestionModel)
 
             // Después de enviar, limpiamos todos los campos
             etNombre.setText("")
@@ -92,19 +99,16 @@ class SugerenciasActivity : AppCompatActivity() {
             etNombre.isEnabled = true
             etNumero.isEnabled = true
         }
-    }
 
-    private fun enviarSugerencia(nombre: String, numero: String, razon: String, mensaje: String, esAnonimo: Boolean) {
-        try {
-            MailerSendService(this).sendSuggestion(nombre, numero, razon, mensaje, esAnonimo)
-            runOnUiThread {
+        // Observamos los cambios en el ViewModel
+        viewModel.suggestionSent.observe(this) { sent ->
+            if (sent) {
                 Toast.makeText(this, "Sugerencia enviada correctamente.", Toast.LENGTH_SHORT).show()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            runOnUiThread {
-                Toast.makeText(this, "Hubo un problema al enviar la sugerencia. Inténtalo de nuevo.", Toast.LENGTH_LONG).show()
-            }
+        }
+
+        viewModel.errorMessage.observe(this) { error ->
+            Toast.makeText(this, error, Toast.LENGTH_LONG).show()
         }
     }
 }

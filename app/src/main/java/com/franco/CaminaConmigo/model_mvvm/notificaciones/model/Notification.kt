@@ -12,5 +12,6 @@ data class Notification(
     val message: String = "",
     val title: String = "",
     val type: String = "",
-    val createdAt: Timestamp? = null
+    val createdAt: Timestamp? = null,
+    var data: Map<String, Any>? = null
 )

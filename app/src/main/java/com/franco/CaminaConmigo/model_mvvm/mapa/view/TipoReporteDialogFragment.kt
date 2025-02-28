@@ -53,7 +53,7 @@ class TipoReporteDialogFragment : BottomSheetDialogFragment() {
             TipoReporte("Agresión Verbal", R.drawable.icon_agre_verbal),
             TipoReporte("Falta de Baños Públicos", R.drawable.icon_faltabanos),
             TipoReporte("Mobiliario Inadecuado", R.drawable.icon_mobiliario),
-            TipoReporte("Persona en situación de calle", R.drawable.icon_situacioncalle)
+            TipoReporte("Personas en situación de calle", R.drawable.icon_situacioncalle)
         )
 
         val adapter = TipoReporteAdapter(tipos) { tipo ->
