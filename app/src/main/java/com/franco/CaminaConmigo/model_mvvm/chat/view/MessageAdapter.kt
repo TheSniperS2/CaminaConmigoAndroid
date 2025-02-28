@@ -13,7 +13,6 @@ import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.firestore.FirebaseFirestore
 
 class MessageAdapter(private val currentUserId: String) : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
@@ -68,38 +67,25 @@ class SentMessageViewHolder(private val binding: ItemMessageSentBinding) : Recyc
 
         // Verificar si el timestamp es válido antes de formatearlo
         message.timestamp?.let {
-            val formattedDate = android.text.format.DateFormat.format("dd/MM/yyyy HH:mm:ss", it.toDate())
-            binding.tvTimestamp.text = formattedDate
+            val formattedTime = android.text.format.DateFormat.format("hh:mm a", it.toDate())
+            binding.tvTimestamp.text = formattedTime
         } ?: run {
-            binding.tvTimestamp.text = "Fecha no disponible"
+            binding.tvTimestamp.text = "Hora no disponible"
         }
     }
 }
 
 class ReceivedMessageViewHolder(private val binding: ItemMessageReceivedBinding) : RecyclerView.ViewHolder(binding.root) {
 
-    private val db = FirebaseFirestore.getInstance()
-
     fun bind(message: Message) {
         binding.tvMessage.text = message.content.ifEmpty { "Mensaje vacío" }
 
-        // Recuperar y mostrar el nombre del remitente usando senderId
-        db.collection("users").document(message.senderId).get()
-            .addOnSuccessListener { document ->
-                val senderName = document.getString("username") ?: "Remitente desconocido"
-                binding.tvSender.text = senderName
-            }
-            .addOnFailureListener { e ->
-                Log.e("ReceivedMessageViewHolder", "Error al obtener nombre de usuario: ${e.message}")
-                binding.tvSender.text = "Remitente desconocido"
-            }
-
         // Verificar si el timestamp es válido antes de formatearlo
         message.timestamp?.let {
-            val formattedDate = android.text.format.DateFormat.format("dd/MM/yyyy HH:mm:ss", it.toDate())
-            binding.tvTimestamp.text = formattedDate
+            val formattedTime = android.text.format.DateFormat.format("hh:mm a", it.toDate())
+            binding.tvTimestamp.text = formattedTime
         } ?: run {
-            binding.tvTimestamp.text = "Fecha no disponible"
+            binding.tvTimestamp.text = "Hora no disponible"
         }
     }
 }

@@ -224,7 +224,14 @@ class ChatViewModel : ViewModel() {
 
         val newMessageRef = messagesRef.document()
 
-        newMessageRef.set(message)
+        val messageData = hashMapOf(
+            "content" to message.content,
+            "isRead" to message.isRead,
+            "senderId" to message.senderId,
+            "timestamp" to message.timestamp
+        )
+
+        newMessageRef.set(messageData)
             .addOnSuccessListener {
                 Log.d("ChatViewModel", "Mensaje enviado con ID: ${newMessageRef.id}")
 

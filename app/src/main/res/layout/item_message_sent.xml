@@ -1,42 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="end"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    android:backgroundTint="@color/colorPrimary">
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:gravity="end">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:background="@drawable/message_background_sent"
+        android:padding="8dp">
 
-        <!-- Contenido del mensaje -->
+        <!-- Texto del mensaje -->
         <TextView
             android:id="@+id/tvMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Este es el contenido del mensaje"
+            android:text="Mensaje enviado"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"/>
-
-        <!-- Fecha del mensaje -->
-        <TextView
-            android:id="@+id/tvTimestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fecha y hora"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:layout_marginTop="4dp"/>
-
+            android:textSize="16sp" />
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+    <!-- Timestamp del mensaje -->
+    <TextView
+        android:id="@+id/tvTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10:00 AM"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="10sp"
+        android:layout_gravity="end"
+        android:paddingTop="4dp" />
+</LinearLayout>

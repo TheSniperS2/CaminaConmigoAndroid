@@ -62,21 +62,22 @@
         android:textStyle="bold"
         android:padding="14dp"
         android:textColor="#000000"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/cardView"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <!-- RecyclerView de solicitudes de amistad -->
-
-    <!-- RecyclerView de notificaciones -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewFriendRequests"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minHeight="100dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvFriendRequests" />
 
+    <!-- RecyclerView de notificaciones -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewNotifications"
         android:layout_width="match_parent"

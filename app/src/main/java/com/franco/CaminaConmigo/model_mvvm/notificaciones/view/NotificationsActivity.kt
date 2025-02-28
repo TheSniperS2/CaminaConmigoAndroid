@@ -2,6 +2,7 @@ package com.franco.CaminaConmigo.model_mvvm.notificaciones.view
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,6 +39,11 @@ class NotificationsActivity : AppCompatActivity() {
 
             if (friendRequests.isEmpty()) {
                 Log.d("NotificationsActivity", "No hay solicitudes de amistad para mostrar.")
+                binding.tvFriendRequests.visibility = View.GONE
+                binding.recyclerViewFriendRequests.visibility = View.GONE
+            } else {
+                binding.tvFriendRequests.visibility = View.VISIBLE
+                binding.recyclerViewFriendRequests.visibility = View.VISIBLE
             }
 
             friendRequestsAdapter.submitList(friendRequests)
