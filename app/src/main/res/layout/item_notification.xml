@@ -1,98 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp"
-    android:backgroundTint="@android:color/white">
+    android:orientation="vertical">
+
+    <!-- Línea superior -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#33000000"/> <!-- Color más transparente -->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@android:color/white">
+
+    <!-- Icono de la notificación -->
+    <ImageView
+        android:id="@+id/ivNotificationIcon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_chat2"
+        android:background="@drawable/circle_backgroundceleste"
+        android:padding="8dp"/>
+
+    <!-- Contenido de la notificación -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:paddingStart="12dp"> <!-- Aumentar el padding -->
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Título de la notificación -->
+        <TextView
+            android:id="@+id/tvNotificationTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:text="Nuevo reporte de amigo"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:textSize="18sp"/> <!-- Aumentar el tamaño del texto -->
 
-            <!-- Icono de la notificación -->
-            <ImageView
-                android:id="@+id/ivNotificationIcon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginEnd="12dp"
-                android:contentDescription="Icono de notificación" />
-
-            <!-- Contenido de la notificación -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <!-- Título de la notificación -->
-                <TextView
-                    android:id="@+id/tvNotificationTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Título de la notificación"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black" />
-
-                <!-- Mensaje de la notificación -->
-                <TextView
-                    android:id="@+id/tvNotificationMessage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Mensaje de la notificación"
-                    android:textColor="@android:color/black"
-                    android:layout_marginTop="4dp" />
-
-                <!-- Fecha de la notificación -->
-                <TextView
-                    android:id="@+id/tvNotificationDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Fecha y hora"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Botones de aceptar y rechazar -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Mensaje de la notificación -->
+        <TextView
+            android:id="@+id/tvNotificationMessage"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnAccept"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/colorAccent"
-                android:text="Aceptar"
-                android:textColor="@android:color/white"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/btnReject"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/colorAccent"
-                android:text="Rechazar"
-                android:textColor="@android:color/white"
-                android:visibility="gone" />
-        </LinearLayout>
+            android:text="juan.otazo ha reportado un incidente en la zona"
+            android:textSize="14sp"
+            android:textColor="#888888"/>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+    <!-- Fecha de la notificación -->
+    <TextView
+        android:id="@+id/tvNotificationDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="hace un momento"
+        android:textSize="14sp"
+        android:textColor="#888888"/>
+</LinearLayout>
+
+    <!-- Línea inferior -->
+<View
+android:layout_width="match_parent"
+android:layout_height="1dp"
+android:background="#33000000"/> <!-- Color más transparente -->
+    </LinearLayout>

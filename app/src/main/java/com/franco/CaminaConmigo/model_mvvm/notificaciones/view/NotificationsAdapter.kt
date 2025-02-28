@@ -3,10 +3,11 @@ package com.franco.CaminaConmigo.model_mvvm.notificaciones.view
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ItemNotificationBinding
 import com.franco.CaminaConmigo.model_mvvm.notificaciones.model.Notification
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.google.firebase.Timestamp
+import java.util.concurrent.TimeUnit
 
 class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.NotificationViewHolder>() {
 
@@ -33,13 +34,41 @@ class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.Notificat
             binding.tvNotificationTitle.text = notification.title
             binding.tvNotificationMessage.text = notification.message
 
+            // Asignar icono según el título de la notificación
+            val iconResId = when (notification.title) {
+                "Nuevo grupo" -> R.drawable.ic_group
+                "Nueva solicitud de amistad", "Solicitud aceptada" -> R.drawable.ic_person
+                "Nuevo reporte de amigo" -> R.drawable.ic_warning
+                "Nuevo comentario" -> R.drawable.ic_comment
+                else -> R.drawable.ic_anadir // Icono por defecto
+            }
+            binding.ivNotificationIcon.setImageResource(iconResId)
+
             // Formatear la fecha de creación si no es nula
             notification.createdAt?.let {
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-                val date = it.toDate()
-                binding.tvNotificationDate.text = dateFormat.format(date)
+                binding.tvNotificationDate.text = getTimeAgo(it)
             } ?: run {
                 binding.tvNotificationDate.text = "Fecha no disponible"
+            }
+        }
+
+        private fun getTimeAgo(timestamp: Timestamp): String {
+            val now = System.currentTimeMillis()
+            val diff = now - timestamp.toDate().time
+
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(diff)
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
+            val hours = TimeUnit.MILLISECONDS.toHours(diff)
+            val days = TimeUnit.MILLISECONDS.toDays(diff)
+
+            return when {
+                seconds < 60 -> "hace un momento"
+                minutes < 60 -> "hace $minutes ${if (minutes == 1L) "minuto" else "minutos"}"
+                hours < 24 -> "hace $hours ${if (hours == 1L) "hora" else "horas"}"
+                days < 7 -> "hace $days ${if (days == 1L) "día" else "días"}"
+                days < 30 -> "hace ${days / 7} ${if (days / 7 == 1L) "semana" else "semanas"}"
+                days < 365 -> "hace ${days / 30} ${if (days / 30 == 1L) "mes" else "meses"}"
+                else -> "hace ${days / 365} ${if (days / 365 == 1L) "año" else "años"}"
             }
         }
     }
