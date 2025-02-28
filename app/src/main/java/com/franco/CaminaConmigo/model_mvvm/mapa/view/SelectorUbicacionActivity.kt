@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -19,10 +20,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Locale
 
 class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -128,7 +128,7 @@ class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
             "Agresión Física" -> R.drawable.i_agresion_fisica
             "Agresión Sexual" -> R.drawable.i_agresion_sexual
             "Agresión Verbal" -> R.drawable.i_agresion_verbal
-            "Falta de Baños Públicos" -> R.drawable.icon_faltabanos
+            "Falta de Baños Públicos" -> R.drawable.i_falta_de_banos_publicos
             "Mobiliario Inadecuado" -> R.drawable.i_mobiliario_inadecuado
             "Puntos Ciegos" -> R.drawable.i_puntos_ciegos
             "Personas en situación de calle" -> R.drawable.i_personas_en_situacion_de_calle
@@ -143,15 +143,22 @@ class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
         return Bitmap.createScaledBitmap(imageBitmap, width, height, false)
     }
 
+    // Modifica el método obtenerNombreUbicacion
     private fun obtenerNombreUbicacion(latLng: LatLng, callback: (String) -> Unit) {
-        val placeFields = listOf(Place.Field.NAME)
-        val request = FetchPlaceRequest.newInstance(latLng.toString(), placeFields)
-
-        placesClient.fetchPlace(request).addOnSuccessListener { response ->
-            val place = response.place
-            callback(place.name ?: "Ubicación seleccionada")
-        }.addOnFailureListener { exception ->
-            Log.e("SelectorUbicacionActivity", "Error al obtener el nombre de la ubicación", exception)
+        val geocoder = Geocoder(this, Locale.getDefault())
+        try {
+            val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+            if (addresses != null && addresses.isNotEmpty()) {
+                val address = addresses[0]
+                val streetAddress = address.thoroughfare ?: "Ubicación seleccionada"
+                val streetNumber = address.subThoroughfare ?: ""
+                val locationName = if (streetNumber.isNotEmpty()) "$streetAddress $streetNumber" else streetAddress
+                callback(locationName)
+            } else {
+                callback("Ubicación seleccionada")
+            }
+        } catch (e: Exception) {
+            Log.e("SelectorUbicacionActivity", "Error al obtener el nombre de la ubicación", e)
             callback("Ubicación seleccionada")
         }
     }

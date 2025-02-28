@@ -133,14 +133,14 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val reporte = hashMapOf(
-            "description" to descripcion,
+            "content" to descripcion,
             "type" to tipoReporte,
             "latitude" to selectedLatitude,
             "longitude" to selectedLongitude,
             "timestamp" to FieldValue.serverTimestamp(),
-            "userId" to userId,
+            "senderId" to userId,
             "isAnonymous" to isAnonimo,
-            "likes" to 0,
+            "isRead" to false,
             "imageUrls" to listOf<String>()
         )
 
@@ -186,6 +186,10 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun createFriendReportNotification(userId: String, friendId: String, reportId: String, reportType: String) {
+        if (!isAdded) {
+            return
+        }
+
         db.collection("users").document(userId).get().addOnSuccessListener { document ->
             val friendName = document.getString("username") ?: "unknown"
             val dataMap = mapOf(
@@ -205,13 +209,19 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
             )
             db.collection("users").document(friendId).collection("notifications").add(notificationData)
                 .addOnSuccessListener {
-                    Toast.makeText(requireContext(), "Notificación de reporte enviada a $friendId", Toast.LENGTH_SHORT).show()
+                    if (isAdded) {
+                        Toast.makeText(requireContext(), "Notificación de reporte enviada a $friendId", Toast.LENGTH_SHORT).show()
+                    }
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(requireContext(), "Error al crear notificación de reporte: ${e.message}", Toast.LENGTH_SHORT).show()
+                    if (isAdded) {
+                        Toast.makeText(requireContext(), "Error al crear notificación de reporte: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
                 }
         }.addOnFailureListener { e ->
-            Toast.makeText(requireContext(), "Error al obtener el nombre de usuario: ${e.message}", Toast.LENGTH_SHORT).show()
+            if (isAdded) {
+                Toast.makeText(requireContext(), "Error al obtener el nombre de usuario: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
