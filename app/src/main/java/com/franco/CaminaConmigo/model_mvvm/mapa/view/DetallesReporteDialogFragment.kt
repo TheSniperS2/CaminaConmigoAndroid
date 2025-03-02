@@ -293,17 +293,6 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
             "userId" to reportOwnerId,
             "createdAt" to FieldValue.serverTimestamp()
         )
-        db.collection("users").document(reportOwnerId).collection("notifications").add(notificationData)
-            .addOnSuccessListener {
-                if (isAdded) {
-                    Toast.makeText(requireContext(), "Notificación de comentario enviada a $reportOwnerId", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .addOnFailureListener { e ->
-                if (isAdded) {
-                    Toast.makeText(requireContext(), "Error al crear notificación de comentario: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
     }
 
     private fun darLike() {
