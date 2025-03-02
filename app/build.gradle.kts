@@ -56,6 +56,7 @@ android {
 dependencies {
     // Google Sign-In y Firebase Authentication
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.firebase:firebase-bom:28.4.2")
     implementation("com.google.firebase:firebase-auth:23.1.0")
     implementation("com.google.firebase:firebase-firestore:24.0.0")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")

@@ -30,29 +30,21 @@ class InvitarAmigosActivity : AppCompatActivity() {
     }
 
     private fun enviarInvitacion() {
-        val numeroTelefono = "+123456789"  // Número de teléfono al que deseas enviar el mensaje
         val mensaje = "¡Hola! Te invito a unirte a la app CaminaConmigo. Descárgala ahora desde Google Play: https://play.google.com/store/apps/details?id=com.franco.CaminaConmigo"
 
-        // Intent para abrir WhatsApp con el mensaje predefinido
-        val uri = Uri.parse("https://wa.me/$numeroTelefono?text=${Uri.encode(mensaje)}")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
+        // Intent para compartir el mensaje con diferentes aplicaciones
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, mensaje)
+        }
 
-        // Verificamos si WhatsApp está instalado en el dispositivo
-        if (isAppInstalled("com.whatsapp")) {
-            startActivity(intent)
+        // Verificar si hay aplicaciones que puedan manejar el Intent
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(Intent.createChooser(intent, "Compartir invitación con"))
         } else {
-            // Si WhatsApp no está instalado, redirigir a Google Play para que lo descargue
+            // Manejar el caso donde no hay aplicaciones disponibles para manejar el Intent
             val playStoreIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.whatsapp"))
             startActivity(playStoreIntent)
-        }
-    }
-
-    private fun isAppInstalled(packageName: String): Boolean {
-        return try {
-            packageManager.getPackageInfo(packageName, 0)
-            true  // Si la app está instalada
-        } catch (e: Exception) {
-            false  // Si la app no está instalada
         }
     }
 }

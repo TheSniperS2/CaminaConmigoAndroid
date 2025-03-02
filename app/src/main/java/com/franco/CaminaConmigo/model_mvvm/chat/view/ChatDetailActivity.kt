@@ -29,6 +29,7 @@ import com.franco.CaminaConmigo.databinding.ActivityChatDetailBinding
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
+import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.LocationSharingViewModel
 import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
 import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
 import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
@@ -46,6 +47,8 @@ class ChatDetailActivity : AppCompatActivity() {
     private var isGroupChat = false
     private var selectedChatId: String? = null
     private var groupImageUri: Uri? = null
+    private val locationSharingViewModel: LocationSharingViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,7 +117,6 @@ class ChatDetailActivity : AppCompatActivity() {
                     senderId = auth.currentUser?.uid ?: "",
                     content = messageContent,
                     timestamp = Timestamp.now(),
-                    isActive = true
                 )
                 viewModel.sendMessage(chatId, message)
                 binding.etMessage.text.clear()
@@ -529,6 +531,7 @@ class ChatDetailActivity : AppCompatActivity() {
         imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
     }
 
+    // Métodos adicionales para gestionar el estado de compartir ubicación
     private fun showLocationSharingDialog() {
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_location_sharing, null)
@@ -556,8 +559,6 @@ class ChatDetailActivity : AppCompatActivity() {
         }
 
         val dialog = builder.create()
-
-        // 👇 Aquí forzamos los bordes redondeados
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         positiveButton.setOnClickListener {
@@ -582,27 +583,8 @@ class ChatDetailActivity : AppCompatActivity() {
 
     private fun stopSharingLocation() {
         val chatId = intent.getStringExtra("CHAT_ID") ?: return
-        val currentUser = auth.currentUser ?: return
-
-        val locationSharingRef = db.collection("chats").document(chatId).collection("locationSharing")
-        locationSharingRef.whereEqualTo("senderId", currentUser.uid)
-            .whereEqualTo("isActive", true)
-            .get()
-            .addOnSuccessListener { snapshots ->
-                for (document in snapshots.documents) {
-                    locationSharingRef.document(document.id).update("isActive", false)
-                        .addOnSuccessListener {
-                            Log.d("ChatDetailActivity", "Ubicación dejada de compartir con éxito")
-                            addLocationSharingMessage(chatId, "Dejó de compartir su ubicación")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("ChatDetailActivity", "Error al dejar de compartir ubicación: ${e.message}")
-                        }
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("ChatDetailActivity", "Error al obtener mensajes de ubicación: ${e.message}")
-            }
+        locationSharingViewModel.stopSharingLocation(chatId)
+        addLocationSharingMessage(chatId, "Dejó de compartir su ubicación")
     }
 
     private fun addLocationSharingMessage(chatId: String, content: String) {
@@ -640,58 +622,8 @@ class ChatDetailActivity : AppCompatActivity() {
     }
 
     private fun shareLocation() {
-        val latitude = -29.913299580848747
-        val longitude = -71.248106468252
-        val currentUser = auth.currentUser
-
-        if (currentUser != null) {
-            val chatId = intent.getStringExtra("CHAT_ID") ?: return
-            val locationSharingRef = db.collection("chats").document(chatId).collection("locationSharing")
-
-            locationSharingRef.whereEqualTo("senderId", currentUser.uid)
-                .get()
-                .addOnSuccessListener { snapshots ->
-                    if (snapshots.isEmpty) {
-                        // Crear un nuevo documento si no existe
-                        val locationMessage = hashMapOf(
-                            "isActive" to true,
-                            "latitude" to latitude,
-                            "longitude" to longitude,
-                            "senderId" to currentUser.uid,
-                            "timestamp" to Timestamp.now()
-                        )
-                        locationSharingRef.add(locationMessage)
-                            .addOnSuccessListener {
-                                Log.d("ChatDetailActivity", "Ubicación compartida con éxito")
-                                addLocationSharingMessage(chatId, "Comenzó a compartir su ubicación")
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("ChatDetailActivity", "Error al compartir ubicación: ${e.message}")
-                            }
-                    } else {
-                        // Actualizar el documento existente
-                        for (document in snapshots.documents) {
-                            locationSharingRef.document(document.id).update(
-                                mapOf(
-                                    "isActive" to true,
-                                    "latitude" to latitude,
-                                    "longitude" to longitude,
-                                    "timestamp" to Timestamp.now()
-                                )
-                            ).addOnSuccessListener {
-                                Log.d("ChatDetailActivity", "Ubicación actualizada con éxito")
-                                addLocationSharingMessage(chatId, "Comenzó a compartir su ubicación")
-                            }.addOnFailureListener { e ->
-                                Log.e("ChatDetailActivity", "Error al actualizar ubicación: ${e.message}")
-                            }
-                        }
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.e("ChatDetailActivity", "Error al obtener mensajes de ubicación: ${e.message}")
-                }
-        } else {
-            Log.e("ChatDetailActivity", "Usuario no autenticado, no se puede compartir la ubicación")
-        }
+        val chatId = intent.getStringExtra("CHAT_ID") ?: return
+        locationSharingViewModel.startSharingLocation(chatId)
+        addLocationSharingMessage(chatId, "Comenzó a compartir su ubicación")
     }
 }

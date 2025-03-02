@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +18,7 @@ import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
 import com.franco.CaminaConmigo.model_mvvm.novedad.adapter.ReporteAdapter
 import com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte
 import com.franco.CaminaConmigo.model_mvvm.novedad.viewmodel.NovedadViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 
 class NovedadActivity : AppCompatActivity() {
 
@@ -55,9 +57,28 @@ class NovedadActivity : AppCompatActivity() {
     }
 
     private fun abrirDetalles(reporte: Reporte) {
-        val intent = Intent(this, DetallesReporteDialogFragment::class.java)
-        intent.putExtra("idReporte", reporte.id)
-        startActivity(intent)
+        // Recuperar los demás datos desde Firestore si es necesario
+        val db = FirebaseFirestore.getInstance()
+        db.collection("reportes").document(reporte.id) // Asegúrate de que reporte.id contiene el ID correcto
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    // Extraer los datos del reporte
+                    val type = document.getString("type") ?: "Tipo desconocido"
+                    val description = document.getString("description") ?: "Descripción desconocida"
+                    val timestamp = document.getDate("timestamp")
+                    val likes = document.getLong("likes")?.toInt() ?: 0
+
+                    // Crear la instancia del fragmento con los datos
+                    val dialogFragment = DetallesReporteDialogFragment.newInstance(
+                        reporte.id, type, description, timestamp, likes
+                    )
+                    dialogFragment.show(supportFragmentManager, "DetallesReporteDialogFragment")
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al obtener los detalles del reporte", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun configurarBotonesInferiores() {

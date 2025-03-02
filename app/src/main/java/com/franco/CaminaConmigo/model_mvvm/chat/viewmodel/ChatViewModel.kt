@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Chat
+import com.franco.CaminaConmigo.model_mvvm.chat.model.LocationMessage
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -83,9 +84,20 @@ class ChatViewModel : ViewModel() {
 
                 val locationMessages = snapshots.documents.mapNotNull { doc ->
                     try {
-                        val message = doc.toObject(Message::class.java)?.copy(id = doc.id)
-                        Log.d("ChatViewModel", "Mensaje de ubicación cargado: ${message?.content}, Timestamp: ${message?.timestamp}")
-                        message
+                        val locationMessage = doc.toObject(LocationMessage::class.java)?.copy(id = doc.id)
+                        if (locationMessage != null) {
+                            val message = Message(
+                                id = locationMessage.id,
+                                senderId = locationMessage.senderId,
+                                content = "Ubicación: ${locationMessage.latitude}, ${locationMessage.longitude}",
+                                timestamp = Timestamp.now(),
+                                isRead = false
+                            )
+                            Log.d("ChatViewModel", "Mensaje de ubicación cargado: ${message.content}, Timestamp: ${message.timestamp}")
+                            message
+                        } else {
+                            null
+                        }
                     } catch (ex: Exception) {
                         Log.e("ChatViewModel", "Error al procesar mensaje de ubicación: ${ex.message}")
                         null
@@ -96,8 +108,6 @@ class ChatViewModel : ViewModel() {
                 _messages.postValue(combinedMessages.sortedBy { it.timestamp })
             }
     }
-
-
 
     fun loadChats() {
         val currentUserId = auth.currentUser?.uid ?: return
@@ -202,20 +212,6 @@ class ChatViewModel : ViewModel() {
                 Log.e("ChatViewModel", "Error al buscar usuario: ${e.message}")
             }
     }
-
-    fun sendLocationMessage(chatId: String, messageContent: String, latitude: Double, longitude: Double) {
-        val currentUser = auth.currentUser ?: return
-        val message = Message(
-            senderId = currentUser.uid,
-            content = messageContent,
-            timestamp = Timestamp.now(),
-            isActive = true,
-            latitude = latitude,
-            longitude = longitude
-        )
-        sendMessage(chatId, message)
-    }
-
 
     fun sendMessage(chatId: String, message: Message) {
         val currentUser = auth.currentUser ?: return

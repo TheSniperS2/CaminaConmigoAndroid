@@ -264,7 +264,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
                 // Enviar notificación
                 user?.let {
                     db.collection("reportes").document(reportId).get().addOnSuccessListener { document ->
-                        val reportOwnerId = document.getString("userId") ?: ""
+                        val reportOwnerId = document.getString("senderId") ?: ""
                         db.collection("users").document(it.uid).get().addOnSuccessListener { userDoc ->
                             val commentAuthorUsername = userDoc.getString("username") ?: "Anónimo"
                             createCommentNotification(it.uid, commentAuthorUsername, text, reportId, reportOwnerId)
@@ -327,6 +327,26 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
                     agregarLike(user.uid)
                 }
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mapView.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
     }
 
     private fun agregarLike(userId: String) {

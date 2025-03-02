@@ -56,9 +56,21 @@ class NovedadViewModel : ViewModel() {
                                 reportesConTendencias.add(reporte)
 
                                 if (reportesConTendencias.size == reportes.size) {
-                                    reportesConTendencias.sortWith(compareByDescending<Reporte> { it.likes }.thenByDescending { it.comentarios })
+                                    reportesConTendencias.sortWith(compareByDescending<Reporte> { it.likes + it.comentarios })
                                     _reportes.value = reportesConTendencias
                                 }
+                            }.addOnFailureListener {
+                                // Manejar errores de comentarios
+                                if (reportesConTendencias.size == reportes.size) {
+                                    reportesConTendencias.sortWith(compareByDescending<Reporte> { it.likes + it.comentarios })
+                                    _reportes.value = reportesConTendencias
+                                }
+                            }
+                        }.addOnFailureListener {
+                            // Manejar errores de likes
+                            if (reportesConTendencias.size == reportes.size) {
+                                reportesConTendencias.sortWith(compareByDescending<Reporte> { it.likes + it.comentarios })
+                                _reportes.value = reportesConTendencias
                             }
                         }
                     }

@@ -34,6 +34,7 @@ class ReporteAdapter(
         private val ubicacion: TextView = itemView.findViewById(R.id.txtUbicacionReporte)
         private val imgReporte: ImageView = itemView.findViewById(R.id.imgReporte)
 
+        // Cambios para asegurar que los comentarios se muestren visualmente
         fun bind(reporte: Reporte) {
             // Verificar si el reporte tiene imágenes
             if (!reporte.imageUrls.isNullOrEmpty()) {

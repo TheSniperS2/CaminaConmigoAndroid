@@ -133,7 +133,7 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val reporte = hashMapOf(
-            "content" to descripcion,
+            "description" to descripcion,  // Asegúrate de usar "description" aquí
             "type" to tipoReporte,
             "latitude" to selectedLatitude,
             "longitude" to selectedLongitude,

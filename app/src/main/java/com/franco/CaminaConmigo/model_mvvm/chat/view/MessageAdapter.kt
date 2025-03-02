@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.franco.CaminaConmigo.databinding.ItemLocationMessageBinding
 import com.franco.CaminaConmigo.databinding.ItemMessageReceivedBinding
 import com.franco.CaminaConmigo.databinding.ItemMessageSentBinding
+import com.franco.CaminaConmigo.model_mvvm.chat.model.LocationMessage
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
@@ -25,7 +26,7 @@ class MessageAdapter(private val currentUserId: String) : ListAdapter<Message, R
     override fun getItemViewType(position: Int): Int {
         val message = getItem(position)
         return when {
-            message.latitude != null && message.longitude != null -> VIEW_TYPE_LOCATION
+            message.content.startsWith("Ubicación:") -> VIEW_TYPE_LOCATION
             message.senderId == currentUserId -> VIEW_TYPE_SENT
             else -> VIEW_TYPE_RECEIVED
         }
@@ -55,7 +56,20 @@ class MessageAdapter(private val currentUserId: String) : ListAdapter<Message, R
         when (holder) {
             is SentMessageViewHolder -> holder.bind(message)
             is ReceivedMessageViewHolder -> holder.bind(message)
-            is LocationMessageViewHolder -> holder.bind(message)
+            is LocationMessageViewHolder -> {
+                // Parse the latitude and longitude from the content
+                val parts = message.content.removePrefix("Ubicación: ").split(", ")
+                val latitude = parts[0].toDouble()
+                val longitude = parts[1].toDouble()
+                val locationMessage = LocationMessage(
+                    senderId = message.senderId,
+                    timestamp = message.timestamp.seconds * 1000, // Convert to milliseconds
+                    latitude = latitude,
+                    longitude = longitude,
+                    isActive = true
+                )
+                holder.bind(locationMessage)
+            }
         }
     }
 }
@@ -92,13 +106,13 @@ class ReceivedMessageViewHolder(private val binding: ItemMessageReceivedBinding)
 
 class LocationMessageViewHolder(private val binding: ItemLocationMessageBinding) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(message: Message) {
-        binding.tvLocationMessage.text = message.content
+    fun bind(locationMessage: LocationMessage) {
+        binding.tvLocationMessage.text = "Ubicación compartida"
         val mapView = binding.mapView
 
         mapView.onCreate(null)
         mapView.getMapAsync { googleMap ->
-            val location = LatLng(message.latitude!!, message.longitude!!)
+            val location = LatLng(locationMessage.latitude, locationMessage.longitude)
             googleMap.addMarker(MarkerOptions().position(location).title("Ubicación compartida"))
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
         }

@@ -21,7 +21,6 @@ class EmergenciaDialogFragment : DialogFragment() {
 
     private val db = FirebaseFirestore.getInstance()
 
-    // Agrega las referencias a mediaPlayer y audioManager
     private var mediaPlayer: MediaPlayer? = null
     private var audioManager: AudioManager? = null
     private var originalVolume: Int = 0
@@ -41,44 +40,65 @@ class EmergenciaDialogFragment : DialogFragment() {
         val txtContacto2 = view.findViewById<TextView>(R.id.txtContacto2)
         val btnCerrar = view.findViewById<TextView>(R.id.btnCerrar)
 
-        // Obtener los 3 contactos de emergencia: Carabineros + 2 contactos personalizados (con order 0 y 1)
+        // Ocultar los contactos personalizados por defecto
+        txtContacto1.visibility = View.GONE
+        btnContacto1.visibility = View.GONE
+        txtContacto2.visibility = View.GONE
+        btnContacto2.visibility = View.GONE
+
+        // Obtener el ID del usuario actual
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             db.collection("users").document(userId).collection("emergency_contacts")
                 .whereIn("order", listOf(0, 1)) // Filtrar por order 0 y 1
                 .orderBy("order") // Ordenar por "order"
-                .limit(2) // Obtener solo los dos contactos personalizados
                 .get()
                 .addOnSuccessListener { documents ->
-                    val contactos = documents.map { doc ->
-                        Pair(doc.getString("name") ?: "No disponible", doc.getString("phone") ?: "")
-                    }.toMutableList()
+                    if (documents.isEmpty) {
+                        // Si no hay contactos de emergencia personalizados, mostrar solo Carabineros
+                        txtCarabineros.text = "Carabineros"
+                        btnCarabineros.setOnClickListener {
+                            realizarLlamada("133")
+                        }
+                    } else {
+                        val contactos = documents.map { doc ->
+                            Pair(doc.getString("name") ?: "No disponible", doc.getString("phone") ?: "")
+                        }.toMutableList()
 
-                    // Agregar el contacto de Carabineros al principio de la lista
-                    contactos.add(0, Pair("Carabineros", "133"))
+                        // Agregar el contacto de Carabineros al principio de la lista
+                        contactos.add(0, Pair("Carabineros", "133"))
 
-                    // Asegurarse de que haya exactamente 3 contactos
-                    while (contactos.size < 3) {
-                        contactos.add(Pair("No disponible", ""))
-                    }
+                        // Asegurarse de que haya exactamente 3 contactos
+                        while (contactos.size < 3) {
+                            contactos.add(Pair("No disponible", ""))
+                        }
 
-                    // Configurar los contactos en la interfaz
-                    // Carabineros
-                    txtCarabineros.text = contactos[0].first
-                    btnCarabineros.setOnClickListener {
-                        realizarLlamada(contactos[0].second)
-                    }
+                        // Configurar los contactos en la interfaz
+                        // Carabineros
+                        txtCarabineros.text = contactos[0].first
+                        btnCarabineros.setOnClickListener {
+                            realizarLlamada(contactos[0].second)
+                        }
 
-                    // Contacto 1 (con order 0)
-                    txtContacto1.text = contactos[1].first
-                    btnContacto1.setOnClickListener {
-                        if (contactos[1].second.isNotEmpty()) realizarLlamada(contactos[1].second)
-                    }
+                        // Contacto 1 (con order 0)
+                        if (contactos[1].second.isNotEmpty()) {
+                            txtContacto1.text = contactos[1].first
+                            txtContacto1.visibility = View.VISIBLE
+                            btnContacto1.visibility = View.VISIBLE
+                            btnContacto1.setOnClickListener {
+                                realizarLlamada(contactos[1].second)
+                            }
+                        }
 
-                    // Contacto 2 (con order 1)
-                    txtContacto2.text = contactos[2].first
-                    btnContacto2.setOnClickListener {
-                        if (contactos[2].second.isNotEmpty()) realizarLlamada(contactos[2].second)
+                        // Contacto 2 (con order 1)
+                        if (contactos[2].second.isNotEmpty()) {
+                            txtContacto2.text = contactos[2].first
+                            txtContacto2.visibility = View.VISIBLE
+                            btnContacto2.visibility = View.VISIBLE
+                            btnContacto2.setOnClickListener {
+                                realizarLlamada(contactos[2].second)
+                            }
+                        }
                     }
                 }
                 .addOnFailureListener {
@@ -111,25 +131,21 @@ class EmergenciaDialogFragment : DialogFragment() {
         dialog?.window?.attributes = params
     }
 
-    // Método para detener la alarma cuando se cierra el DialogFragment
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         detenerAlarma()
     }
 
-    // Método para detener la alarma cuando se destruye la vista del DialogFragment
     override fun onDestroyView() {
         super.onDestroyView()
         detenerAlarma()
     }
 
-    // Método para detener la alarma cuando el fragmento ya no está visible
     override fun onStop() {
         super.onStop()
         detenerAlarma()
     }
 
-    // Método para detener la alarma y restaurar el volumen original
     private fun detenerAlarma() {
         if (mediaPlayer != null) {
             mediaPlayer?.stop()
@@ -140,7 +156,6 @@ class EmergenciaDialogFragment : DialogFragment() {
         }
     }
 
-    // Método para configurar el MediaPlayer y AudioManager antes de que se muestre el DialogFragment
     fun setMediaPlayer(mediaPlayer: MediaPlayer, audioManager: AudioManager, originalVolume: Int) {
         this.mediaPlayer = mediaPlayer
         this.audioManager = audioManager
