@@ -456,8 +456,15 @@ class ComentariosAdapter(
         holder.bind(comentario)
 
         // Configurar el botón de borrar
-        holder.imgBorrar.setOnClickListener {
-            borrarComentario(comentario)
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        if (user != null && user.uid == comentario.authorId) {
+            holder.imgBorrar.visibility = View.VISIBLE
+            holder.imgBorrar.setOnClickListener {
+                borrarComentario(comentario)
+            }
+        } else {
+            holder.imgBorrar.visibility = View.GONE
         }
     }
 
