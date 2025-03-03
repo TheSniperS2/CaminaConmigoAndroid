@@ -164,10 +164,6 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         }
         mMap.isMyLocationEnabled = true
 
-        // Coordenadas de La Serena, Chile
-        val laSerena = LatLng(-29.9027, -71.2519)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(laSerena, 12f))
-
         mMap.setOnMarkerClickListener { marker ->
             val reporteId = marker.tag as? String
             if (reporteId != null) {
@@ -196,15 +192,13 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
             true
         }
 
-        /*
-        // CÓDIGO COMENTADO PARA GPS EN TIEMPO REAL (Activar cuando sea necesario)
+        // Obtener ubicación en tiempo real
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
                 val miUbicacion = LatLng(it.latitude, it.longitude)
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 15f))
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 12f))
             }
         }
-        */
     }
 
     private fun cargarReportes() {

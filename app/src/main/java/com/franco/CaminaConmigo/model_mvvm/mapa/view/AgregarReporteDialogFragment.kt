@@ -29,7 +29,7 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
     private lateinit var tipoReporte: String
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
-    private var selectedImageUri: Uri? = null
+    private val selectedImageUris = mutableListOf<Uri>()
     private var selectedLatitude: Double? = null
     private var selectedLongitude: Double? = null
     private var selectedLocationName: String? = null
@@ -133,7 +133,7 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val reporte = hashMapOf(
-            "description" to descripcion,  // Asegúrate de usar "description" aquí
+            "description" to descripcion,
             "type" to tipoReporte,
             "latitude" to selectedLatitude,
             "longitude" to selectedLongitude,
@@ -148,17 +148,19 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
             .add(reporte)
             .addOnSuccessListener { documentReference ->
                 Toast.makeText(requireContext(), "Reporte enviado", Toast.LENGTH_SHORT).show()
-                selectedImageUri?.let { uri ->
-                    val storageRef = storage.reference.child("report_images/${UUID.randomUUID()}")
-                    storageRef.putFile(uri)
-                        .addOnSuccessListener {
-                            storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                                documentReference.update("imageUrls", FieldValue.arrayUnion(downloadUri.toString()))
+                if (selectedImageUris.isNotEmpty()) {
+                    for (uri in selectedImageUris) {
+                        val storageRef = storage.reference.child("report_images/${UUID.randomUUID()}")
+                        storageRef.putFile(uri)
+                            .addOnSuccessListener {
+                                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                                    documentReference.update("imageUrls", FieldValue.arrayUnion(downloadUri.toString()))
+                                }
                             }
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(requireContext(), "Error al subir imagen", Toast.LENGTH_SHORT).show()
-                        }
+                            .addOnFailureListener {
+                                Toast.makeText(requireContext(), "Error al subir imagen", Toast.LENGTH_SHORT).show()
+                            }
+                    }
                 }
                 if (!isAnonimo) {
                     notifyFriendsAboutReport(userId, documentReference.id, tipoReporte)
@@ -246,6 +248,7 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
 
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         startActivityForResult(intent, IMAGE_PICK_CODE)
     }
 
@@ -254,13 +257,25 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             when (requestCode) {
                 IMAGE_PICK_CODE -> {
-                    selectedImageUri = data?.data
-                    Toast.makeText(requireContext(), "Imagen seleccionada", Toast.LENGTH_SHORT).show()
+                    data?.let {
+                        if (it.clipData != null) {
+                            val count = it.clipData!!.itemCount
+                            for (i in 0 until count) {
+                                val imageUri = it.clipData!!.getItemAt(i).uri
+                                selectedImageUris.add(imageUri)
+                            }
+                            Toast.makeText(requireContext(), "$count imágenes seleccionadas", Toast.LENGTH_SHORT).show()
+                        } else if (it.data != null) {
+                            val imageUri = it.data!!
+                            selectedImageUris.add(imageUri)
+                            Toast.makeText(requireContext(), "1 imagen seleccionada", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
                 CAMERA_REQUEST_CODE -> {
                     val photo: Bitmap = data?.extras?.get("data") as Bitmap
                     val uri = getImageUriFromBitmap(photo)
-                    selectedImageUri = uri
+                    selectedImageUris.add(uri)
                     Toast.makeText(requireContext(), "Foto tomada", Toast.LENGTH_SHORT).show()
                 }
                 LOCATION_PICKER_REQUEST -> {

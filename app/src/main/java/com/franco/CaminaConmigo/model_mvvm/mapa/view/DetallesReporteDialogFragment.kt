@@ -4,10 +4,12 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -51,6 +53,11 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
     private lateinit var imgIconoReporte: ImageView
     private lateinit var likeContainer: LinearLayout
     private lateinit var imgReporte: ImageView
+    private lateinit var imgAnterior: ImageView
+    private lateinit var imgSiguiente: ImageView
+    private lateinit var imageContainer: FrameLayout
+    private var imageUrls: List<String> = emptyList()
+    private var currentImageIndex = 0
 
     // Firebase
     private val db = FirebaseFirestore.getInstance()
@@ -149,18 +156,30 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
         }
 
         // Verificar si el reporte tiene imágenes
+// Verificar si el reporte tiene imágenes
         val reportRef = db.collection("reportes").document(reportId)
         reportRef.get().addOnSuccessListener { document ->
             if (document.exists()) {
-                val imageUrls = document.get("imageUrls") as? List<String>
-                if (!imageUrls.isNullOrEmpty()) {
-                    // Mostrar la imagen
+                imageUrls = document.get("imageUrls") as? List<String> ?: emptyList()
+                if (imageUrls.isNotEmpty()) {
+                    // Mostrar la primera imagen
                     imgReporte.visibility = View.VISIBLE
+                    imageContainer.visibility = View.VISIBLE
                     mapView.visibility = View.GONE
                     Glide.with(this).load(imageUrls[0]).into(imgReporte)
+
+                    // Configurar visibilidad de botones de navegación
+                    if (imageUrls.size > 1) {
+                        imgAnterior.visibility = View.VISIBLE
+                        imgSiguiente.visibility = View.VISIBLE
+                    } else {
+                        imgAnterior.visibility = View.GONE
+                        imgSiguiente.visibility = View.GONE
+                    }
                 } else {
                     // Mostrar el mapa
                     imgReporte.visibility = View.GONE
+                    imageContainer.visibility = View.GONE
                     mapView.visibility = View.VISIBLE
                 }
             }
@@ -188,6 +207,11 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
         likeContainer.setOnClickListener { darLike() }
         txtCompartir.setOnClickListener { compartirReporte() }
         btnEnviarComentario.setOnClickListener { enviarComentario() }
+        imgAnterior = view.findViewById(R.id.imgAnterior)
+        imgSiguiente = view.findViewById(R.id.imgSiguiente)
+        imageContainer = view.findViewById(R.id.imageContainer)
+        imgAnterior.setOnClickListener { mostrarImagenAnterior() }
+        imgSiguiente.setOnClickListener { mostrarImagenSiguiente() }
 
         // Botón cerrar
         val btnCerrar: TextView = view.findViewById(R.id.btnCerrar)
@@ -198,7 +222,41 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
         // Cargar los comentarios
         cargarComentarios()
 
+        // Ajustar la vista cuando el teclado se muestra
+        adjustViewForKeyboard(view)
+
         return view
+    }
+
+    private fun adjustViewForKeyboard(view: View) {
+        val rootView = view.findViewById<View>(R.id.rootLayout)
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                val rect = Rect()
+                rootView.getWindowVisibleDisplayFrame(rect)
+                val screenHeight = rootView.height
+                val keypadHeight = screenHeight - rect.bottom
+                if (keypadHeight > screenHeight * 0.15) { // Teclado visible
+                    rootView.findViewById<LinearLayout>(R.id.commentSection).translationY = -keypadHeight.toFloat()
+                } else { // Teclado oculto
+                    rootView.findViewById<LinearLayout>(R.id.commentSection).translationY = 0f
+                }
+            }
+        })
+    }
+
+    private fun mostrarImagenAnterior() {
+        if (imageUrls.isNotEmpty()) {
+            currentImageIndex = (currentImageIndex - 1 + imageUrls.size) % imageUrls.size
+            Glide.with(this).load(imageUrls[currentImageIndex]).into(imgReporte)
+        }
+    }
+
+    private fun mostrarImagenSiguiente() {
+        if (imageUrls.isNotEmpty()) {
+            currentImageIndex = (currentImageIndex + 1) % imageUrls.size
+            Glide.with(this).load(imageUrls[currentImageIndex]).into(imgReporte)
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
