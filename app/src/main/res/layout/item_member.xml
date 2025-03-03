@@ -20,11 +20,4 @@
         android:text="Member Name"
         android:textSize="16sp"
         android:layout_weight="1" />
-
-    <Button
-        android:id="@+id/removeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Remove"
-        android:textColor="@android:color/holo_red_light" />
 </LinearLayout>

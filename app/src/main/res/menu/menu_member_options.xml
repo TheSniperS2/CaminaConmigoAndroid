@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_give_admin"
+        android:title="Dar Admin"/>
+    <item
+        android:id="@+id/action_remove_admin"
+        android:title="Remover Admin"/>
+    <item
+        android:id="@+id/action_remove_member"
+        android:title="Eliminar del grupo"/>
+
+</menu>

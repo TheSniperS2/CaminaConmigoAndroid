@@ -83,7 +83,7 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_priorizar"
+                    android:src="@drawable/ic_three_dots"
                     android:contentDescription="Opciones"/>
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
@@ -104,23 +104,26 @@
     <LinearLayout
         android:id="@+id/messageLayout"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginBottom="72dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/linearLayoutFooter">
 
         <!-- EditText para escribir el mensaje -->
         <EditText
             android:id="@+id/etMessage"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/edit_text_background"
             android:hint="Escribe un mensaje..."
-            android:inputType="text"
+            android:inputType="textMultiLine"
             android:padding="8dp"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:gravity="top|start"
+            android:minLines="1"
+            android:maxLines="5"
+            android:scrollbars="vertical"/>
 
         <!-- Botón de enviar -->
         <ImageButton

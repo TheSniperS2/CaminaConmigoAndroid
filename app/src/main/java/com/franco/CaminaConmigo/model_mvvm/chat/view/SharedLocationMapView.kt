@@ -41,6 +41,21 @@ class SharedLocationMapViewFragment : Fragment(R.layout.fragment_shared_location
         binding.btnShowFullScreen.setOnClickListener {
             // Handle showing full screen map
         }
+
+        locationSharingViewModel.activeLocationSharing.observe(viewLifecycleOwner, { locationMap ->
+            locationMap[locationMessage.senderId]?.let { updatedLocation ->
+                updateMapLocation(updatedLocation.latitude, updatedLocation.longitude)
+            }
+        })
+    }
+
+    private fun updateMapLocation(latitude: Double, longitude: Double) {
+        map?.let {
+            val location = LatLng(latitude, longitude)
+            it.clear()
+            it.addMarker(MarkerOptions().position(location).title("Ubicación compartida"))
+            it.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

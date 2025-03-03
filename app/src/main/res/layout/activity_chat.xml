@@ -73,7 +73,7 @@
         app:layout_constraintHorizontal_bias="0.533"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView7"
-        app:srcCompat="@drawable/anadir" />
+        app:srcCompat="@drawable/person_add_24px" />
 
     <ImageView
         android:id="@+id/imageView46"
@@ -83,7 +83,7 @@
         android:layout_marginEnd="12dp"
         app:layout_constraintEnd_toStartOf="@+id/textView57"
         app:layout_constraintTop_toBottomOf="@+id/cardView7"
-        app:srcCompat="@drawable/anadir" />
+        app:srcCompat="@drawable/group_add_24px" />
 
     <!-- RecyclerView para chats -->
     <androidx.recyclerview.widget.RecyclerView

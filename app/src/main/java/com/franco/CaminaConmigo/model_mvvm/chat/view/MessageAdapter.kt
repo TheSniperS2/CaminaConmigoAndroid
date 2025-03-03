@@ -14,6 +14,7 @@ import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.Timestamp
 
 class MessageAdapter(private val currentUserId: String) : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
@@ -63,7 +64,7 @@ class MessageAdapter(private val currentUserId: String) : ListAdapter<Message, R
                 val longitude = parts[1].toDouble()
                 val locationMessage = LocationMessage(
                     senderId = message.senderId,
-                    timestamp = message.timestamp.seconds * 1000, // Convert to milliseconds
+                    timestamp = Timestamp.now(), // Convert to milliseconds
                     latitude = latitude,
                     longitude = longitude,
                     isActive = true

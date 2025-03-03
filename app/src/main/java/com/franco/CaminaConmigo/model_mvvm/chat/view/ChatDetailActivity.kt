@@ -1,10 +1,14 @@
 package com.franco.CaminaConmigo.model_mvvm.chat.view
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,9 +21,11 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,14 +55,14 @@ class ChatDetailActivity : AppCompatActivity() {
     private var groupImageUri: Uri? = null
     private val locationSharingViewModel: LocationSharingViewModel by viewModels()
 
+    private lateinit var chatId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val chatId = intent.getStringExtra("CHAT_ID")
-        if (chatId == null) {
+        chatId = intent.getStringExtra("CHAT_ID") ?: run {
             Log.e("ChatDetailActivity", "Chat ID es nulo, no se pueden cargar mensajes")
             return
         }
@@ -106,8 +112,17 @@ class ChatDetailActivity : AppCompatActivity() {
         viewModel.loadLocationMessages(chatId) // Cargar mensajes de ubicación
         viewModel.loadChats()
 
+        // Observa el estado de isActive y actualiza el icono de btnCall en consecuencia
+        locationSharingViewModel.isActive.observe(this, Observer { isActive ->
+            val iconRes = if (isActive) R.drawable.location_on_24px else R.drawable.location_off_24px
+            btnCall.setImageResource(iconRes)
+        })
+
         // Verificar el estado de compartir ubicación
-        checkLocationSharingStatus()
+        checkLocationSharingStatus(chatId)
+
+        // Restaurar el estado de compartir ubicación si es necesario
+        locationSharingViewModel.restoreSharingStateIfNeeded()
 
         // Enviar mensaje
         binding.btnSend.setOnClickListener {
@@ -123,10 +138,38 @@ class ChatDetailActivity : AppCompatActivity() {
             }
         }
 
+
+// Agrega un TextWatcher para ajustar el tamaño dinámicamente
+        binding.etMessage.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                // No se necesita implementación aquí
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // No se necesita implementación aquí
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val minLines = 2
+                val maxLines = 5
+                val lineHeight = binding.etMessage.lineHeight
+                val lines = binding.etMessage.lineCount
+
+                if (lines in minLines..maxLines) {
+                    binding.etMessage.layoutParams.height = lineHeight * lines
+                } else if (lines > maxLines) {
+                    binding.etMessage.layoutParams.height = lineHeight * maxLines
+                    binding.etMessage.isVerticalScrollBarEnabled = true
+                } else {
+                    binding.etMessage.layoutParams.height = lineHeight * minLines
+                }
+                binding.etMessage.requestLayout()
+            }
+        })
+
         // Configurar el menú desplegable para btnOptions
         val btnOptions = findViewById<ImageButton>(R.id.btnOptions)
         btnOptions.setOnClickListener { view ->
-            val chatId = intent.getStringExtra("CHAT_ID") ?: return@setOnClickListener
             viewModel.isGroupChat(chatId) { isGroup ->
                 isGroupChat = isGroup
                 showPopupMenu(view, chatId)
@@ -135,7 +178,23 @@ class ChatDetailActivity : AppCompatActivity() {
 
         // Configurar el botón para compartir ubicación
         btnCall.setOnClickListener {
-            showLocationSharingDialog()
+            showLocationSharingDialog(chatId)
+        }
+    }
+
+
+    private fun startSharingLocationWithPermission(chatId: String) {
+        locationSharingViewModel.startSharingLocation(chatId)
+        Toast.makeText(this, "Comenzó a compartir su ubicación", Toast.LENGTH_SHORT).show()
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            startSharingLocationWithPermission(chatId)
+        } else {
+            Toast.makeText(this, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -180,47 +239,32 @@ class ChatDetailActivity : AppCompatActivity() {
         viewModel.isGroupChat(chatId) { isGroup ->
             if (isGroup) {
                 viewModel.isAdmin(chatId) { isAdmin ->
-                    if (isAdmin) {
-                        popupMenu.menuInflater.inflate(R.menu.menu_group_options, popupMenu.menu)
+                    popupMenu.menuInflater.inflate(R.menu.menu_group_options, popupMenu.menu)
+
+                    // Solo permitir opciones adicionales para administradores
+                    if (!isAdmin) {
+                        popupMenu.menu.removeItem(R.id.action_edit_group_name)
+                        popupMenu.menu.removeItem(R.id.action_add_participants)
+                        popupMenu.menu.removeItem(R.id.action_manage_members)
+                        popupMenu.menu.removeItem(R.id.action_change_group_image)
                     }
-                    // Agregar opción para cambiar la imagen del grupo solo para administradores
-                    if (isAdmin) {
-                        popupMenu.menu.add(0, R.id.action_change_group_image, 1, "Cambiar imagen del grupo")
-                    }
-                    // Agregar opción para salir del grupo siempre
-                    popupMenu.menu.add(0, R.id.action_leave_group, 2, "Salir del grupo")
+
                     popupMenu.setOnMenuItemClickListener { menuItem ->
                         when (menuItem.itemId) {
                             R.id.action_change_nickname -> {
-                                if (!isGroup) {
-                                    showChangeNicknameDialog(chatId)
-                                } else {
-                                    Toast.makeText(this, "Esta opción no está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                                }
+                                Toast.makeText(this, "Esta opción no está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
                                 true
                             }
                             R.id.action_edit_group_name -> {
-                                if (isGroup) {
-                                    showEditGroupNameDialog(chatId)
-                                } else {
-                                    Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                                }
+                                showEditGroupNameDialog(chatId)
                                 true
                             }
                             R.id.action_add_participants -> {
-                                if (isGroup) {
-                                    showAddParticipantsDialog(chatId)
-                                } else {
-                                    Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                                }
+                                showAddParticipantsDialog(chatId)
                                 true
                             }
                             R.id.action_manage_members -> {
-                                if (isGroup) {
-                                    showManageMembersDialog(chatId)
-                                } else {
-                                    Toast.makeText(this, "Esta opción solo está disponible para chats de grupo", Toast.LENGTH_SHORT).show()
-                                }
+                                showManageMembersDialog(chatId)
                                 true
                             }
                             R.id.action_change_group_image -> {
@@ -365,38 +409,6 @@ class ChatDetailActivity : AppCompatActivity() {
             }
         }
 
-        dialogView.findViewById<Button>(R.id.btnAddAdmin).setOnClickListener {
-            val editText = EditText(this)
-            val addAdminDialog = AlertDialog.Builder(this)
-                .setTitle("Añadir administrador")
-                .setView(editText)
-                .setPositiveButton("Añadir") { _, _ ->
-                    val username = editText.text.toString().trim()
-                    if (username.isNotEmpty()) {
-                        viewModel.addAdmin(chatId, username)
-                    }
-                }
-                .setNegativeButton("Cancelar", null)
-                .create()
-            addAdminDialog.show()
-        }
-
-        dialogView.findViewById<Button>(R.id.btnRemoveAdmin).setOnClickListener {
-            val editText = EditText(this)
-            val removeAdminDialog = AlertDialog.Builder(this)
-                .setTitle("Remover administrador")
-                .setView(editText)
-                .setPositiveButton("Remover") { _, _ ->
-                    val username = editText.text.toString().trim()
-                    if (username.isNotEmpty()) {
-                        viewModel.removeAdmin(chatId, username)
-                    }
-                }
-                .setNegativeButton("Cancelar", null)
-                .create()
-            removeAdminDialog.show()
-        }
-
         builder.show()
     }
 
@@ -407,6 +419,7 @@ class ChatDetailActivity : AppCompatActivity() {
     ) : RecyclerView.Adapter<MembersAdapter.MemberViewHolder>() {
 
         private var membersList: List<String> = emptyList()
+        private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
         fun submitList(members: List<String>) {
             membersList = members
@@ -415,7 +428,7 @@ class ChatDetailActivity : AppCompatActivity() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemberViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_member, parent, false)
-            return MemberViewHolder(view, db, chatId, viewModel)
+            return MemberViewHolder(view, db, chatId, viewModel, this)
         }
 
         override fun onBindViewHolder(holder: MemberViewHolder, position: Int) {
@@ -425,15 +438,16 @@ class ChatDetailActivity : AppCompatActivity() {
 
         override fun getItemCount(): Int = membersList.size
 
-        inner class MemberViewHolder(
+        class MemberViewHolder(
             itemView: View,
             private val db: FirebaseFirestore,
             private val chatId: String,
-            private val viewModel: ChatViewModel
+            private val viewModel: ChatViewModel,
+            private val adapter: MembersAdapter
         ) : RecyclerView.ViewHolder(itemView) {
             private val memberNameTextView: TextView = itemView.findViewById(R.id.memberNameTextView)
             private val memberImageView: ImageView = itemView.findViewById(R.id.memberImageView)
-            private val removeButton: Button = itemView.findViewById(R.id.removeButton)
+            private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
             fun bind(memberId: String) {
                 db.collection("users").document(memberId).get()
@@ -453,8 +467,55 @@ class ChatDetailActivity : AppCompatActivity() {
                         memberNameTextView.text = memberId
                     }
 
-                removeButton.setOnClickListener {
-                    viewModel.removeParticipant(chatId, memberId)
+                itemView.setOnClickListener {
+                    showMemberOptions(memberId, memberNameTextView.text.toString())
+                }
+            }
+
+            private fun showMemberOptions(memberId: String, username: String) {
+                if (memberId == currentUserId) {
+                    // No permitir eliminar al usuario actual
+                    return
+                }
+
+                val popupMenu = PopupMenu(itemView.context, itemView)
+                popupMenu.menuInflater.inflate(R.menu.menu_member_options, popupMenu.menu)
+
+                viewModel.isAdmin(chatId) { isAdmin ->
+                    viewModel.isAdmin(chatId, username) { isMemberAdmin ->
+                        popupMenu.menu.findItem(R.id.action_give_admin).isVisible = isAdmin && !isMemberAdmin
+                        popupMenu.menu.findItem(R.id.action_remove_admin).isVisible = isAdmin && isMemberAdmin
+
+                        popupMenu.setOnMenuItemClickListener { menuItem ->
+                            when (menuItem.itemId) {
+                                R.id.action_give_admin -> {
+                                    viewModel.addAdmin(chatId, username)
+                                    adapter.reloadMembers()
+                                    true
+                                }
+                                R.id.action_remove_admin -> {
+                                    viewModel.removeAdmin(chatId, username)
+                                    adapter.reloadMembers()
+                                    true
+                                }
+                                R.id.action_remove_member -> {
+                                    viewModel.removeParticipant(chatId, username)
+                                    adapter.reloadMembers()
+                                    true
+                                }
+                                else -> false
+                            }
+                        }
+                        popupMenu.show()
+                    }
+                }
+            }
+
+            private fun MembersAdapter.reloadMembers() {
+                viewModel.loadChatById(chatId) { chat ->
+                    if (chat != null) {
+                        submitList(chat.participants)
+                    }
                 }
             }
         }
@@ -509,7 +570,6 @@ class ChatDetailActivity : AppCompatActivity() {
             }
     }
 
-
     private fun showChangeNicknameDialog(friendId: String) {
         val editText = EditText(this)
         val dialog = AlertDialog.Builder(this)
@@ -532,7 +592,7 @@ class ChatDetailActivity : AppCompatActivity() {
     }
 
     // Métodos adicionales para gestionar el estado de compartir ubicación
-    private fun showLocationSharingDialog() {
+    private fun showLocationSharingDialog(chatId: String) {
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_location_sharing, null)
         builder.setView(dialogView)
@@ -542,7 +602,9 @@ class ChatDetailActivity : AppCompatActivity() {
         val positiveButton = dialogView.findViewById<Button>(R.id.positiveButton)
         val negativeButton = dialogView.findViewById<Button>(R.id.negativeButton)
 
-        if (isSharingLocation) {
+        val isActive = locationSharingViewModel.isActive.value ?: false
+
+        if (isActive) {
             title.text = "Compartir ubicación"
             description.text = "¿Deseas dejar de compartir tu ubicación actual?"
             positiveButton.text = "Dejar de compartir"
@@ -562,14 +624,19 @@ class ChatDetailActivity : AppCompatActivity() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         positiveButton.setOnClickListener {
-            if (isSharingLocation) {
-                isSharingLocation = false
-                stopSharingLocation()
+            if (isActive) {
+                locationSharingViewModel.stopSharingLocation(chatId)
                 Toast.makeText(this, "Dejó de compartir su ubicación", Toast.LENGTH_SHORT).show()
             } else {
-                isSharingLocation = true
-                shareLocation()
-                Toast.makeText(this, "Comenzó a compartir su ubicación", Toast.LENGTH_SHORT).show()
+                if (ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    startSharingLocationWithPermission(chatId)
+                } else {
+                    requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                }
             }
             dialog.dismiss()
         }
@@ -580,6 +647,7 @@ class ChatDetailActivity : AppCompatActivity() {
 
         dialog.show()
     }
+
 
     private fun stopSharingLocation() {
         val chatId = intent.getStringExtra("CHAT_ID") ?: return
@@ -605,16 +673,18 @@ class ChatDetailActivity : AppCompatActivity() {
             }
     }
 
-    private fun checkLocationSharingStatus() {
-        val chatId = intent.getStringExtra("CHAT_ID") ?: return
-        val currentUser = auth.currentUser ?: return
+    private fun checkLocationSharingStatus(chatId: String) {
+        val currentUserId = auth.currentUser?.uid ?: return
 
         val locationSharingRef = db.collection("chats").document(chatId).collection("locationSharing")
-        locationSharingRef.whereEqualTo("senderId", currentUser.uid)
+        locationSharingRef.whereEqualTo("senderId", currentUserId)
             .whereEqualTo("isActive", true)
             .get()
             .addOnSuccessListener { snapshots ->
                 isSharingLocation = !snapshots.isEmpty
+                locationSharingViewModel.setActive(isSharingLocation)
+                val iconRes = if (isSharingLocation) R.drawable.location_on_24px else R.drawable.location_off_24px
+                findViewById<ImageButton>(R.id.btnCall).setImageResource(iconRes)
             }
             .addOnFailureListener { e ->
                 Log.e("ChatDetailActivity", "Error al verificar estado de compartir ubicación: ${e.message}")
