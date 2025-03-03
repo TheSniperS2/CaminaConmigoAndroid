@@ -98,7 +98,7 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
             "Poca Iluminación" -> R.drawable.icono_iluminacion
             "Vegetación Abundante" -> R.drawable.icono_vegetacion
             "Espacios Abandonados" -> R.drawable.icon_abandonados
-            "Agresión Fisica" -> R.drawable.icon_agre_fisica
+            "Agresión Física" -> R.drawable.icon_agre_fisica
             "Agresión Sexual" -> R.drawable.icon_agre_sexual
             "Agresión Verbal" -> R.drawable.icon_agre_verbal
             "Falta de Baños Públicos" -> R.drawable.icon_faltabanos

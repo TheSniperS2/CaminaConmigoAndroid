@@ -60,6 +60,8 @@
         android:textSize="14sp"
         android:textColor="@android:color/darker_gray"
         android:layout_marginStart="52dp"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="4dp"
+        android:maxLines="2"
+        android:ellipsize="end" />
 
 </LinearLayout>

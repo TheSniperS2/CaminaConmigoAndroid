@@ -194,7 +194,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
             "Poca Iluminación" -> imgIconoReporte.setImageResource(R.drawable.icono_iluminacion)
             "Vegetación Abundante" -> imgIconoReporte.setImageResource(R.drawable.icono_vegetacion)
             "Espacios Abandonados" -> imgIconoReporte.setImageResource(R.drawable.icon_abandonados)
-            "Agresión Fisica" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_fisica)
+            "Agresión Física" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_fisica)
             "Agresión Sexual" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_sexual)
             "Agresión Verbal" -> imgIconoReporte.setImageResource(R.drawable.icon_agre_verbal)
             "Falta de Baños Públicos" -> imgIconoReporte.setImageResource(R.drawable.icon_faltabanos)

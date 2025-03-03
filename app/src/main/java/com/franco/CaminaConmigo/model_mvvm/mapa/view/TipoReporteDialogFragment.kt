@@ -48,7 +48,7 @@ class TipoReporteDialogFragment : BottomSheetDialogFragment() {
             TipoReporte("Poca Iluminación", R.drawable.icono_iluminacion),
             TipoReporte("Vegetación Abundante", R.drawable.icono_vegetacion),
             TipoReporte("Espacios Abandonados", R.drawable.icon_abandonados),
-            TipoReporte("Agresión Fisica", R.drawable.icon_agre_fisica),
+            TipoReporte("Agresión Física", R.drawable.icon_agre_fisica),
             TipoReporte("Agresión Sexual", R.drawable.icon_agre_sexual),
             TipoReporte("Agresión Verbal", R.drawable.icon_agre_verbal),
             TipoReporte("Falta de Baños Públicos", R.drawable.icon_faltabanos),
