@@ -74,14 +74,16 @@
                     android:id="@+id/btnCall"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:layout_marginEnd="16dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_ubi"
+                    android:src="@drawable/location_off_24px"
                     android:contentDescription="Llamar"/>
 
                 <ImageButton
                     android:id="@+id/btnOptions"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:layout_marginEnd="12dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_three_dots"
                     android:contentDescription="Opciones"/>

@@ -86,6 +86,12 @@ class ChatDetailActivity : AppCompatActivity() {
             startActivity(Intent(this, MapaActivity::class.java))
         }
 
+        // Añadir este código dentro de onCreate después de setContentView y antes de cualquier otro código
+        val btnBack = findViewById<ImageButton>(R.id.btnBack)
+        btnBack.setOnClickListener {
+            finish() // Cerrar la actividad actual y volver a la actividad anterior
+        }
+
         btnNovedades.setOnClickListener {
             startActivity(Intent(this, NovedadActivity::class.java))
         }
@@ -370,23 +376,120 @@ class ChatDetailActivity : AppCompatActivity() {
 
     private fun showAddParticipantsDialog(chatId: String) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_participants, null)
-        val editText = dialogView.findViewById<EditText>(R.id.editTextParticipants)
-        val dialog = AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(this)
             .setTitle("Añadir participantes")
             .setView(dialogView)
-            .setPositiveButton("Añadir") { _, _ ->
-                val newParticipants = editText.text.toString().split(",").map { it.trim() }
-                if (newParticipants.isNotEmpty()) {
-                    viewModel.addParticipants(chatId, newParticipants)
+            .setPositiveButton("Cerrar", null)
+            .create()
+
+        val listView = dialogView.findViewById<RecyclerView>(R.id.recyclerViewFriends)
+        listView.layoutManager = LinearLayoutManager(this)
+
+        val adapter = FriendsAdapter(viewModel, FirebaseFirestore.getInstance(), chatId, this, dialogView)
+        listView.adapter = adapter
+
+        loadFriendsNotInChat(chatId, adapter, dialogView)
+
+        builder.show()
+    }
+
+    private fun loadFriendsNotInChat(chatId: String, adapter: FriendsAdapter, dialogView: View) {
+        viewModel.loadFriendsNotInChat(chatId) { friends ->
+            if (friends.isNotEmpty()) {
+                adapter.submitList(friends)
+                dialogView.findViewById<TextView>(R.id.noFriendsTextView).visibility = View.GONE
+            } else {
+                dialogView.findViewById<TextView>(R.id.noFriendsTextView).visibility = View.VISIBLE
+            }
+        }
+    }
+
+    class FriendsAdapter(
+        private val viewModel: ChatViewModel,
+        private val db: FirebaseFirestore,
+        private val chatId: String,
+        private val activity: ChatDetailActivity,
+        private val dialogView: View
+    ) : RecyclerView.Adapter<FriendsAdapter.FriendViewHolder>() {
+
+        private var friendsList: List<String> = emptyList()
+
+        fun submitList(friends: List<String>) {
+            friendsList = friends
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_add_friend, parent, false)
+            return FriendViewHolder(view, db, chatId, viewModel, this, activity, dialogView)
+        }
+
+        override fun onBindViewHolder(holder: FriendViewHolder, position: Int) {
+            val friendId = friendsList[position]
+            holder.bind(friendId)
+        }
+
+        override fun getItemCount(): Int = friendsList.size
+
+        // Método para eliminar un amigo y volver a cargar la lista
+        fun removeFriend(friendId: String) {
+            friendsList = friendsList.filter { it != friendId }
+            notifyDataSetChanged()
+            activity.loadFriendsNotInChat(chatId, this, dialogView)
+        }
+
+        class FriendViewHolder(
+            itemView: View,
+            private val db: FirebaseFirestore,
+            private val chatId: String,
+            private val viewModel: ChatViewModel,
+            private val adapter: FriendsAdapter,
+            private val activity: ChatDetailActivity,
+            private val dialogView: View
+        ) : RecyclerView.ViewHolder(itemView) {
+            private val friendNameTextView: TextView = itemView.findViewById(R.id.friendNameTextView)
+            private val friendImageView: ImageView = itemView.findViewById(R.id.friendImageView)
+
+            fun bind(friendId: String) {
+                db.collection("users").document(friendId).get()
+                    .addOnSuccessListener { document ->
+                        val username = document.getString("username") ?: friendId
+                        val photoURL = document.getString("photoURL")
+                        friendNameTextView.text = username
+                        if (!photoURL.isNullOrEmpty()) {
+                            Glide.with(itemView.context)
+                                .load(photoURL)
+                                .circleCrop()
+                                .into(friendImageView)
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FriendsAdapter", "Error al obtener nombre de usuario: ${e.message}")
+                        friendNameTextView.text = friendId
+                    }
+
+                itemView.setOnClickListener {
+                    showAddFriendOptions(friendId, friendNameTextView.text.toString())
                 }
             }
-            .setNegativeButton("Cancelar", null)
-            .create()
-        dialog.show()
 
-        editText.requestFocus()
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+            private fun showAddFriendOptions(friendId: String, username: String) {
+                val popupMenu = PopupMenu(itemView.context, itemView)
+                popupMenu.menuInflater.inflate(R.menu.menu_add_friend_options, popupMenu.menu)
+
+                popupMenu.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_add_friend -> {
+                            viewModel.addParticipants(chatId, listOf(friendId))
+                            adapter.removeFriend(friendId)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                popupMenu.show()
+            }
+        }
     }
 
     private fun showManageMembersDialog(chatId: String) {
@@ -447,6 +550,7 @@ class ChatDetailActivity : AppCompatActivity() {
         ) : RecyclerView.ViewHolder(itemView) {
             private val memberNameTextView: TextView = itemView.findViewById(R.id.memberNameTextView)
             private val memberImageView: ImageView = itemView.findViewById(R.id.memberImageView)
+            private val optionsButton: ImageButton = itemView.findViewById(R.id.optionsButton)
             private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
             fun bind(memberId: String) {
@@ -468,6 +572,9 @@ class ChatDetailActivity : AppCompatActivity() {
                     }
 
                 itemView.setOnClickListener {
+                    showMemberOptions(memberId, memberNameTextView.text.toString())
+                }
+                optionsButton.setOnClickListener {
                     showMemberOptions(memberId, memberNameTextView.text.toString())
                 }
             }

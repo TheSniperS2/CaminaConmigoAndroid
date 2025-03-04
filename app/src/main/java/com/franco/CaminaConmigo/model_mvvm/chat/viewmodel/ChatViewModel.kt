@@ -349,6 +349,29 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+    // Método para cargar amigos que no están en el chat
+    fun loadFriendsNotInChat(chatId: String, callback: (List<String>) -> Unit) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        db.collection("users").document(currentUserId).collection("friends").get()
+            .addOnSuccessListener { documents ->
+                val friends = documents.mapNotNull { it.id }
+                db.collection("chats").document(chatId).get()
+                    .addOnSuccessListener { chatDocument ->
+                        val participants = chatDocument.get("participants") as? List<String> ?: emptyList()
+                        val friendsNotInChat = friends.filterNot { it in participants }
+                        callback(friendsNotInChat)
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("ChatViewModel", "Error al cargar participantes del chat: ${e.message}")
+                        callback(emptyList())
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatViewModel", "Error al cargar amigos: ${e.message}")
+                callback(emptyList())
+            }
+    }
+
     private fun removeParticipantById(chatId: String, userId: String) {
         val chatRef = db.collection("chats").document(chatId)
         chatRef.update(
@@ -522,34 +545,14 @@ class ChatViewModel : ViewModel() {
             }
     }
 
+    // Método para añadir participantes al chat
     fun addParticipants(chatId: String, newParticipants: List<String>) {
-        db.collection("users")
-            .whereIn("username", newParticipants)
-            .get()
-            .addOnSuccessListener { documents ->
-                if (documents.isEmpty) {
-                    Log.e("ChatViewModel", "No se encontraron usuarios con los nombres de usuario proporcionados")
-                    return@addOnSuccessListener
-                }
-
-                val userIds = documents.documents.map { it.id }
-                val batch = db.batch()
-                val chatRef = db.collection("chats").document(chatId)
-
-                // Actualizar la lista de participantes
-                batch.update(chatRef, "participants", FieldValue.arrayUnion(*userIds.toTypedArray()))
-
-                // Actualizar el contador de mensajes no leídos para los nuevos participantes
-                userIds.forEach { userId ->
-                    batch.update(chatRef, "unreadCount.$userId", 0)
-                }
-
-                batch.commit()
-                    .addOnSuccessListener { Log.d("ChatViewModel", "Participantes añadidos con éxito") }
-                    .addOnFailureListener { e -> Log.e("ChatViewModel", "Error al añadir participantes: ${e.message}") }
+        db.collection("chats").document(chatId).update("participants", FieldValue.arrayUnion(*newParticipants.toTypedArray()))
+            .addOnSuccessListener {
+                Log.d("ChatViewModel", "Participantes añadidos correctamente")
             }
             .addOnFailureListener { e ->
-                Log.e("ChatViewModel", "Error al buscar usuarios: ${e.message}")
+                Log.e("ChatViewModel", "Error al añadir participantes: ${e.message}")
             }
     }
 

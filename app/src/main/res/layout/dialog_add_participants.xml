@@ -1,49 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/rounded_dialog_background">
 
     <TextView
-        android:id="@+id/dialogTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Añadir participantes"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:paddingBottom="8dp"/>
-
-    <EditText
-        android:id="@+id/editTextParticipants"
+        android:id="@+id/noFriendsTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Username"
-        android:inputType="text"/>
+        android:text="No hay amigos disponibles para añadir"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="16dp"/>
 
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewFriends"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:paddingTop="16dp">
-
-        <Button
-            android:id="@+id/positiveButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Añadir"
-            android:textColor="@android:color/white"
-            android:background="?attr/colorPrimary"/>
-
-        <Button
-            android:id="@+id/negativeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancelar"
-            android:textColor="@android:color/white"
-            android:background="?attr/colorPrimary"
-            android:layout_marginStart="8dp"/>
-    </LinearLayout>
+        android:maxHeight="300dp"
+        android:layout_marginBottom="16dp"/>
 </LinearLayout>
