@@ -79,38 +79,8 @@ class AddFriendActivity : AppCompatActivity() {
                                         // Agregar solicitud a Firestore
                                         db.collection("friendRequests")
                                             .add(requestData)
-                                            .addOnSuccessListener { requestRef ->
-                                                val requestId = requestRef.id // Obtener el ID del request
-
-                                                // Crear la estructura del mapa "data"
-                                                val dataMap = mapOf(
-                                                    "fromUserId" to currentUserId,
-                                                    "fromUsername" to currentUserUsername, // Usar el username
-                                                    "requestId" to requestId // ID de la solicitud
-                                                )
-
-                                                // Crear la notificación con `data`
-                                                val notificationData = mapOf(
-                                                    "data" to dataMap, // Mapa con datos de la solicitud
-                                                    "userId" to receiverId,
-                                                    "message" to "$currentUserUsername quiere ser tu amigo",
-                                                    "title" to "Nueva solicitud de amistad",
-                                                    "type" to "friendRequest",
-                                                    "isRead" to false, // Notificación no leída
-                                                    "createdAt" to Timestamp.now() // Fecha de la notificación
-                                                )
-
-                                                // Guardar la notificación en `users/notifications`
-                                                db.collection("users")
-                                                    .document(receiverId)
-                                                    .collection("notifications")
-                                                    .add(notificationData)
-                                                    .addOnSuccessListener {
-                                                        Toast.makeText(this, "Solicitud enviada a $username", Toast.LENGTH_SHORT).show()
-                                                    }
-                                                    .addOnFailureListener {
-                                                        Toast.makeText(this, "Error al enviar notificación", Toast.LENGTH_SHORT).show()
-                                                    }
+                                            .addOnSuccessListener {
+                                                Toast.makeText(this, "Solicitud enviada a $username", Toast.LENGTH_SHORT).show()
                                             }
                                             .addOnFailureListener {
                                                 Toast.makeText(this, "Error al enviar solicitud", Toast.LENGTH_SHORT).show()
