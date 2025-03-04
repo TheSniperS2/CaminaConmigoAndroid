@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Friend
 
@@ -55,6 +56,7 @@ class FriendsAdapter(
             Glide.with(itemView.context)
                 .load(friend.imageUrl)
                 .placeholder(R.drawable.ic_imagen)
+                .transform(CircleCrop())
                 .into(friendImage)
         }
     }

@@ -15,6 +15,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.franco.CaminaConmigo.databinding.FragmentCreateGroupBottomSheetBinding
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Friend
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
@@ -89,7 +91,10 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             groupImageUri = data?.data
-            binding.imageViewGroup.setImageURI(groupImageUri)
+            Glide.with(this)
+                .load(groupImageUri)
+                .transform(CircleCrop())
+                .into(binding.imageViewGroup)
         }
     }
 

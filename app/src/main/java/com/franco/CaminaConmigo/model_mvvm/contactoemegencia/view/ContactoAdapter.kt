@@ -8,9 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.model_mvvm.contactoemegencia.model.ContactoEmergencia
+import com.franco.CaminaConmigo.model_mvvm.contactoemegencia.viewmodel.ContactoEmergenciaViewModel
 
 class ContactoAdapter(
-    private val contactos: List<ContactoEmergencia>,
+    private val contactos: MutableList<ContactoEmergencia>,
+    private val viewModel: ContactoEmergenciaViewModel,
     private val onEditar: (Int) -> Unit,
     private val onMoverArriba: (Int) -> Unit,
     private val onMoverAbajo: (Int) -> Unit
@@ -26,16 +28,45 @@ class ContactoAdapter(
         val contacto = contactos[position]
         holder.textNombre.text = contacto.name
         holder.textNumero.text = contacto.phone
-        holder.textPrioridad.text = (contacto.order + 1).toString() // Mostrar el número de prioridad, sumando 1
+        holder.textPrioridad.text = (position + 1).toString() // Mostrar el número de prioridad basado en la posición
 
         // Asignar evento de editar solo
         holder.btnEditar.setOnClickListener { onEditar(position) }
 
         holder.btnMoverArriba.setOnClickListener { onMoverArriba(position) }
         holder.btnMoverAbajo.setOnClickListener { onMoverAbajo(position) }
+
+        // Cambiar la apariencia del primer contacto de emergencia
+        if (position == 0) {
+            holder.itemView.setBackgroundResource(R.drawable.bg_highlighted_contact)
+            holder.textNombre.textSize = 18f
+            holder.textNumero.textSize = 16f
+        } else {
+            holder.itemView.setBackgroundResource(android.R.color.transparent)
+            holder.textNombre.textSize = 16f
+            holder.textNumero.textSize = 14f
+        }
     }
 
     override fun getItemCount() = contactos.size
+
+    fun swapItems(fromPosition: Int, toPosition: Int) {
+        val fromItem = contactos[fromPosition]
+        contactos[fromPosition] = contactos[toPosition]
+        contactos[toPosition] = fromItem
+    }
+
+    fun updateOrder() {
+        for ((index, contacto) in contactos.withIndex()) {
+            contacto.order = index
+        }
+        notifyDataSetChanged()
+    }
+
+    fun updateOrderInDatabase() {
+        updateOrder()
+        viewModel.updateContactsOrder(contactos)
+    }
 
     class ContactoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textNombre: TextView = view.findViewById(R.id.textViewNombre)

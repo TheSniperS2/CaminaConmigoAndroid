@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ActivityContactoemergenciaBinding
@@ -30,12 +31,20 @@ class ContactoEmegenciaActivity : AppCompatActivity() {
         // Observando los contactos en el ViewModel
         viewModel.contactos.observe(this) { contactos ->
             adapter = ContactoAdapter(
-                contactos,
+                contactos.toMutableList(),
+                viewModel,
                 ::editarContacto,
                 ::moverArriba,
                 ::moverAbajo
             )
             binding.recyclerViewContactos.adapter = adapter
+
+            // Configurar ItemTouchHelper
+            val callback = ItemTouchHelperCallback(adapter) { fromPosition, toPosition ->
+                viewModel.moverContacto(fromPosition, toPosition)
+            }
+            val itemTouchHelper = ItemTouchHelper(callback)
+            itemTouchHelper.attachToRecyclerView(binding.recyclerViewContactos)
         }
 
         // Configurar el botón de agregar contacto

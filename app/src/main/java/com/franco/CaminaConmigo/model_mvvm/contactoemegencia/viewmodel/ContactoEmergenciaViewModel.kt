@@ -68,8 +68,16 @@ class ContactoEmergenciaViewModel : ViewModel() {
     }
 
     fun moverContacto(fromPosition: Int, toPosition: Int) {
-        val contacto = listaContactos.removeAt(fromPosition)
-        listaContactos.add(toPosition, contacto)
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                listaContactos[i] = listaContactos.set(i + 1, listaContactos[i])
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                listaContactos[i] = listaContactos.set(i - 1, listaContactos[i])
+            }
+        }
+        listaContactos[toPosition].order = toPosition
         actualizarOrdenEnFirestore()
     }
 
@@ -100,6 +108,19 @@ class ContactoEmergenciaViewModel : ViewModel() {
             .update("name", nuevoNombre, "phone", nuevoNumero)
 
         _contactos.value = listaContactos
+    }
+
+    fun updateContactsOrder(contactos: List<ContactoEmergencia>) {
+        val userId = auth.currentUser?.uid ?: return
+        val batch = firestore.batch()
+        for (contacto in contactos) {
+            val docRef = firestore.collection("users")
+                .document(userId)
+                .collection("emergency_contacts")
+                .document(contacto.id)
+            batch.update(docRef, "order", contacto.order)
+        }
+        batch.commit()
     }
 
     private fun actualizarOrdenEnFirestore() {
