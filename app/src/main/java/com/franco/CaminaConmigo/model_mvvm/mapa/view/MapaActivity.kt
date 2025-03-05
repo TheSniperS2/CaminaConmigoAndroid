@@ -51,6 +51,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
     private var originalVolume: Int = 0
     private val markersList = mutableListOf<Marker>()
     private var searchMarker: Marker? = null
+    private var isAlarmActive: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,8 +103,13 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         // Guardar el volumen original
         originalVolume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: 0
 
-        // Configurar el botón para activar la alarma de emergencia
+// Configurar el botón para activar la alarma de emergencia
         findViewById<Button>(R.id.btnSOS).setOnClickListener {
+            if (isAlarmActive) {
+                // Si la alarma ya está activa, no hacer nada
+                return@setOnClickListener
+            }
+
             try {
                 // Liberar el MediaPlayer si ya existe
                 mediaPlayer?.release()
@@ -124,11 +130,17 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
                             0
                         )
                         player.start()
+                        isAlarmActive = true
                         Toast.makeText(this, "¡Emergencia activada!", Toast.LENGTH_SHORT).show()
 
                         // Mostrar el diálogo de emergencia
                         val emergenciaDialog = EmergenciaDialogFragment().apply {
                             setMediaPlayer(player, audioManager!!, originalVolume)
+                            setOnDismissListener(object : EmergenciaDialogFragment.OnDismissListener {
+                                override fun onDismiss() {
+                                    isAlarmActive = false
+                                }
+                            })
                         }
                         emergenciaDialog.show(supportFragmentManager, "EmergenciaDialogFragment")
                     }

@@ -685,8 +685,14 @@ class ChatDetailActivity : AppCompatActivity() {
             .setPositiveButton("Guardar") { _, _ ->
                 val newNickname = editText.text.toString()
                 if (newNickname.isNotEmpty()) {
-                    viewModel.updateNickname(friendId, newNickname)
-                    binding.tvContactName.text = newNickname
+                    viewModel.updateNickname(friendId, newNickname) { success, message ->
+                        if (success) {
+                            binding.tvContactName.text = newNickname
+                            Toast.makeText(this, "Apodo actualizado con éxito", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this, "Error al actualizar apodo: $message", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
             .setNegativeButton("Cancelar", null)

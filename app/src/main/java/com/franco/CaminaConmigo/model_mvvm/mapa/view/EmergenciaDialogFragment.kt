@@ -1,5 +1,6 @@
 package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.media.AudioManager
@@ -24,6 +25,11 @@ class EmergenciaDialogFragment : DialogFragment() {
     private var mediaPlayer: MediaPlayer? = null
     private var audioManager: AudioManager? = null
     private var originalVolume: Int = 0
+    private var onDismissListener: OnDismissListener? = null
+
+    interface OnDismissListener {
+        fun onDismiss()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_emergencia_dialog, container, false)
@@ -113,6 +119,25 @@ class EmergenciaDialogFragment : DialogFragment() {
         btnCerrar.setOnClickListener {
             dismiss()
         }
+
+        // Reproducir la alarma
+        audioManager = context?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        originalVolume = audioManager?.getStreamVolume(AudioManager.STREAM_MUSIC) ?: 0
+
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(context, R.raw.emergency_alarm).apply {
+                isLooping = true
+                setVolume(1.0f, 1.0f)
+                start()
+            }
+
+            audioManager?.setStreamVolume(
+                AudioManager.STREAM_MUSIC,
+                audioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC) ?: 0,
+                0
+            )
+            Toast.makeText(context, "¡Emergencia activada!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun realizarLlamada(numero: String) {
@@ -134,6 +159,7 @@ class EmergenciaDialogFragment : DialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         detenerAlarma()
+        onDismissListener?.onDismiss()
     }
 
     override fun onDestroyView() {
@@ -147,18 +173,24 @@ class EmergenciaDialogFragment : DialogFragment() {
     }
 
     private fun detenerAlarma() {
-        if (mediaPlayer != null) {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
-            audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
-            Toast.makeText(context, "¡Emergencia desactivada!", Toast.LENGTH_SHORT).show()
+        mediaPlayer?.let {
+            if (it.isPlaying) {
+                it.stop()
+            }
+            it.release()
         }
+        mediaPlayer = null
+        audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
+        Toast.makeText(context, "¡Emergencia desactivada!", Toast.LENGTH_SHORT).show()
     }
 
     fun setMediaPlayer(mediaPlayer: MediaPlayer, audioManager: AudioManager, originalVolume: Int) {
         this.mediaPlayer = mediaPlayer
         this.audioManager = audioManager
         this.originalVolume = originalVolume
+    }
+
+    fun setOnDismissListener(listener: OnDismissListener) {
+        onDismissListener = listener
     }
 }

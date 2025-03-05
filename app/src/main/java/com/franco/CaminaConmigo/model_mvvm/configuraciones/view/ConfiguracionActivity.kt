@@ -1,12 +1,13 @@
 package com.franco.CaminaConmigo.model_mvvm.configuraciones.view
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
-import com.franco.CaminaConmigo.R
 import androidx.appcompat.app.AppCompatDelegate
+import com.franco.CaminaConmigo.R
 
 class ConfiguracionActivity : AppCompatActivity() {
 
@@ -57,7 +58,11 @@ class ConfiguracionActivity : AppCompatActivity() {
 
         switchShakeAlerta.setOnCheckedChangeListener { _, isChecked ->
             guardarConfiguracion("shake_alerta", isChecked)
+            enviarBroadcastShakeAlerta(isChecked)
         }
+
+        // Aplicar modo oscuro si está activado
+        aplicarModoOscuro(switchModoOscuro.isChecked)
     }
 
     private fun guardarConfiguracion(clave: String, valor: Boolean) {
@@ -73,7 +78,11 @@ class ConfiguracionActivity : AppCompatActivity() {
             AppCompatDelegate.MODE_NIGHT_NO
         }
         AppCompatDelegate.setDefaultNightMode(modo)
-        recreate()
     }
 
+    private fun enviarBroadcastShakeAlerta(activar: Boolean) {
+        val intent = Intent("com.franco.CaminaConmigo.SHAKE_ALERTA")
+        intent.putExtra("activar", activar)
+        sendBroadcast(intent)
+    }
 }

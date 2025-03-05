@@ -269,7 +269,7 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    fun updateNickname(friendId: String, newNickname: String) {
+    fun updateNickname(friendId: String, newNickname: String, callback: (Boolean, String?) -> Unit) {
         val currentUser = auth.currentUser ?: return
         val userRef = db.collection("users").document(currentUser.uid)
         val friendRef = userRef.collection("friends").document(friendId)
@@ -279,15 +279,19 @@ class ChatViewModel : ViewModel() {
                 friendRef.update("nickname", newNickname)
                     .addOnSuccessListener {
                         Log.d("ChatViewModel", "Apodo actualizado con éxito en la subcolección friends")
+                        callback(true, null)
                     }
                     .addOnFailureListener { e ->
                         Log.e("ChatViewModel", "Error al actualizar apodo en la subcolección friends: ${e.message}")
+                        callback(false, e.message)
                     }
             } else {
                 Log.e("ChatViewModel", "El documento del amigo no existe")
+                callback(false, "El documento del amigo no existe")
             }
         }.addOnFailureListener { e ->
             Log.e("ChatViewModel", "Error al obtener el documento del amigo: ${e.message}")
+            callback(false, e.message)
         }
     }
 
