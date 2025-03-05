@@ -1,8 +1,10 @@
 package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -30,6 +32,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
@@ -52,10 +55,21 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
     private val markersList = mutableListOf<Marker>()
     private var searchMarker: Marker? = null
     private var isAlarmActive: Boolean = false
+    private lateinit var modoOscuroReceiver: BroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mapa)
+
+        modoOscuroReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val activar = intent?.getBooleanExtra("activar", false) ?: return
+                aplicarModoOscuroEnMapa(activar)
+            }
+        }
+        val filter = IntentFilter("com.franco.CaminaConmigo.MODO_OSCURO")
+        registerReceiver(modoOscuroReceiver, filter, RECEIVER_NOT_EXPORTED)
+
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -166,9 +180,16 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         }
     }
 
+
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         cargarReportes()
+
+        // Aplicar el estilo del mapa basado en el modo oscuro
+        val sharedPreferences = getSharedPreferences("configuraciones", Context.MODE_PRIVATE)
+        val modoOscuroActivado = sharedPreferences.getBoolean("modo_oscuro", false)
+        aplicarModoOscuroEnMapa(modoOscuroActivado)
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
@@ -322,6 +343,17 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         // Restaurar el volumen original al cerrar la actividad
         audioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0)
     }
+
+    // Nueva función para aplicar el modo oscuro en el mapa
+    private fun aplicarModoOscuroEnMapa(activar: Boolean) {
+        val style = if (activar) {
+            R.raw.map_style_night
+        } else {
+            R.raw.map_style_standard
+        }
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, style))
+    }
+
 
     override fun onTipoReporteSeleccionado(tipoReporte: String) {
         val descripcionEditText = findViewById<EditText>(R.id.edtDescripcion)

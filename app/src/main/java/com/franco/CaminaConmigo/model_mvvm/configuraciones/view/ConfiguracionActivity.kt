@@ -78,6 +78,11 @@ class ConfiguracionActivity : AppCompatActivity() {
             AppCompatDelegate.MODE_NIGHT_NO
         }
         AppCompatDelegate.setDefaultNightMode(modo)
+
+        // Enviar broadcast para actualizar el modo del mapa
+        val intent = Intent("com.franco.CaminaConmigo.MODO_OSCURO")
+        intent.putExtra("activar", activar)
+        sendBroadcast(intent)
     }
 
     private fun enviarBroadcastShakeAlerta(activar: Boolean) {
