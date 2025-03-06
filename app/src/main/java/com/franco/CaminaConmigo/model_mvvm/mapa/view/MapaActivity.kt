@@ -193,6 +193,17 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         mMap = googleMap
         cargarReportes()
 
+        // Obtener las coordenadas del intent
+        val latitude = intent.getDoubleExtra("latitude", 0.0)
+        val longitude = intent.getDoubleExtra("longitude", 0.0)
+        val locationName = intent.getStringExtra("location_name")
+        val zoomLevel = intent.getFloatExtra("zoom_level", 15.0f) // Nivel de zoom predeterminado
+
+        // Añadir marcador en la ubicación especificada y mover la cámara
+        val location = LatLng(latitude, longitude)
+        mMap.addMarker(MarkerOptions().position(location).title(locationName))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoomLevel))
+
         // Aplicar el estilo del mapa basado en el modo oscuro
         val sharedPreferences = getSharedPreferences("configuraciones", Context.MODE_PRIVATE)
         val modoOscuroActivado = sharedPreferences.getBoolean("modo_oscuro", false)

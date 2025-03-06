@@ -1,7 +1,6 @@
 package com.franco.CaminaConmigo.model_mvvm.ayuda.view
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.TextView
@@ -24,30 +23,46 @@ class AyudaActivity : AppCompatActivity() {
         setContentView(R.layout.activity_ayuda)
 
         // Observamos los datos del ViewModel
-        viewModel.ayudaData.observe(this, { ayudaModel ->
+        viewModel.ayudaData.observe(this) { ayudaModel ->
             // Redirigir al cliente de correo
-            val emailTextView = findViewById<TextView>(R.id.textView48)
+            val emailTextView = findViewById<TextView>(R.id.correo_centro_liwen)
             emailTextView.setOnClickListener {
-                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("mailto:${ayudaModel.email}")
+                val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "message/rfc822"
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(ayudaModel.email))
+                    putExtra(Intent.EXTRA_SUBJECT, "Consulta sobre Centro de la Mujer Liwen")
                 }
-                if (emailIntent.resolveActivity(packageManager) != null) {
-                    startActivity(emailIntent)
-                } else {
-                    Toast.makeText(this, "No hay aplicaciones de correo instaladas", Toast.LENGTH_SHORT).show()
+                try {
+                    startActivity(Intent.createChooser(emailIntent, "Enviar correo usando..."))
+                } catch (ex: android.content.ActivityNotFoundException) {
+                    Toast.makeText(this, "No hay aplicaciones de correo instaladas.", Toast.LENGTH_SHORT).show()
                 }
             }
+        }
 
-            // Redirigir a los números de teléfono
-            val phoneTextView = findViewById<TextView>(R.id.textView47)
-            phoneTextView.setOnClickListener {
-                val intent = Intent(Intent.ACTION_DIAL).apply {
-                    data = Uri.parse("tel:${ayudaModel.phoneNumbers.first()}")
-                }
-                startActivity(intent)
+        // Configuración del texto interactivo para el Centro de la Mujer Liwen
+        val btnCentroLiwen = findViewById<TextView>(R.id.btn_centro_liwen)
+        btnCentroLiwen.setOnClickListener {
+            val intent = Intent(this, MapaActivity::class.java).apply {
+                putExtra("location_name", "Centro de la Mujer Liwen - La Serena")
+                putExtra("latitude", -29.9073)
+                putExtra("longitude", -71.2540)
+                putExtra("zoom_level", 18.0f) // Añadir nivel de zoom aquí
             }
-        })
+            startActivity(intent)
+        }
 
+// Configuración del texto interactivo para el Centro de Atención Especializada en Violencias de Género
+        val btnCentroAtencionEspecializada = findViewById<TextView>(R.id.btn_ubicacion_centro_atencion_especializada)
+        btnCentroAtencionEspecializada.setOnClickListener {
+            val intent = Intent(this, MapaActivity::class.java).apply {
+                putExtra("location_name", "Centro de Atención Especializada en Violencias de Género")
+                putExtra("latitude", -29.9160)
+                putExtra("longitude", -71.2488)
+                putExtra("zoom_level", 18.0f) // Añadir nivel de zoom aquí
+            }
+            startActivity(intent)
+        }
         // Funcionalidad de los botones inferiores
         val btnMapa = findViewById<ImageButton>(R.id.imageButton10)
         val btnNovedades = findViewById<ImageButton>(R.id.imageButton11)

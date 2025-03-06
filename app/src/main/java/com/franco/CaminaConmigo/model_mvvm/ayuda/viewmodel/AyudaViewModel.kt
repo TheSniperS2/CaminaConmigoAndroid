@@ -12,6 +12,9 @@ class AyudaViewModel : ViewModel() {
 
     init {
         // Inicializamos con datos por defecto
-        _ayudaData.value = AyudaModel()
+        _ayudaData.value = AyudaModel(
+            email = "centroliwen@laserena.cl",
+            phoneNumbers = listOf("51-2641850", "51-2427844", "961244738")
+        )
     }
 }
