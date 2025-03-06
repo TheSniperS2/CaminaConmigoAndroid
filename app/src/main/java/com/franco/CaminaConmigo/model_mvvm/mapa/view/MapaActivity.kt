@@ -17,6 +17,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
@@ -105,6 +106,12 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
                 Toast.makeText(this@MapaActivity, "Error al seleccionar el lugar: ${status.statusMessage}", Toast.LENGTH_SHORT).show()
             }
         })
+
+        // Dentro del método onCreate
+        findViewById<AppCompatButton>(R.id.btnAyuda).setOnClickListener {
+            val instruccionesDialog = InstruccionesBottomSheetDialogFragment()
+            instruccionesDialog.show(supportFragmentManager, "InstruccionesDialogFragment")
+        }
 
         findViewById<Button>(R.id.btnReportar).setOnClickListener {
             val dialogFragment = TipoReporteDialogFragment()
