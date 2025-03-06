@@ -285,7 +285,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
             else -> return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
         }
 
-        return BitmapDescriptorFactory.fromBitmap(redimensionarIcono(resId, 100, 100))
+        return BitmapDescriptorFactory.fromBitmap(redimensionarIcono(resId, 60, 60))
     }
 
     private fun redimensionarIcono(resId: Int, width: Int, height: Int): Bitmap {

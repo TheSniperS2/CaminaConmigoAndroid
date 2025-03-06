@@ -1,158 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="20dp"
-    android:background="@android:color/white"
-    app:cardCornerRadius="20dp">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
+    <!-- Título centrado al principio -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="16dp">
 
-        <!-- Encabezado con icono y nombre del reporte -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/imgIconoReporte"
+            android:layout_width="40dp"
+            android:layout_height="40dp" />
+
+        <TextView
+            android:id="@+id/txtTipoReporte"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:text="Tipo de Reporte"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingStart="8dp" />
 
-            <ImageView
-                android:id="@+id/imgIconoReporte"
-                android:layout_width="40dp"
-                android:layout_height="40dp" />
+        <ImageView
+            android:id="@+id/btnCerrar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/quantum_ic_clear_grey600_24"
+            android:contentDescription="Cerrar"
+            android:layout_marginEnd="4dp" />
+    </LinearLayout>
 
-            <TextView
-                android:id="@+id/txtTipoReporte"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Tipo de Reporte"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:paddingStart="8dp" />
+    <!-- Campo de texto para descripción -->
+    <EditText
+        android:id="@+id/edtDescripcion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="¿Qué sucede?..."
+        android:padding="10dp"
+        android:background="@android:color/transparent"
+        android:minHeight="100dp"
+        android:gravity="top"
+        android:layout_marginTop="10dp" />
 
-            <ImageView
-                android:id="@+id/btnCerrar"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/btn_dialog"
-                android:contentDescription="Cerrar"
-                android:layout_marginEnd="4dp" />
-        </LinearLayout>
+    <!-- Ubicación -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
 
-        <!-- Campo de texto para descripción -->
-        <EditText
-            android:id="@+id/edtDescripcion"
-            android:layout_width="match_parent"
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_ubi"
+            app:tint="#888888" />
+
+        <TextView
+            android:id="@+id/txtUbicacion"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="¿Qué sucede?..."
-            android:padding="10dp"
-            android:background="@android:color/transparent"
-            android:minHeight="100dp"
-            android:gravity="top"
-            android:layout_marginTop="10dp" />
+            android:layout_weight="1"
+            android:text="Seleccionar ubicación"
+            android:textSize="14sp"
+            android:textColor="#888888"
+            android:paddingStart="6dp"
+            android:clickable="true"
+            android:focusable="true"/>
+    </LinearLayout>
 
-        <!-- Ubicación -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="8dp">
+    <!-- com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte anónimo -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="12dp">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_ubi"
-                app:tint="#000000" />
-
-            <TextView
-                android:id="@+id/txtUbicacion"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Seleccionar ubicación"
-                android:textSize="14sp"
-                android:textColor="#000000"
-                android:paddingStart="6dp"
-                android:clickable="true"
-                android:focusable="true"/>
-
-        </LinearLayout>
-
-        <!-- Botones para agregar foto -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="10dp">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginEnd="20dp">
-
-                <ImageView
-                    android:id="@+id/btnTomarFoto"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@android:drawable/ic_menu_camera"
-                    app:tint="#000000" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tomar foto"
-                    android:textSize="12sp"
-                    android:textColor="#000000" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <ImageView
-                    android:id="@+id/btnSeleccionarFoto"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@android:drawable/ic_menu_gallery"
-                    app:tint="#000000" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Seleccionar foto"
-                    android:textSize="12sp"
-                    android:textColor="#000000"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte anónimo -->
-        <CheckBox
-            android:id="@+id/chkAnonimo"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Reportar anónimamente"
             android:textSize="14sp"
-            android:layout_marginTop="12dp"/>
+            android:layout_weight="1"/>
 
-        <!-- Botón de enviar reporte -->
-        <Button
-            android:id="@+id/btnEnviarReporte"
-            android:layout_width="match_parent"
+        <Switch
+            android:id="@+id/switchAnonimo"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="REPORTAR"
-            android:backgroundTint="#FA79B6"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="12dp"/>
+            android:checked="true"
+            android:layout_gravity="end"/>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+    <!-- Sección para imágenes adjuntadas -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewImages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"/>
+
+    <!-- Botones para agregar foto -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginEnd="20dp">
+
+            <ImageView
+                android:id="@+id/btnTomarFoto"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_menu_camera"
+                app:tint="@android:color/holo_blue_dark" />
+
+            <TextView
+                android:id="@+id/TomarFoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tomar foto"
+                android:textSize="14sp"
+                android:textColor="@android:color/holo_blue_dark"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/btnSeleccionarFoto"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_menu_gallery"
+                app:tint="@android:color/holo_blue_dark" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Seleccionar fotos"
+                android:textSize="14sp"
+                android:textColor="@android:color/holo_blue_dark"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/transparent" />
+
+    <!-- Botón de enviar reporte -->
+    <Button
+        android:id="@+id/btnEnviarReporte"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="REPORTAR"
+        android:backgroundTint="#FA79B6"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="12dp"
+        android:layout_gravity="bottom"/>
+</LinearLayout>

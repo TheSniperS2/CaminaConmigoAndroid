@@ -1,6 +1,9 @@
 package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -9,13 +12,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.franco.CaminaConmigo.R
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -34,15 +43,19 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
     private var selectedLongitude: Double? = null
     private var selectedLocationName: String? = null
 
+
     private lateinit var txtUbicacion: TextView
     private lateinit var edtDescripcion: EditText
-    private lateinit var chkAnonimo: CheckBox
+    private lateinit var switchAnonimo: Switch
     private lateinit var btnEnviarReporte: Button
     private lateinit var imgTipoReporte: ImageView
+    private lateinit var recyclerViewImages: RecyclerView
+    private lateinit var imagesAdapter: ImagesAdapter
 
     private val IMAGE_PICK_CODE = 102
     private val CAMERA_REQUEST_CODE = 103
     private val LOCATION_PICKER_REQUEST = 104
+    private val CAMERA_PERMISSION_CODE = 105
 
     companion object {
         fun newInstance(tipoReporte: String): AgregarReporteDialogFragment {
@@ -59,6 +72,17 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         tipoReporte = arguments?.getString("tipoReporte") ?: "Sin Tipo"
     }
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): BottomSheetDialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        dialog.setCanceledOnTouchOutside(false) // Disable closing when touching outside the dialog
+        return dialog
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupBottomSheetBehavior(view)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -69,9 +93,11 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         val txtTipoReporte = view.findViewById<TextView>(R.id.txtTipoReporte)
         txtUbicacion = view.findViewById(R.id.txtUbicacion)
         edtDescripcion = view.findViewById(R.id.edtDescripcion)
-        chkAnonimo = view.findViewById(R.id.chkAnonimo)
+        switchAnonimo = view.findViewById(R.id.switchAnonimo)
+        switchAnonimo.isChecked = true // Activar por defecto
         btnEnviarReporte = view.findViewById(R.id.btnEnviarReporte)
         imgTipoReporte = view.findViewById(R.id.imgIconoReporte)
+        recyclerViewImages = view.findViewById(R.id.recyclerViewImages)
 
         val btnCerrar = view.findViewById<ImageView>(R.id.btnCerrar)
         val btnTomarFoto = view.findViewById<ImageView>(R.id.btnTomarFoto)
@@ -80,13 +106,66 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         txtTipoReporte.text = tipoReporte
         setImageForTipoReporte(tipoReporte)
 
-        btnTomarFoto.setOnClickListener { openCamera() }
+        // Configurar colores del Switch basado en el estado
+        val colorActive = ContextCompat.getColor(requireContext(), R.color.purple_500)
+        val colorInactive = ContextCompat.getColor(requireContext(), android.R.color.darker_gray)
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_checked), // Estado activado
+            intArrayOf(-android.R.attr.state_checked) // Estado desactivado
+        )
+        val colors = intArrayOf(
+            colorActive,
+            colorInactive
+        )
+        val colorStateList = ColorStateList(states, colors)
+        switchAnonimo.trackTintList = colorStateList
+        switchAnonimo.thumbTintList = colorStateList
+
+        btnTomarFoto.setOnClickListener { checkCameraPermissionAndOpenCamera() }
         btnSeleccionarFoto.setOnClickListener { openGallery() }
         btnEnviarReporte.setOnClickListener { enviarReporte() }
         btnCerrar.setOnClickListener { dismiss() }
         txtUbicacion.setOnClickListener { abrirSelectorUbicacion() }
 
+        // Configurar RecyclerView para las imágenes
+        imagesAdapter = ImagesAdapter(selectedImageUris) { uri -> removeImage(uri) }
+        recyclerViewImages.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        recyclerViewImages.adapter = imagesAdapter
+
+        // Establecer color inicial del texto de txtUbicacion
+        txtUbicacion.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.darker_gray))
+
         return view
+    }
+
+    private fun setupBottomSheetBehavior(view: View) {
+        val bottomSheet = view.parent as View
+        val behavior = BottomSheetBehavior.from(bottomSheet)
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        behavior.peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
+        behavior.isFitToContents = true
+        behavior.skipCollapsed = true
+        behavior.isHideable = true  // Allow hiding the bottom sheet by swiping down
+        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                // No-op
+            }
+        })
+        behavior.maxHeight = (resources.displayMetrics.heightPixels * 0.9).toInt() // Set the max height to 90% of screen height
+    }
+
+    private fun removeImage(uri: Uri) {
+        selectedImageUris.remove(uri)
+        imagesAdapter.notifyDataSetChanged()
+        if (selectedImageUris.isEmpty()) {
+            recyclerViewImages.visibility = View.GONE
+        }
     }
 
     private fun setImageForTipoReporte(tipo: String) {
@@ -114,9 +193,11 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         startActivityForResult(intent, LOCATION_PICKER_REQUEST)
     }
 
+
+
     private fun enviarReporte() {
         val descripcion = edtDescripcion.text.toString().trim()
-        val isAnonimo = chkAnonimo.isChecked
+        val isAnonimo = switchAnonimo.isChecked
 
         if (descripcion.isBlank()) {
             Toast.makeText(requireContext(), "Por favor ingresa una descripción", Toast.LENGTH_SHORT).show()
@@ -246,6 +327,23 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         startActivityForResult(intent, CAMERA_REQUEST_CODE)
     }
 
+    private fun checkCameraPermissionAndOpenCamera() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE)
+        } else {
+            openCamera()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            openCamera()
+        } else {
+            Toast.makeText(requireContext(), "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
@@ -270,6 +368,8 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
                             selectedImageUris.add(imageUri)
                             Toast.makeText(requireContext(), "1 imagen seleccionada", Toast.LENGTH_SHORT).show()
                         }
+                        imagesAdapter.notifyDataSetChanged()
+                        recyclerViewImages.visibility = View.VISIBLE
                     }
                 }
                 CAMERA_REQUEST_CODE -> {
@@ -277,12 +377,21 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
                     val uri = getImageUriFromBitmap(photo)
                     selectedImageUris.add(uri)
                     Toast.makeText(requireContext(), "Foto tomada", Toast.LENGTH_SHORT).show()
+                    imagesAdapter.notifyDataSetChanged()
+                    recyclerViewImages.visibility = View.VISIBLE
                 }
                 LOCATION_PICKER_REQUEST -> {
                     selectedLatitude = data?.getDoubleExtra("latitude", 0.0)
                     selectedLongitude = data?.getDoubleExtra("longitude", 0.0)
                     selectedLocationName = data?.getStringExtra("locationName")
                     txtUbicacion.text = selectedLocationName ?: "Ubicación seleccionada"
+
+                    // Cambiar color del texto de txtUbicacion
+                    if (selectedLocationName == null) {
+                        txtUbicacion.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.darker_gray))
+                    } else {
+                        txtUbicacion.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_blue_dark))
+                    }
                 }
             }
         }
@@ -294,4 +403,33 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         val path = MediaStore.Images.Media.insertImage(requireContext().contentResolver, bitmap, "Title", null)
         return Uri.parse(path)
     }
+
+    class ImagesAdapter(
+        private val imageUris: List<Uri>,
+        private val onRemoveImage: (Uri) -> Unit
+    ) : RecyclerView.Adapter<ImagesAdapter.ImageViewHolder>() {
+
+        inner class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val imageView: ImageView = view.findViewById(R.id.imageView)
+            val btnRemove: ImageView = view.findViewById(R.id.btnRemove)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_image, parent, false)
+            return ImageViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+            val uri = imageUris[position]
+            holder.imageView.setImageURI(uri)
+            holder.btnRemove.setOnClickListener {
+                onRemoveImage(uri)
+            }
+        }
+
+        override fun getItemCount(): Int {
+            return imageUris.size
+        }
+    }
+
 }

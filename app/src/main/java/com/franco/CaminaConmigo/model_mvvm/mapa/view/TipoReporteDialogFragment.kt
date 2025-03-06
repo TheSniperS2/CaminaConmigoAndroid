@@ -66,6 +66,11 @@ class TipoReporteDialogFragment : BottomSheetDialogFragment() {
         // Agregamos espacio entre los elementos
         recyclerView.addItemDecoration(SpaceItemDecoration(24))
 
+        // Configurar el botón Cerrar
+        view.findViewById<TextView>(R.id.btnCerrar).setOnClickListener {
+            dismiss()
+        }
+
         return view
     }
 

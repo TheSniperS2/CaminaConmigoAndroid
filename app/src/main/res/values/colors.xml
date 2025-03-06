@@ -11,4 +11,5 @@
     <color name="colorSelectedFriend">#D3D3D3</color> <!-- Color gris claro para indicar la selección -->
     <color name="gray">#999999</color>
     <color name="light_purple">#B39DDB</color>
+    <color name="purple_500">#FA79B6</color>
 </resources>
