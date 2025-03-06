@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class NovedadViewModel : ViewModel() {
 
@@ -79,5 +81,45 @@ class NovedadViewModel : ViewModel() {
             .addOnFailureListener {
                 _reportes.value = emptyList() // Si falla, se envía una lista vacía
             }
+    }
+
+    fun buscarReportes(query: String) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("reportes")
+            .whereGreaterThanOrEqualTo("type", query)
+            .whereLessThanOrEqualTo("type", query + '\uf8ff')
+            .get()
+            .addOnSuccessListener { documents ->
+                val reportesList = mutableListOf<Reporte>()
+                for (document in documents) {
+                    val reporte = document.toObject(Reporte::class.java)
+                    reportesList.add(reporte)
+                }
+                _reportes.value = reportesList
+            }
+            .addOnFailureListener {
+                _reportes.value = emptyList()
+            }
+    }
+
+    fun filtrarPorCiudad(userLatitude: Double, userLongitude: Double) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("reportes")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val lista = snapshot.documents.mapNotNull { it.toObject(Reporte::class.java) }
+                val listaOrdenada = lista.sortedBy { reporte ->
+                    val distancia = calcularDistancia(userLatitude, userLongitude, reporte.latitude, reporte.longitude)
+                    distancia
+                }
+                _reportes.value = listaOrdenada
+            }
+            .addOnFailureListener {
+                _reportes.value = emptyList() // Si falla, se envía una lista vacía
+            }
+    }
+
+    private fun calcularDistancia(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        return sqrt((lat1 - lat2).pow(2) + (lon1 - lon2).pow(2))
     }
 }

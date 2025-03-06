@@ -12,4 +12,5 @@
     <color name="gray">#999999</color>
     <color name="light_purple">#B39DDB</color>
     <color name="purple_500">#FA79B6</color>
+    <color name="gray_500">#DFDFDF</color>
 </resources>
