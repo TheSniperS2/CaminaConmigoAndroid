@@ -25,16 +25,7 @@ class ItemTouchHelperCallback(
     ): Boolean {
         val fromPosition = viewHolder.adapterPosition
         val toPosition = target.adapterPosition
-        if (fromPosition < toPosition) {
-            for (i in fromPosition until toPosition) {
-                adapter.swapItems(i, i + 1)
-            }
-        } else {
-            for (i in fromPosition downTo toPosition + 1) {
-                adapter.swapItems(i, i - 1)
-            }
-        }
-        adapter.notifyItemMoved(fromPosition, toPosition)
+        onMove(fromPosition, toPosition)
         return true
     }
 

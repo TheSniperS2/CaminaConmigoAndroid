@@ -63,22 +63,26 @@ class ContactoEmergenciaViewModel : ViewModel() {
             .addOnSuccessListener { documentReference ->
                 nuevoContacto.id = documentReference.id
                 listaContactos.add(nuevoContacto)
-                _contactos.value = listaContactos
+                _contactos.value = listaContactos.toList() // Actualizar LiveData
             }
     }
 
     fun moverContacto(fromPosition: Int, toPosition: Int) {
         if (fromPosition < toPosition) {
             for (i in fromPosition until toPosition) {
-                listaContactos[i] = listaContactos.set(i + 1, listaContactos[i])
+                val temp = listaContactos[i]
+                listaContactos[i] = listaContactos[i + 1]
+                listaContactos[i + 1] = temp
             }
         } else {
             for (i in fromPosition downTo toPosition + 1) {
-                listaContactos[i] = listaContactos.set(i - 1, listaContactos[i])
+                val temp = listaContactos[i]
+                listaContactos[i] = listaContactos[i - 1]
+                listaContactos[i - 1] = temp
             }
         }
-        listaContactos[toPosition].order = toPosition
         actualizarOrdenEnFirestore()
+        _contactos.value = listaContactos.toList() // Actualizar LiveData para reflejar cambios
     }
 
     fun eliminarContacto(index: Int) {
@@ -107,7 +111,7 @@ class ContactoEmergenciaViewModel : ViewModel() {
             .document(contacto.id)
             .update("name", nuevoNombre, "phone", nuevoNumero)
 
-        _contactos.value = listaContactos
+        _contactos.value = listaContactos.toList() // Actualizar LiveData
     }
 
     fun updateContactsOrder(contactos: List<ContactoEmergencia>) {
@@ -133,6 +137,6 @@ class ContactoEmergenciaViewModel : ViewModel() {
                 .document(contacto.id)
                 .update("order", index)
         }
-        _contactos.value = listaContactos
+        _contactos.value = listaContactos.toList() // Actualizar LiveData
     }
 }

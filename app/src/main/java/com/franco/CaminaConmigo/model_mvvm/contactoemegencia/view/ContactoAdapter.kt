@@ -13,9 +13,7 @@ import com.franco.CaminaConmigo.model_mvvm.contactoemegencia.viewmodel.ContactoE
 class ContactoAdapter(
     private val contactos: MutableList<ContactoEmergencia>,
     private val viewModel: ContactoEmergenciaViewModel,
-    private val onEditar: (Int) -> Unit,
-    private val onMoverArriba: (Int) -> Unit,
-    private val onMoverAbajo: (Int) -> Unit
+    private val onEditar: (Int) -> Unit
 ) : RecyclerView.Adapter<ContactoAdapter.ContactoViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactoViewHolder {
@@ -30,30 +28,21 @@ class ContactoAdapter(
         holder.textNumero.text = contacto.phone
         holder.textPrioridad.text = (position + 1).toString() // Mostrar el número de prioridad basado en la posición
 
-        // Asignar evento de editar solo
+        // Asignar evento de editar
         holder.btnEditar.setOnClickListener { onEditar(position) }
 
-        holder.btnMoverArriba.setOnClickListener { onMoverArriba(position) }
-        holder.btnMoverAbajo.setOnClickListener { onMoverAbajo(position) }
-
-        // Cambiar la apariencia del primer contacto de emergencia
-        if (position == 0) {
-            holder.itemView.setBackgroundResource(R.drawable.bg_highlighted_contact)
-            holder.textNombre.textSize = 18f
-            holder.textNumero.textSize = 16f
-        } else {
-            holder.itemView.setBackgroundResource(android.R.color.transparent)
-            holder.textNombre.textSize = 16f
-            holder.textNumero.textSize = 14f
-        }
+        // No cambiar la apariencia del primer contacto de emergencia
+        holder.itemView.setBackgroundResource(android.R.color.transparent)
+        holder.textNombre.textSize = 16f
+        holder.textNumero.textSize = 14f
     }
 
     override fun getItemCount() = contactos.size
 
     fun swapItems(fromPosition: Int, toPosition: Int) {
-        val fromItem = contactos[fromPosition]
-        contactos[fromPosition] = contactos[toPosition]
-        contactos[toPosition] = fromItem
+        val fromItem = contactos.removeAt(fromPosition)
+        contactos.add(toPosition, fromItem)
+        notifyItemMoved(fromPosition, toPosition)
     }
 
     fun updateOrder() {
@@ -73,7 +62,6 @@ class ContactoAdapter(
         val textNumero: TextView = view.findViewById(R.id.textViewNumero)
         val textPrioridad: TextView = view.findViewById(R.id.textViewPrioridad)
         val btnEditar: ImageView = view.findViewById(R.id.imageViewEditar)
-        val btnMoverArriba: ImageView = view.findViewById(R.id.imageViewMoverArriba)
-        val btnMoverAbajo: ImageView = view.findViewById(R.id.imageViewMoverAbajo)
+        val btnMover: ImageView = view.findViewById(R.id.imageViewMover)
     }
 }

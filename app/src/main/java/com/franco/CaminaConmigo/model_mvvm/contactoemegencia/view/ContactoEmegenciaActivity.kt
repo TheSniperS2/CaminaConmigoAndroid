@@ -2,10 +2,7 @@ package com.franco.CaminaConmigo.model_mvvm.contactoemegencia.view
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.widget.EditText
 import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,8 +13,8 @@ import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
 
 class ContactoEmegenciaActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityContactoemergenciaBinding
-    private val viewModel: ContactoEmergenciaViewModel = ContactoEmergenciaViewModel()
+    lateinit var binding: ActivityContactoemergenciaBinding
+    val viewModel: ContactoEmergenciaViewModel = ContactoEmergenciaViewModel()
     private lateinit var adapter: ContactoAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,14 +30,13 @@ class ContactoEmegenciaActivity : AppCompatActivity() {
             adapter = ContactoAdapter(
                 contactos.toMutableList(),
                 viewModel,
-                ::editarContacto,
-                ::moverArriba,
-                ::moverAbajo
+                ::editarContacto
             )
             binding.recyclerViewContactos.adapter = adapter
 
             // Configurar ItemTouchHelper
             val callback = ItemTouchHelperCallback(adapter) { fromPosition, toPosition ->
+                adapter.swapItems(fromPosition, toPosition)
                 viewModel.moverContacto(fromPosition, toPosition)
             }
             val itemTouchHelper = ItemTouchHelper(callback)
@@ -48,7 +44,7 @@ class ContactoEmegenciaActivity : AppCompatActivity() {
         }
 
         // Configurar el botón de agregar contacto
-        binding.imageViewAgregar.setOnClickListener { agregarContacto() }
+        binding.textViewAgregarContacto.setOnClickListener { agregarContacto() }
 
         // Configurar el botón de retroceder
         val btnRetroceder: ImageView = findViewById(R.id.btnRetroceder)
@@ -65,60 +61,15 @@ class ContactoEmegenciaActivity : AppCompatActivity() {
     }
 
     private fun editarContacto(index: Int) {
-        val builder = AlertDialog.Builder(this)
-        val view = LayoutInflater.from(this).inflate(R.layout.dialog_editar_numero, null)
-        val editTextNombre = view.findViewById<EditText>(R.id.editTextNuevoNombre)
-        val editTextNumero = view.findViewById<EditText>(R.id.editTextNuevoNumero)
-
-        // Rellenar los campos con los datos actuales
-        editTextNombre.setText(viewModel.contactos.value?.get(index)?.name)
-        editTextNumero.setText(viewModel.contactos.value?.get(index)?.phone)
-
-        builder.setView(view)
-        builder.setPositiveButton("Guardar") { _, _ ->
-            val nuevoNombre = editTextNombre.text.toString()
-            val nuevoNumero = editTextNumero.text.toString()
-            if (nuevoNombre.isNotEmpty() && nuevoNumero.isNotEmpty()) {
-                viewModel.editarContacto(index, nuevoNombre, nuevoNumero)
-            }
-        }
-
-        builder.setNegativeButton("Cancelar", null)
-
-        builder.setNeutralButton("Eliminar") { _, _ ->
-            eliminarContacto(index)
-        }
-
-        builder.show()
-    }
-
-    private fun moverArriba(index: Int) {
-        if (index > 0) {
-            viewModel.moverContacto(index, index - 1)
-            adapter.notifyItemMoved(index, index - 1)
-        }
-    }
-
-    private fun moverAbajo(index: Int) {
-        if (index < viewModel.contactos.value?.size?.minus(1) ?: 0) {
-            viewModel.moverContacto(index, index + 1)
-            adapter.notifyItemMoved(index, index + 1)
+        val contacto = viewModel.contactos.value?.get(index)
+        contacto?.let {
+            val dialog = EditContactDialogFragment(it, index)
+            dialog.show(supportFragmentManager, "EditContactDialogFragment")
         }
     }
 
     private fun agregarContacto() {
-        val builder = AlertDialog.Builder(this)
-        val view = LayoutInflater.from(this).inflate(R.layout.dialog_agregar_contacto, null)
-        val editTextNombre = view.findViewById<EditText>(R.id.editTextNombre)
-        val editTextNumero = view.findViewById<EditText>(R.id.editTextNumero)
-
-        builder.setView(view)
-        builder.setPositiveButton("Agregar") { _, _ ->
-            if (editTextNombre.text.isNotEmpty() && editTextNumero.text.isNotEmpty()) {
-                viewModel.agregarContacto(editTextNombre.text.toString(), editTextNumero.text.toString())
-            }
-        }
-        builder.setNegativeButton("Cancelar", null)
-        builder.show()
+        val dialog = AddContactDialogFragment()
+        dialog.show(supportFragmentManager, "AddContactDialogFragment")
     }
 }

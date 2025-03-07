@@ -1,24 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/dialog_background"
+    android:layout_gravity="center">
 
-    <!-- Editar Nombre -->
+    <!-- Título del diálogo -->
+    <TextView
+        android:id="@+id/tvTituloEditar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Editar Contacto"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:paddingBottom="16dp"/>
+
     <EditText
         android:id="@+id/editTextNuevoNombre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nuevo nombre"
+        android:hint="Nombre"
         android:inputType="textPersonName"
-        android:layout_marginBottom="8dp" />
+        android:background="@drawable/edit_text_background"
+        android:padding="10dp"
+        android:layout_marginBottom="12dp"/>
 
-    <!-- Editar Número -->
     <EditText
         android:id="@+id/editTextNuevoNumero"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nuevo número"
+        android:hint="Número"
         android:inputType="phone"
-        android:layout_marginBottom="8dp" />
+        android:background="@drawable/edit_text_background"
+        android:padding="10dp"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Botones de acción -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/btnCancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/button_background_cancel"/>
+
+        <Button
+            android:id="@+id/btnGuardar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Guardar"
+            android:layout_weight="1"
+            android:background="@drawable/button_background_enabled"/>
+    </LinearLayout>
 </LinearLayout>
