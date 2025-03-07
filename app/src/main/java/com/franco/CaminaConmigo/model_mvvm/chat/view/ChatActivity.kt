@@ -11,12 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ActivityChatBinding
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
-import com.franco.CaminaConmigo.model_mvvm.chat.model.Friend
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
 import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
 import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
 import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -83,7 +81,8 @@ class ChatActivity : AppCompatActivity() {
         }
 
         binding.textView55.setOnClickListener {
-            startActivity(Intent(this, AddFriendActivity::class.java))
+            val addFriendBottomSheetFragment = AddFriendBottomSheetFragment()
+            addFriendBottomSheetFragment.show(supportFragmentManager, addFriendBottomSheetFragment.tag)
         }
 
         binding.textView57.setOnClickListener {
@@ -141,26 +140,4 @@ class ChatActivity : AppCompatActivity() {
         createGroupBottomSheetFragment.show(supportFragmentManager, createGroupBottomSheetFragment.tag)
     }
 
-    private fun createGroup(selectedFriends: List<Friend>) {
-        val currentUserId = auth.currentUser?.uid ?: return
-        val groupUserIds = selectedFriends.map { it.id } + currentUserId
-
-        val groupData = mapOf(
-            "adminIds" to listOf(currentUserId),
-            "lastMessage" to "Hola",
-            "lastMessageTimestamp" to Timestamp.now(),
-            "name" to "Nuevo Grupo",
-            "participants" to groupUserIds,
-            "unreadCount" to groupUserIds.associateWith { 0 }
-        )
-
-        db.collection("chats").add(groupData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Grupo creado exitosamente.", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Log.e("ChatActivity", "Error al crear el grupo: ${e.message}")
-                Toast.makeText(this, "Error al crear el grupo.", Toast.LENGTH_SHORT).show()
-            }
-    }
 }

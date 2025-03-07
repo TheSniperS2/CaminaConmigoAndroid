@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Contenedor del perfil y nombre del chat -->
+    <!-- Contenedor del perfil, nombre del chat y último mensaje -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,53 +15,59 @@
         <!-- Imagen de perfil -->
         <ImageView
             android:id="@+id/profileImage"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:scaleType="centerCrop"
             android:layout_marginEnd="12dp"
             android:background="@drawable/ic_imagen" />
 
-        <!-- Nombre del chat y hora del último mensaje -->
+        <!-- Contenedor del nombre del chat y último mensaje -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal"
-            android:weightSum="1">
+            android:orientation="vertical">
 
-            <!-- Nombre del chat -->
-            <TextView
-                android:id="@+id/chatName"
-                android:layout_width="0dp"
+            <!-- Contenedor del nombre del chat y hora del último mensaje -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Chat Name"
-                android:textSize="16sp"
-                android:layout_weight="0.7" />
+                android:orientation="horizontal"
+                android:weightSum="1">
 
-            <!-- Hora del último mensaje -->
+                <!-- Nombre del chat -->
+                <TextView
+                    android:id="@+id/chatName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Chat Name"
+                    android:textSize="16sp"
+                    android:layout_weight="0.7" />
+
+                <!-- Hora del último mensaje -->
+                <TextView
+                    android:id="@+id/lastMessageTimestamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12:30 PM"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_weight="0.3"
+                    android:gravity="end" />
+            </LinearLayout>
+
+            <!-- Último mensaje o comentario -->
             <TextView
-                android:id="@+id/lastMessageTimestamp"
-                android:layout_width="wrap_content"
+                android:id="@+id/lastMessage"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="12:30 PM"
-                android:textSize="12sp"
+                android:text="Last message"
+                android:textSize="14sp"
                 android:textColor="@android:color/darker_gray"
-                android:layout_weight="0.3"
-                android:gravity="end" />
+                android:layout_marginTop="4dp"
+                android:maxLines="2"
+                android:ellipsize="end" />
         </LinearLayout>
     </LinearLayout>
-
-    <!-- Último mensaje o comentario -->
-    <TextView
-        android:id="@+id/lastMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Last message"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="4dp"
-        android:maxLines="2"
-        android:ellipsize="end" />
-
 </LinearLayout>
+

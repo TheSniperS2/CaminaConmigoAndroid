@@ -12,6 +12,8 @@ import com.franco.CaminaConmigo.databinding.ItemChatBinding
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Chat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ChatAdapter(private val onChatClick: (String) -> Unit) : ListAdapter<Chat, ChatViewHolder>(ChatDiffCallback()) {
 
@@ -46,13 +48,13 @@ class ChatViewHolder(
             // Mostrar el último mensaje si existe
             binding.lastMessage.text = chat.lastMessage ?: "Sin mensaje"
 
-            // Formatear la fecha del último mensaje si se tiene el timestamp
+            // Formatear la hora del último mensaje si se tiene el timestamp
             val timestamp = chat.lastMessageTimestamp
             if (timestamp != null) {
-                val formattedDate = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm").format(timestamp.toDate())
-                binding.lastMessageTimestamp.text = formattedDate
+                val formattedTime = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(timestamp.toDate())
+                binding.lastMessageTimestamp.text = formattedTime
             } else {
-                binding.lastMessageTimestamp.text = "Sin fecha"
+                binding.lastMessageTimestamp.text = "Sin hora"
             }
 
             // Recuperar y mostrar la imagen de perfil del usuario o del grupo

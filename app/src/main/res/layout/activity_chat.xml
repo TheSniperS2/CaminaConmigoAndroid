@@ -38,68 +38,94 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/textView55"
-        android:layout_width="wrap_content"
+    <!-- Contenedor para Añadir Amigo y Crear Grupo -->
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="116dp"
-        android:text="Añadir Amigo"
-        android:textColor="#2EB9FF"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerViewChats"
-        app:layout_constraintEnd_toStartOf="@+id/imageView46"
-        app:layout_constraintTop_toBottomOf="@+id/cardView7"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/textView57"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="Crear Grupo"
-        android:textColor="#2EB9FF"
-        android:textSize="16sp"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView7" />
-
-    <ImageView
-        android:id="@+id/imageView45"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toStartOf="@+id/textView55"
-        app:layout_constraintHorizontal_bias="0.533"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView7"
-        app:srcCompat="@drawable/person_add_24px" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView7">
 
-    <ImageView
-        android:id="@+id/imageView46"
+        <!-- Contenedor Añadir Amigo -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- Imagen Añadir Amigo -->
+            <ImageView
+                android:id="@+id/imageView45"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                app:srcCompat="@drawable/person_add_24px" />
+
+            <!-- Texto Añadir Amigo -->
+            <TextView
+                android:id="@+id/textView55"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="32dp"
+                android:text="Añadir Amigo"
+                android:textColor="#2EB9FF"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- Contenedor Crear Grupo -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- Imagen Crear Grupo -->
+            <ImageView
+                android:id="@+id/imageView46"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                app:srcCompat="@drawable/group_add_24px" />
+
+            <!-- Texto Crear Grupo -->
+            <TextView
+                android:id="@+id/textView57"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Crear Grupo"
+                android:textColor="#2EB9FF"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Título Chats Activos -->
+    <TextView
+        android:id="@+id/textViewChatsActivos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="12dp"
-        app:layout_constraintEnd_toStartOf="@+id/textView57"
-        app:layout_constraintTop_toBottomOf="@+id/cardView7"
-        app:srcCompat="@drawable/group_add_24px" />
+        android:text="Chats activos"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout5"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp" />
+
 
     <!-- RecyclerView para chats -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewChats"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="13dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toTopOf="@id/linearLayoutFooter"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardView7"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewChatsActivos" />
 
     <LinearLayout
         android:id="@+id/linearLayoutFooter"

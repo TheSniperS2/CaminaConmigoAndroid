@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.FragmentCreateGroupBottomSheetBinding
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Friend
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
@@ -40,6 +41,7 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private var groupImageUri: Uri? = null
+    private lateinit var friendsAdapter: FriendsAdapter
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
 
@@ -54,20 +56,23 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val friendsAdapter = FriendsAdapter(emptyList()) { friend ->
-            // Lógica para manejar la selección de amigos
+        friendsAdapter = FriendsAdapter(emptyList()) { friend ->
+            updateCreateGroupButtonState(friendsAdapter.getSelectedFriends().size)
         }
         binding.recyclerViewFriends.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewFriends.adapter = friendsAdapter
 
-        loadFriends(friendsAdapter)
+        loadFriends()
 
-        binding.imageViewGroup.setOnClickListener {
+        val selectPhotoListener = View.OnClickListener {
             // Lógica para seleccionar una imagen del dispositivo
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
             startActivityForResult(intent, 1)
         }
+
+        binding.imageViewGroup.setOnClickListener(selectPhotoListener)
+        binding.selectGroupPhoto.setOnClickListener(selectPhotoListener)
 
         binding.buttonCreateGroup.setOnClickListener {
             val selectedFriends = friendsAdapter.getSelectedFriends()
@@ -98,7 +103,7 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun loadFriends(friendsAdapter: FriendsAdapter) {
+    private fun loadFriends() {
         val currentUserId = auth.currentUser?.uid ?: return
         lifecycleScope.launch {
             try {
@@ -196,6 +201,14 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
             .addOnFailureListener { e ->
                 Log.e("CreateGroupBottomSheetFragment", "Error al crear notificación de invitación a grupo para $userId", e)
             }
+    }
+
+    private fun updateCreateGroupButtonState(selectedFriendsCount: Int) {
+        if (selectedFriendsCount >= 2) {
+            binding.buttonCreateGroup.setBackgroundColor(resources.getColor(android.R.color.holo_blue_dark))
+        } else {
+            binding.buttonCreateGroup.setBackgroundColor(resources.getColor(android.R.color.darker_gray))
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

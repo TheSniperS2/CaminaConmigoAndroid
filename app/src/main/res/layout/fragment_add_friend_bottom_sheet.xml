@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:gravity="top">
 
         <!-- Encabezado -->
         <RelativeLayout
@@ -21,7 +22,7 @@
                 android:id="@+id/txtTitulo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Crear Grupo"
+                android:text="Añadir Amigo"
                 android:textStyle="bold"
                 android:textSize="24sp"
                 android:layout_centerHorizontal="true" />
@@ -32,60 +33,42 @@
                 android:layout_height="wrap_content"
                 android:text="Cerrar"
                 android:textColor="@android:color/holo_blue_dark"
+                android:layout_centerVertical="true"
                 android:textSize="14sp"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true" />
         </RelativeLayout>
 
-        <!-- Imagen del grupo -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imageViewGroup"
-            android:layout_width="130dp"
-            android:layout_height="130dp"
-            android:layout_gravity="center"
-            android:background="@drawable/ic_imagen"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Texto para seleccionar foto de grupo -->
         <TextView
-            android:id="@+id/selectGroupPhoto"
+            android:id="@+id/txtDescripcion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Seleccionar foto de grupo"
-            android:textColor="@android:color/holo_blue_dark"
+            android:text="Ingresa el email o username de tu amigo"
             android:textSize="16sp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="16dp"
-            android:clickable="true"
-            android:focusable="true" />
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center" />
 
+        <!-- Campo de correo o username -->
         <EditText
-            android:id="@+id/editTextGroupName"
+            android:id="@+id/etUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nombre del grupo"
+            android:hint="Email o username"
             android:padding="12dp"
             android:background="@drawable/edit_text_background"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginTop="16dp"
+            android:textColorHint="@android:color/darker_gray"
+            android:inputType="textEmailAddress|textPersonName" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Selecciona amigos para el grupo"
-            android:textSize="18sp"
-            android:layout_marginBottom="16dp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewFriends"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginBottom="16dp" />
-
+        <!-- Botón para enviar la solicitud -->
         <Button
-            android:id="@+id/buttonCreateGroup"
+            android:id="@+id/btnSendRequest"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/darker_gray"
-            android:text="Crear Grupo"
-            android:textColor="@android:color/white" />
+            android:text="Enviar Solicitud"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@android:color/holo_blue_dark"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
