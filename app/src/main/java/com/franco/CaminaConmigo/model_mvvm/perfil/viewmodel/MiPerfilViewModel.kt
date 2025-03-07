@@ -10,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.tasks.await
 
 class MiPerfilViewModel(private val context: Context) {
 
@@ -110,5 +111,37 @@ class MiPerfilViewModel(private val context: Context) {
         userRef.set(user, SetOptions.merge())
             .addOnSuccessListener { Log.d("Firestore", "Usuario guardado correctamente") }
             .addOnFailureListener { e -> Log.e("Firestore", "Error al guardar usuario", e) }
+    }
+
+    fun isUsernameAvailable(username: String, callback: (Boolean) -> Unit) {
+        firestore.collection("users")
+            .whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener { documents ->
+                callback(documents.isEmpty)
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error al verificar disponibilidad del username", e)
+                callback(false)
+            }
+    }
+
+    suspend fun generateUniqueUsername(baseUsername: String): String {
+        var username = baseUsername
+        var counter = 1
+
+        while (true) {
+            val snapshot = firestore.collection("users")
+                .whereEqualTo("username", username)
+                .get()
+                .await()
+
+            if (snapshot.documents.isEmpty()) {
+                return username
+            }
+
+            username = "$baseUsername$counter"
+            counter += 1
+        }
     }
 }

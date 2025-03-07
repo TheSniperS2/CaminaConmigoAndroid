@@ -57,8 +57,14 @@ class MiPerfilActivity : AppCompatActivity() {
 
         binding.imageButton12.setOnClickListener {
             showEditDialog("Editar Nombre de Usuario", binding.textView16) { newValue ->
-                binding.textView16.text = newValue
-                viewModel.saveUserUsername(newValue)
+                viewModel.isUsernameAvailable(newValue) { isAvailable ->
+                    if (isAvailable) {
+                        binding.textView16.text = newValue
+                        viewModel.saveUserUsername(newValue)
+                    } else {
+                        Toast.makeText(this, "Nombre de usuario no disponible", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
 
