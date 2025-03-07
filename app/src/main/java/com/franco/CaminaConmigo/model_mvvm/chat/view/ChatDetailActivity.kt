@@ -109,7 +109,7 @@ class ChatDetailActivity : AppCompatActivity() {
             Log.d("ChatDetailActivity", "Mensajes actualizados en UI: ${messages.size}")
             val adapter = MessageAdapter(auth.currentUser?.uid ?: "")
             binding.recyclerViewMessages.adapter = adapter
-            adapter.submitList(messages)
+            adapter.submitListWithHeaders(messages)
             binding.recyclerViewMessages.scrollToPosition(messages.size - 1) // Desplazar al último mensaje
         })
 
