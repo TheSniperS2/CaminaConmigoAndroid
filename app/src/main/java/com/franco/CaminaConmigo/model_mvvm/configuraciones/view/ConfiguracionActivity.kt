@@ -3,11 +3,14 @@ package com.franco.CaminaConmigo.model_mvvm.configuraciones.view
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.franco.CaminaConmigo.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ConfiguracionActivity : AppCompatActivity() {
 
@@ -16,6 +19,8 @@ class ConfiguracionActivity : AppCompatActivity() {
     private lateinit var switchModoOscuro: Switch
     private lateinit var switchShakeAlerta: Switch
     private lateinit var sharedPreferences: SharedPreferences
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +54,7 @@ class ConfiguracionActivity : AppCompatActivity() {
 
         switchNotificacionesReporte.setOnCheckedChangeListener { _, isChecked ->
             guardarConfiguracion("notificaciones_reporte", isChecked)
+            actualizarNotificacionEnFirebase(isChecked)
         }
 
         switchModoOscuro.setOnCheckedChangeListener { _, isChecked ->
@@ -64,6 +70,31 @@ class ConfiguracionActivity : AppCompatActivity() {
         // Aplicar modo oscuro si está activado
         aplicarModoOscuro(switchModoOscuro.isChecked)
     }
+
+    private fun actualizarNotificacionEnFirebase(isChecked: Boolean) {
+        val userId = obtenerUserId()
+        if (userId != null) {
+            val db = FirebaseFirestore.getInstance()
+
+            db.collection("users").document(userId)
+                .update("reportNotifications", isChecked)
+                .addOnSuccessListener {
+                    Log.d("Firebase", "Notificaciones de reporte actualizadas: $isChecked")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Firebase", "Error al actualizar notificaciones de reporte", e)
+                }
+        } else {
+            Log.e("Firebase", "Usuario no autenticado")
+        }
+    }
+
+
+    private fun obtenerUserId(): String? {
+        val user = FirebaseAuth.getInstance().currentUser
+        return user?.uid
+    }
+
 
     private fun guardarConfiguracion(clave: String, valor: Boolean) {
         val editor = sharedPreferences.edit()

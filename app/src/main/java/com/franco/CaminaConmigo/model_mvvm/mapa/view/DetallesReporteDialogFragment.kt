@@ -322,7 +322,7 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
                 // Enviar notificación
                 user?.let {
                     db.collection("reportes").document(reportId).get().addOnSuccessListener { document ->
-                        val reportOwnerId = document.getString("senderId") ?: ""
+                        val reportOwnerId = document.getString("userId") ?: ""
                         db.collection("users").document(it.uid).get().addOnSuccessListener { userDoc ->
                             val commentAuthorUsername = userDoc.getString("username") ?: "Anónimo"
                             createCommentNotification(it.uid, commentAuthorUsername, text, reportId, reportOwnerId)
@@ -351,6 +351,14 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
             "userId" to reportOwnerId,
             "createdAt" to FieldValue.serverTimestamp()
         )
+
+        db.collection("users").document(reportOwnerId).collection("notifications").add(notificationData)
+            .addOnSuccessListener {
+                Toast.makeText(requireContext(), "Notificación enviada al autor del reporte", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Error al enviar notificación: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun darLike() {

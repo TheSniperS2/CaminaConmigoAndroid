@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +43,7 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
     private var selectedLatitude: Double? = null
     private var selectedLongitude: Double? = null
     private var selectedLocationName: String? = null
-
+    private var likes: Int = 0
 
     private lateinit var txtUbicacion: TextView
     private lateinit var edtDescripcion: EditText
@@ -193,8 +194,6 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         startActivityForResult(intent, LOCATION_PICKER_REQUEST)
     }
 
-
-
     private fun enviarReporte() {
         val descripcion = edtDescripcion.text.toString().trim()
         val isAnonimo = switchAnonimo.isChecked
@@ -217,11 +216,11 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
             "description" to descripcion,
             "type" to tipoReporte,
             "latitude" to selectedLatitude,
+            "likes" to likes,
             "longitude" to selectedLongitude,
             "timestamp" to FieldValue.serverTimestamp(),
-            "senderId" to userId,
+            "userId" to userId,
             "isAnonymous" to isAnonimo,
-            "isRead" to false,
             "imageUrls" to listOf<String>()
         )
 
@@ -243,9 +242,11 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
                             }
                     }
                 }
+
                 if (!isAnonimo) {
                     notifyFriendsAboutReport(userId, documentReference.id, tipoReporte)
                 }
+
                 dismiss()
             }
             .addOnFailureListener {
@@ -256,17 +257,59 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun notifyFriendsAboutReport(userId: String, reportId: String, reportType: String) {
-        db.collection("users").document(userId).collection("friends").get()
-            .addOnSuccessListener { querySnapshot ->
-                for (document in querySnapshot.documents) {
-                    val friendId = document.id
-                    createFriendReportNotification(userId, friendId, reportId, reportType)
+        val userRef = db.collection("users").document(userId)
+
+        // Obtener el nombre del usuario actual
+        userRef.get().addOnSuccessListener { userSnapshot ->
+            val username = userSnapshot.getString("username") ?: return@addOnSuccessListener
+
+            // Obtener la lista de amigos
+            userRef.collection("friends").get().addOnSuccessListener { friendsSnapshot ->
+                for (friendDoc in friendsSnapshot.documents) {
+                    val friendId = friendDoc.id
+
+                    // Verificar si el amigo tiene activadas las notificaciones de reportes
+                    db.collection("users").document(friendId).get().addOnSuccessListener { friendSnapshot ->
+                        val reportNotificationsEnabled = friendSnapshot.getBoolean("reportNotifications") ?: true
+
+                        if (reportNotificationsEnabled) {
+                            val notificationData = mapOf(
+                                "userId" to friendId,
+                                "type" to "friendReport",
+                                "title" to "Nuevo reporte de amigo",
+                                "message" to "$username ha reportado un incidente de $reportType",
+                                "createdAt" to FieldValue.serverTimestamp(),
+                                "isRead" to false,
+                                "data" to mapOf(
+                                    "reportId" to reportId,
+                                    "reportType" to reportType,
+                                    "friendId" to userId,
+                                    "friendName" to username
+                                )
+                            )
+
+                            // Guardar la notificación en Firestore
+                            db.collection("users").document(friendId)
+                                .collection("notifications").add(notificationData)
+                                .addOnSuccessListener {
+                                    Log.d("NotifyFriends", "Notificación enviada a $friendId")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("NotifyFriends", "Error al crear notificación: ${e.message}")
+                                }
+                        }
+                    }.addOnFailureListener { e ->
+                        Log.e("NotifyFriends", "Error al obtener datos del amigo: ${e.message}")
+                    }
                 }
+            }.addOnFailureListener { e ->
+                Log.e("NotifyFriends", "Error al obtener la lista de amigos: ${e.message}")
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(requireContext(), "Error al notificar a los amigos: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        }.addOnFailureListener { e ->
+            Log.e("NotifyFriends", "Error al obtener datos del usuario: ${e.message}")
+        }
     }
+
 
     private fun createFriendReportNotification(userId: String, friendId: String, reportId: String, reportType: String) {
         if (!isAdded) {
@@ -293,17 +336,17 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
             db.collection("users").document(friendId).collection("notifications").add(notificationData)
                 .addOnSuccessListener {
                     if (isAdded) {
-                        Toast.makeText(requireContext(), "Notificación de reporte enviada a $friendId", Toast.LENGTH_SHORT).show()
+                        Log.d("AgregarReporte", "Notificación de reporte enviada a $friendId")
                     }
                 }
                 .addOnFailureListener { e ->
                     if (isAdded) {
-                        Toast.makeText(requireContext(), "Error al crear notificación de reporte: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Log.e("AgregarReporte", "Error al crear notificación de reporte: ${e.message}")
                     }
                 }
         }.addOnFailureListener { e ->
             if (isAdded) {
-                Toast.makeText(requireContext(), "Error al obtener el nombre de usuario: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("AgregarReporte", "Error al obtener el nombre de usuario: ${e.message}")
             }
         }
     }

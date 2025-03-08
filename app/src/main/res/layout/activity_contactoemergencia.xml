@@ -4,7 +4,7 @@
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ContactoEmegenciaActivity">
+    tools:context=".model_mvvm.contactoemegencia.view.ContactoEmegenciaActivity">
 
     <!-- Título en CardView -->
     <androidx.cardview.widget.CardView
