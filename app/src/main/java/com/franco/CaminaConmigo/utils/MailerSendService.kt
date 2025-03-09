@@ -2,7 +2,9 @@ package com.franco.CaminaConmigo.utils
 
 import android.content.Context
 import com.google.gson.Gson
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -19,8 +21,7 @@ class MailerSendService(private val context: Context) {
     private var logoURL: String? = null
 
     init {
-        // Cargar el logo al inicializar el servicio
-        runBlocking {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 logoURL = storageService.uploadLogo()
             } catch (e: Exception) {
@@ -28,6 +29,7 @@ class MailerSendService(private val context: Context) {
             }
         }
     }
+
 
     fun sendSuggestion(nombre: String, numero: String, razon: String, mensaje: String, isAnonymous: Boolean) {
         val htmlContent = """

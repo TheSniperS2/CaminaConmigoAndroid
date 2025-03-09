@@ -27,7 +27,7 @@ class ConfiguracionActivity : AppCompatActivity() {
         setContentView(R.layout.activity_configuraciones)
 
         // Inicializar elementos de la interfaz
-        val btnRetroceder: ImageView = findViewById(R.id.imageView)
+        val btnRetroceder: ImageView = findViewById(R.id.btnRetroceder)
         switchNotificacionesGrupos = findViewById(R.id.switch3)
         switchNotificacionesReporte = findViewById(R.id.switch2)
         switchModoOscuro = findViewById(R.id.switch4)

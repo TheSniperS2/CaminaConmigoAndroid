@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
@@ -27,13 +27,13 @@ class MenuActivity : AppCompatActivity() {
         setContentView(R.layout.activity_menu)
 
         // Referencias a los elementos del menú
-        val perfil = findViewById<ImageView>(R.id.imageView6)
-        val chat = findViewById<ImageView>(R.id.imageView7)
-        val contactoEmergencia = findViewById<ImageView>(R.id.imageView8)
-        val notificaciones = findViewById<ImageView>(R.id.imageView9)
-        val invitarAmigos = findViewById<ImageView>(R.id.imageView13)
-        val sugerencias = findViewById<ImageView>(R.id.imageView14)
-        val configuracion = findViewById<ImageView>(R.id.imageView15)
+        val perfil = findViewById<LinearLayout>(R.id.miPerfilContainer)
+        val chat = findViewById<LinearLayout>(R.id.chatContainer)
+        val contactoEmergencia = findViewById<LinearLayout>(R.id.contactosEmergenciaContainer)
+        val notificaciones = findViewById<LinearLayout>(R.id.notificacionesContainer)
+        val invitarAmigos = findViewById<LinearLayout>(R.id.invitarAmigosContainer)
+        val sugerencias = findViewById<LinearLayout>(R.id.sugerenciasContainer)
+        val configuracion = findViewById<LinearLayout>(R.id.configuracionContainer)
         val btnCerrarSesion = findViewById<Button>(R.id.button2)
         val Mapa = findViewById<ImageButton>(R.id.imageButton10)
         val Novedad = findViewById<ImageButton>(R.id.imageButton11)

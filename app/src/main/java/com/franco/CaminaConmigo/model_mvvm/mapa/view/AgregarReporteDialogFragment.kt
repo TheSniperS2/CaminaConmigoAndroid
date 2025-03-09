@@ -102,7 +102,9 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
 
         val btnCerrar = view.findViewById<ImageView>(R.id.btnCerrar)
         val btnTomarFoto = view.findViewById<ImageView>(R.id.btnTomarFoto)
+        val btnTomarFoto2 = view.findViewById<TextView>(R.id.TomarFoto)
         val btnSeleccionarFoto = view.findViewById<ImageView>(R.id.btnSeleccionarFoto)
+        val btnSeleccionarFoto2 = view.findViewById<TextView>(R.id.SeleccionarFoto)
 
         txtTipoReporte.text = tipoReporte
         setImageForTipoReporte(tipoReporte)
@@ -122,8 +124,10 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
         switchAnonimo.trackTintList = colorStateList
         switchAnonimo.thumbTintList = colorStateList
 
+        btnTomarFoto2.setOnClickListener { checkCameraPermissionAndOpenCamera() }
         btnTomarFoto.setOnClickListener { checkCameraPermissionAndOpenCamera() }
         btnSeleccionarFoto.setOnClickListener { openGallery() }
+        btnSeleccionarFoto2.setOnClickListener { openGallery() }
         btnEnviarReporte.setOnClickListener { enviarReporte() }
         btnCerrar.setOnClickListener { dismiss() }
         txtUbicacion.setOnClickListener { abrirSelectorUbicacion() }

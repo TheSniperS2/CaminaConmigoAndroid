@@ -15,11 +15,11 @@ class InvitarAmigosActivity : AppCompatActivity() {
         setContentView(R.layout.activity_invitaramigos)
 
         // Inicializando los elementos de la UI
-        val imageViewBack = findViewById<ImageView>(R.id.imageView)
+        val btnRetroceder = findViewById<ImageView>(R.id.btnRetroceder)
         val buttonInvitar = findViewById<Button>(R.id.button)
 
         // Acción para el botón de retroceder
-        imageViewBack.setOnClickListener {
+        btnRetroceder.setOnClickListener {
             onBackPressed()
         }
 

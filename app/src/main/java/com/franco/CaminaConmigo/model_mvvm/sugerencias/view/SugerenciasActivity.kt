@@ -24,12 +24,15 @@ class SugerenciasActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sugerencias)
 
+        window.decorView.post {
+            inicializarViewModel()
+        }
         // Inicializamos el ViewModel
         val mailerSendService = MailerSendService(applicationContext)
         viewModel = ViewModelProvider(this, SugerenciasViewModelFactory(mailerSendService)).get(SugerenciasViewModel::class.java)
 
         // Inicializamos los elementos de la UI
-        val imageViewBack = findViewById<ImageView>(R.id.imageView)
+        val imageViewBack = findViewById<ImageView>(R.id.btnRetroceder)
         val buttonEnviar = findViewById<Button>(R.id.button)
         val etNombre = findViewById<EditText>(R.id.etNombre)
         val etNumero = findViewById<EditText>(R.id.etNombre2)
@@ -110,5 +113,10 @@ class SugerenciasActivity : AppCompatActivity() {
         viewModel.errorMessage.observe(this) { error ->
             Toast.makeText(this, error, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun inicializarViewModel() {
+        val mailerSendService = MailerSendService(applicationContext)
+        viewModel = ViewModelProvider(this, SugerenciasViewModelFactory(mailerSendService)).get(SugerenciasViewModel::class.java)
     }
 }

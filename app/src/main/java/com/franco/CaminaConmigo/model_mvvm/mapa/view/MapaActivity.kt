@@ -247,7 +247,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
                 val miUbicacion = LatLng(it.latitude, it.longitude)
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 12f))
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 14f))
             }
         }
     }
