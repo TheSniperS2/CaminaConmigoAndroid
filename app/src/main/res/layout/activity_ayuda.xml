@@ -275,135 +275,176 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Barra inferior con botones de navegación -->
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/purple_500"
+        android:background="#EF6098"
         android:orientation="horizontal"
         android:weightSum="5"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- Mapa -->
         <LinearLayout
+            android:id="@+id/MapaContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageButton
                 android:id="@+id/imageButton10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:srcCompat="@drawable/ic_mapa" />
+                app:srcCompat="@drawable/ic_mapa"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:focusable="false"/>
 
             <TextView
                 android:id="@+id/textView49"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Mapa"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:textColor="#FFFFFF"
+                android:alpha="0.5"
+                android:textSize="12sp"
+                android:clickable="false"
+                android:focusable="false"/>
         </LinearLayout>
 
         <!-- Novedad -->
         <LinearLayout
+            android:id="@+id/NovedadContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageButton
                 android:id="@+id/imageButton11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:srcCompat="@drawable/ic_novedad" />
+                app:srcCompat="@drawable/ic_novedad"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:focusable="false"/>
 
             <TextView
                 android:id="@+id/textView50"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Novedad"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:textColor="#FFFFFF"
+                android:alpha="0.5"
+                android:textSize="12sp"
+                android:clickable="false"
+                android:focusable="false"/>
         </LinearLayout>
 
         <!-- Chat -->
         <LinearLayout
+            android:id="@+id/ChatContainer2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageButton
                 android:id="@+id/imageButton12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:srcCompat="@drawable/ic_chat" />
+                app:srcCompat="@drawable/ic_chat"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:focusable="false"/>
 
             <TextView
                 android:id="@+id/textView51"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Chat"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:textColor="#FFFFFF"
+                android:alpha="0.5"
+                android:textSize="12sp"
+                android:clickable="false"
+                android:focusable="false"/>
         </LinearLayout>
 
         <!-- Ayuda -->
         <LinearLayout
+            android:id="@+id/AyudaContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageButton
                 android:id="@+id/imageButton13"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:srcCompat="@drawable/ic_ayuda" />
+                app:srcCompat="@drawable/ic_ayuda"
+                android:clickable="false"
+                android:focusable="false"/>
 
             <TextView
                 android:id="@+id/textView52"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ayuda"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:clickable="false"
+                android:focusable="false"/>
         </LinearLayout>
 
         <!-- Menú -->
         <LinearLayout
+            android:id="@+id/MenuContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageButton
                 android:id="@+id/imageButton14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:srcCompat="@drawable/ic_menu" />
+                app:srcCompat="@drawable/ic_menu"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:focusable="false"/>
 
             <TextView
                 android:id="@+id/textView53"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Menú"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:focusable="false"/>
         </LinearLayout>
     </LinearLayout>
 

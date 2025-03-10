@@ -3,7 +3,6 @@ package com.franco.CaminaConmigo.model_mvvm.menu.view
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.franco.CaminaConmigo.R
@@ -35,10 +34,11 @@ class MenuActivity : AppCompatActivity() {
         val sugerencias = findViewById<LinearLayout>(R.id.sugerenciasContainer)
         val configuracion = findViewById<LinearLayout>(R.id.configuracionContainer)
         val btnCerrarSesion = findViewById<Button>(R.id.button2)
-        val Mapa = findViewById<ImageButton>(R.id.imageButton10)
-        val Novedad = findViewById<ImageButton>(R.id.imageButton11)
-        val chat_friend = findViewById<ImageButton>(R.id.imageButton12)
-        val Ayuda = findViewById<ImageButton>(R.id.imageButton13)
+
+        val Mapa = findViewById<LinearLayout>(R.id.MapaContainer)
+        val Novedad = findViewById<LinearLayout>(R.id.NovedadContainer)
+        val chat_friend = findViewById<LinearLayout>(R.id.ChatContainer2)
+        val Ayuda = findViewById<LinearLayout>(R.id.AyudaContainer)
 
 
         // Navegación entre actividades

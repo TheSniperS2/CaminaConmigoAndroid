@@ -334,7 +334,7 @@
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.2"
         app:layout_constraintHorizontal_bias="0.497"
@@ -355,10 +355,10 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView16" />
 
     <LinearLayout
-        android:id="@+id/linearLayout3"
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:background="#FA79B6"
+        android:background="#EF6098"
         android:orientation="horizontal"
         android:weightSum="5"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -367,9 +367,12 @@
 
         <!-- Mapa -->
         <LinearLayout
+            android:id="@+id/MapaContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -377,13 +380,19 @@
                 android:id="@+id/imageButton10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.5"
                 android:background="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
                 app:srcCompat="@drawable/ic_mapa" />
 
             <TextView
                 android:id="@+id/textView49"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:focusable="false"
                 android:text="Mapa"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
@@ -391,9 +400,12 @@
 
         <!-- Novedad -->
         <LinearLayout
+            android:id="@+id/NovedadContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -401,13 +413,19 @@
                 android:id="@+id/imageButton11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.5"
                 android:background="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
                 app:srcCompat="@drawable/ic_novedad" />
 
             <TextView
                 android:id="@+id/textView50"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:focusable="false"
                 android:text="Novedad"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
@@ -415,9 +433,12 @@
 
         <!-- Chat -->
         <LinearLayout
+            android:id="@+id/ChatContainer2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -425,13 +446,19 @@
                 android:id="@+id/imageButton12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.5"
                 android:background="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
                 app:srcCompat="@drawable/ic_chat" />
 
             <TextView
                 android:id="@+id/textView51"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:clickable="false"
+                android:focusable="false"
                 android:text="Chat"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
@@ -439,9 +466,12 @@
 
         <!-- Ayuda -->
         <LinearLayout
+            android:id="@+id/AyudaContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -450,12 +480,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                android:clickable="false"
+                android:alpha="0.5"
+                android:focusable="false"
                 app:srcCompat="@drawable/ic_ayuda" />
 
             <TextView
                 android:id="@+id/textView52"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="false"
+                android:alpha="0.5"
+                android:focusable="false"
                 android:text="Ayuda"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
@@ -463,9 +499,12 @@
 
         <!-- Menú -->
         <LinearLayout
+            android:id="@+id/MenuContainer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -474,17 +513,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
                 app:srcCompat="@drawable/ic_menu" />
 
             <TextView
                 android:id="@+id/textView53"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false"
                 android:text="Menú"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
         </LinearLayout>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

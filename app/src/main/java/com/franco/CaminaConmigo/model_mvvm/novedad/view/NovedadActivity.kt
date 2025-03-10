@@ -196,10 +196,10 @@ class NovedadActivity : AppCompatActivity() {
     }
 
     private fun configurarBotonesInferiores() {
-        val btnMapa = findViewById<ImageButton>(R.id.imageButton10)
-        val btnAyuda = findViewById<ImageButton>(R.id.imageButton13)
-        val btnChats = findViewById<ImageButton>(R.id.imageButton12)
-        val btnMenu = findViewById<ImageButton>(R.id.imageButton14)
+        val btnMapa = findViewById<LinearLayout>(R.id.MapaContainer)
+        val btnChats = findViewById<LinearLayout>(R.id.ChatContainer2)
+        val btnAyuda = findViewById<LinearLayout>(R.id.AyudaContainer)
+        val btnMenu = findViewById<LinearLayout>(R.id.MenuContainer)
 
         btnMapa.setOnClickListener {
             startActivity(Intent(this, MapaActivity::class.java))

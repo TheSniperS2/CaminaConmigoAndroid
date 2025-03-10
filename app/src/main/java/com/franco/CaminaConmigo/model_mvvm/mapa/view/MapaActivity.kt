@@ -14,7 +14,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -173,16 +173,16 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         }
 
         // Botones de navegación
-        findViewById<ImageButton>(R.id.imageButton11).setOnClickListener {
+        findViewById<LinearLayout>(R.id.NovedadContainer).setOnClickListener {
             startActivity(Intent(this, NovedadActivity::class.java))
         }
-        findViewById<ImageButton>(R.id.imageButton12).setOnClickListener {
+        findViewById<LinearLayout>(R.id.ChatContainer2).setOnClickListener {
             startActivity(Intent(this, ChatActivity::class.java))
         }
-        findViewById<ImageButton>(R.id.imageButton13).setOnClickListener {
+        findViewById<LinearLayout>(R.id.AyudaContainer).setOnClickListener {
             startActivity(Intent(this, AyudaActivity::class.java))
         }
-        findViewById<ImageButton>(R.id.imageButton14).setOnClickListener {
+        findViewById<LinearLayout>(R.id.MenuContainer).setOnClickListener {
             startActivity(Intent(this, MenuActivity::class.java))
         }
     }

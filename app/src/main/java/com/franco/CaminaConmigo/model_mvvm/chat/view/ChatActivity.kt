@@ -3,7 +3,7 @@ package com.franco.CaminaConmigo.model_mvvm.chat.view
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -59,10 +59,10 @@ class ChatActivity : AppCompatActivity() {
         }
 
         // Funcionalidad de los botones inferiores
-        val btnMapa = findViewById<ImageButton>(R.id.imageButton10)
-        val btnNovedades = findViewById<ImageButton>(R.id.imageButton11)
-        val btnAyuda = findViewById<ImageButton>(R.id.imageButton13)
-        val btnMenu = findViewById<ImageButton>(R.id.imageButton14)
+        val btnMapa = findViewById<LinearLayout>(R.id.MapaContainer)
+        val btnNovedades = findViewById<LinearLayout>(R.id.NovedadContainer)
+        val btnAyuda = findViewById<LinearLayout>(R.id.AyudaContainer)
+        val btnMenu = findViewById<LinearLayout>(R.id.MenuContainer)
 
         btnMapa.setOnClickListener {
             startActivity(Intent(this, MapaActivity::class.java))
