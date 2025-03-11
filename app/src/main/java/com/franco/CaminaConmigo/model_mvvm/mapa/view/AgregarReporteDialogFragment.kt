@@ -251,6 +251,10 @@ class AgregarReporteDialogFragment : BottomSheetDialogFragment() {
                     notifyFriendsAboutReport(userId, documentReference.id, tipoReporte)
                 }
 
+                // Enviar una señal a MapaActivity para refrescar el mapa
+                val intent = Intent("com.franco.CaminaConmigo.REFRESH_MAP")
+                requireContext().sendBroadcast(intent)
+
                 dismiss()
             }
             .addOnFailureListener {

@@ -57,6 +57,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
     private var searchMarker: Marker? = null
     private var isAlarmActive: Boolean = false
     private lateinit var modoOscuroReceiver: BroadcastReceiver
+    private lateinit var refreshMapReceiver: BroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +72,14 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
         val filter = IntentFilter("com.franco.CaminaConmigo.MODO_OSCURO")
         registerReceiver(modoOscuroReceiver, filter, RECEIVER_NOT_EXPORTED)
 
+    // Dentro del método onCreate
+        refreshMapReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                cargarReportes()
+            }
+        }
+        val refreshFilter = IntentFilter("com.franco.CaminaConmigo.REFRESH_MAP")
+        registerReceiver(refreshMapReceiver, refreshFilter, RECEIVER_NOT_EXPORTED)
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -107,7 +116,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
             }
         })
 
-        // Dentro del método onCreate
+
         findViewById<AppCompatButton>(R.id.btnAyuda).setOnClickListener {
             val instruccionesDialog = InstruccionesBottomSheetDialogFragment()
             instruccionesDialog.show(supportFragmentManager, "InstruccionesDialogFragment")
@@ -353,6 +362,7 @@ class MapaActivity : AppCompatActivity(), OnMapReadyCallback, TipoReporteDialogF
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(refreshMapReceiver)
 
         // Liberar el recurso del MediaPlayer cuando la actividad se destruye
         mediaPlayer?.release()
