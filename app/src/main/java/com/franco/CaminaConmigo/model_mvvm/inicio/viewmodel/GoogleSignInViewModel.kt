@@ -36,11 +36,9 @@ class GoogleSignInViewModel : ViewModel() {
                     .addOnCompleteListener { authTask ->
                         if (authTask.isSuccessful) {
                             _accountLiveData.postValue(account)
-
                             // Verificar si el usuario ya existe en Firestore
                             val userId = firebaseAuth.currentUser?.uid
                             val firestore = FirebaseFirestore.getInstance()
-
                             firestore.collection("users").document(userId!!).get()
                                 .addOnSuccessListener { document ->
                                     if (!document.exists()) {
@@ -75,11 +73,15 @@ class GoogleSignInViewModel : ViewModel() {
         }
     }
 
+    // Functión para continuar como invitado
+    fun continueAsGuest() {
+        _accountLiveData.postValue(null)
+    }
+
     private fun generateUniqueUsername(baseUsername: String, callback: (String) -> Unit) {
         val firestore = FirebaseFirestore.getInstance()
         var username = baseUsername
         var suffix = 1
-
         firestore.collection("users").whereEqualTo("username", username).get()
             .addOnSuccessListener { documents ->
                 while (!documents.isEmpty) {
@@ -94,7 +96,6 @@ class GoogleSignInViewModel : ViewModel() {
     private fun saveNewUserToFirestore(user: User) {
         val firestore = FirebaseFirestore.getInstance()
         val userRef = firestore.collection("users").document(user.id)
-
         userRef.set(user)
             .addOnSuccessListener { Log.d("Firestore", "Usuario guardado correctamente") }
             .addOnFailureListener { e -> Log.e("Firestore", "Error al guardar usuario", e) }

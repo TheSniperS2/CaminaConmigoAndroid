@@ -6,12 +6,14 @@ import android.util.Log
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ActivityChatBinding
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
+import com.franco.CaminaConmigo.model_mvvm.inicio.view.MainActivity
 import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
 import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
 import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
@@ -81,16 +83,29 @@ class ChatActivity : AppCompatActivity() {
         }
 
         binding.textView55.setOnClickListener {
-            val addFriendBottomSheetFragment = AddFriendBottomSheetFragment()
-            addFriendBottomSheetFragment.show(supportFragmentManager, addFriendBottomSheetFragment.tag)
+            if (isUserAuthenticated()) {
+                val addFriendBottomSheetFragment = AddFriendBottomSheetFragment()
+                addFriendBottomSheetFragment.show(supportFragmentManager, addFriendBottomSheetFragment.tag)
+            } else {
+                showSignInDialog()
+            }
         }
 
         binding.textView57.setOnClickListener {
-            showCreateGroupBottomSheet()
+            if (isUserAuthenticated()) {
+                showCreateGroupBottomSheet()
+            } else {
+                showSignInDialog()
+            }
         }
     }
 
     private fun verifyFriendship() {
+        if (!isUserAuthenticated()) {
+            showSignInDialog()
+            return
+        }
+
         val currentUserId = auth.currentUser?.uid
         if (currentUserId == null) {
             Toast.makeText(this, "No estás autenticado", Toast.LENGTH_LONG).show()
@@ -120,6 +135,11 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun loadChats() {
+        if (!isUserAuthenticated()) {
+            showSignInDialog()
+            return
+        }
+
         try {
             viewModel.loadChats()
         } catch (e: Exception) {
@@ -140,4 +160,22 @@ class ChatActivity : AppCompatActivity() {
         createGroupBottomSheetFragment.show(supportFragmentManager, createGroupBottomSheetFragment.tag)
     }
 
+    private fun isUserAuthenticated(): Boolean {
+        return auth.currentUser != null
+    }
+
+    private fun showSignInDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Iniciar Sesión Requerido")
+        builder.setMessage("Para acceder a esta funcionalidad, por favor inicia sesión.")
+        builder.setPositiveButton("Iniciar Sesión") { _, _ ->
+            // Redirigir a la pantalla de inicio de sesión
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+        builder.setNegativeButton("Cancelar") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.show()
+    }
 }

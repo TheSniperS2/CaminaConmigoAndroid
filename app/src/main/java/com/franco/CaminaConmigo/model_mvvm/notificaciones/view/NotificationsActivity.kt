@@ -3,9 +3,11 @@ package com.franco.CaminaConmigo.model_mvvm.notificaciones.view
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ActivityNotificationsBinding
 import com.franco.CaminaConmigo.model_mvvm.notificaciones.viewmodel.NotificationsViewModel
 
@@ -29,6 +31,13 @@ class NotificationsActivity : AppCompatActivity() {
             }
         )
         binding.recyclerViewFriendRequests.adapter = friendRequestsAdapter
+
+        val btnRetroceder = findViewById<ImageView>(R.id.btnRetroceder)
+
+        // Acción para el botón de retroceder
+        btnRetroceder.setOnClickListener {
+            onBackPressed()
+        }
 
         binding.recyclerViewNotifications.layoutManager = LinearLayoutManager(this)
         val notificationsAdapter = NotificationsAdapter()

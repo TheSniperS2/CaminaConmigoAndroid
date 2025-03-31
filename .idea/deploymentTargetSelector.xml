@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="MenuActivity">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-03-09T16:11:19.646438100Z">
+        <DropdownSelection timestamp="2025-03-31T20:42:12.515994400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Franco\.android\avd\Copy_of_Pixel_9_Pro_XL_API_29.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Franco\.android\avd\a.avd" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -34,10 +34,10 @@
       </SelectionState>
       <SelectionState runConfigName="MainActivity">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-03-07T21:25:36.032419Z">
+        <DropdownSelection timestamp="2025-03-31T20:51:58.550665Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=R9JN8099C9J" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Franco\.android\avd\a.avd" />
             </handle>
           </Target>
         </DropdownSelection>

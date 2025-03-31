@@ -37,6 +37,11 @@ class MainActivity : AppCompatActivity() {
             signInWithGoogle()
         }
 
+        // Vincula el botón para continuar como invitado
+        binding.button.setOnClickListener {
+            continueAsGuest()
+        }
+
         // Observa los cambios en la cuenta de usuario
         googleSignInViewModel.accountLiveData.observe(this) { account ->
             account?.let {
@@ -56,6 +61,14 @@ class MainActivity : AppCompatActivity() {
                 finish()  // Cierra la actividad principal
             }
         }
+    }
+
+    // Función para continuar como invitado
+    private fun continueAsGuest() {
+        googleSignInViewModel.continueAsGuest()
+        val intent = Intent(this, MapaActivity::class.java)
+        startActivity(intent)
+        finish()  // Cierra la actividad principal
     }
 
     // Función para configurar las notificaciones por defecto

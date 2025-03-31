@@ -1,5 +1,6 @@
 package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.franco.CaminaConmigo.R
+import com.franco.CaminaConmigo.model_mvvm.inicio.view.MainActivity
 import com.franco.CaminaConmigo.model_mvvm.mapa.model.Comentario
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
@@ -301,38 +303,42 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun enviarComentario() {
-        val text = edtComentario.text.toString().trim()
-        if (text.isEmpty()) return
+        if (isUserAuthenticated()) {
+            val text = edtComentario.text.toString().trim()
+            if (text.isEmpty()) return
 
-        val auth = FirebaseAuth.getInstance()
-        val user = auth.currentUser
-        val comentario = hashMapOf(
-            "authorId" to (user?.uid ?: "Anónimo"),
-            "authorName" to (user?.displayName ?: "Anónimo"),
-            "reportId" to reportId,
-            "text" to text,
-            "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
-        )
+            val auth = FirebaseAuth.getInstance()
+            val user = auth.currentUser
+            val comentario = hashMapOf(
+                "authorId" to (user?.uid ?: "Anónimo"),
+                "authorName" to (user?.displayName ?: "Anónimo"),
+                "reportId" to reportId,
+                "text" to text,
+                "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+            )
 
-        db.collection("reportes").document(reportId).collection("comentarios")
-            .add(comentario)
-            .addOnSuccessListener {
-                edtComentario.text.clear()
-                Toast.makeText(requireContext(), "Comentario agregado", Toast.LENGTH_SHORT).show()
-                // Enviar notificación
-                user?.let {
-                    db.collection("reportes").document(reportId).get().addOnSuccessListener { document ->
-                        val reportOwnerId = document.getString("userId") ?: ""
-                        db.collection("users").document(it.uid).get().addOnSuccessListener { userDoc ->
-                            val commentAuthorUsername = userDoc.getString("username") ?: "Anónimo"
-                            createCommentNotification(it.uid, commentAuthorUsername, text, reportId, reportOwnerId)
+            db.collection("reportes").document(reportId).collection("comentarios")
+                .add(comentario)
+                .addOnSuccessListener {
+                    edtComentario.text.clear()
+                    Toast.makeText(requireContext(), "Comentario agregado", Toast.LENGTH_SHORT).show()
+                    // Enviar notificación
+                    user?.let {
+                        db.collection("reportes").document(reportId).get().addOnSuccessListener { document ->
+                            val reportOwnerId = document.getString("userId") ?: ""
+                            db.collection("users").document(it.uid).get().addOnSuccessListener { userDoc ->
+                                val commentAuthorUsername = userDoc.getString("username") ?: "Anónimo"
+                                createCommentNotification(it.uid, commentAuthorUsername, text, reportId, reportOwnerId)
+                            }
                         }
                     }
                 }
-            }
-            .addOnFailureListener {
-                Toast.makeText(requireContext(), "Error al agregar comentario", Toast.LENGTH_SHORT).show()
-            }
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "Error al agregar comentario", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            showSignInDialog()
+        }
     }
 
     private fun createCommentNotification(commentAuthorId: String, commentAuthorName: String, commentText: String, reportId: String, reportOwnerId: String) {
@@ -362,26 +368,45 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun darLike() {
-        val auth = FirebaseAuth.getInstance()
-        val user = auth.currentUser
-        if (user == null) {
-            Toast.makeText(requireContext(), "Inicia sesión para dar like", Toast.LENGTH_SHORT).show()
-            return
-        }
+        if (isUserAuthenticated()) {
+            val auth = FirebaseAuth.getInstance()
+            val user = auth.currentUser
 
-        // Verificar si el usuario ya ha dado like
-        db.collection("reportes").document(reportId).collection("likes")
-            .document(user.uid) // Usamos el ID del usuario para identificar si ya dio like
-            .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    // Si el usuario ya dio like, lo eliminamos
-                    eliminarLike(user.uid)
-                } else {
-                    // Si el usuario no ha dado like, lo agregamos
-                    agregarLike(user.uid)
+            // Verificar si el usuario ya ha dado like
+            db.collection("reportes").document(reportId).collection("likes")
+                .document(user!!.uid) // Usamos el ID del usuario para identificar si ya dio like
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        // Si el usuario ya dio like, lo eliminamos
+                        eliminarLike(user.uid)
+                    } else {
+                        // Si el usuario no ha dado like, lo agregamos
+                        agregarLike(user.uid)
+                    }
                 }
-            }
+        } else {
+            showSignInDialog()
+        }
+    }
+
+    private fun isUserAuthenticated(): Boolean {
+        return FirebaseAuth.getInstance().currentUser != null
+    }
+
+    private fun showSignInDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Iniciar Sesión Requerido")
+        builder.setMessage("Para acceder a esta funcionalidad, por favor inicia sesión.")
+        builder.setPositiveButton("Iniciar Sesión") { _, _ ->
+            // Redirigir a la pantalla de inicio de sesión
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+        }
+        builder.setNegativeButton("Cancelar") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.show()
     }
 
     override fun onResume() {

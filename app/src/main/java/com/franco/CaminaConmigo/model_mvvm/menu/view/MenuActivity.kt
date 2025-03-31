@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
@@ -17,6 +18,7 @@ import com.franco.CaminaConmigo.model_mvvm.notificaciones.view.NotificationsActi
 import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
 import com.franco.CaminaConmigo.model_mvvm.perfil.view.MiPerfilActivity
 import com.franco.CaminaConmigo.model_mvvm.sugerencias.view.SugerenciasActivity
+import com.google.firebase.auth.FirebaseAuth
 
 
 class MenuActivity : AppCompatActivity() {
@@ -40,10 +42,18 @@ class MenuActivity : AppCompatActivity() {
         val chat_friend = findViewById<LinearLayout>(R.id.ChatContainer2)
         val Ayuda = findViewById<LinearLayout>(R.id.AyudaContainer)
 
+        // Verificar si el usuario está logueado y cambiar el texto del botón
+        if (!isUserAuthenticated()) {
+            btnCerrarSesion.text = "Iniciar sesión"
+        }
 
         // Navegación entre actividades
         perfil.setOnClickListener {
-            startActivity(Intent(this, MiPerfilActivity::class.java))
+            if (isUserAuthenticated()) {
+                startActivity(Intent(this, MiPerfilActivity::class.java))
+            } else {
+                showSignInDialog()
+            }
         }
 
         chat.setOnClickListener {
@@ -51,7 +61,11 @@ class MenuActivity : AppCompatActivity() {
         }
 
         contactoEmergencia.setOnClickListener {
-            startActivity(Intent(this, ContactoEmegenciaActivity::class.java))
+            if (isUserAuthenticated()) {
+                startActivity(Intent(this, ContactoEmegenciaActivity::class.java))
+            } else {
+                showSignInDialog()
+            }
         }
 
         notificaciones.setOnClickListener {
@@ -63,11 +77,19 @@ class MenuActivity : AppCompatActivity() {
         }
 
         sugerencias.setOnClickListener {
-            startActivity(Intent(this, SugerenciasActivity::class.java))
+            if (isUserAuthenticated()) {
+                startActivity(Intent(this, SugerenciasActivity::class.java))
+            } else {
+                showSignInDialog()
+            }
         }
 
         configuracion.setOnClickListener {
-            startActivity(Intent(this, ConfiguracionActivity::class.java))
+            if (isUserAuthenticated()) {
+                startActivity(Intent(this, ConfiguracionActivity::class.java))
+            } else {
+                showSignInDialog()
+            }
         }
 
         Mapa.setOnClickListener {
@@ -86,13 +108,38 @@ class MenuActivity : AppCompatActivity() {
             startActivity(Intent(this, AyudaActivity::class.java))
         }
 
-        // Cerrar sesión
+        // Cerrar sesión o iniciar sesión
         btnCerrarSesion.setOnClickListener {
-            // Lógica para cerrar sesión (ejemplo: volver a pantalla de login)
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+            if (isUserAuthenticated()) {
+                // Lógica para cerrar sesión (ejemplo: volver a pantalla de login)
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            } else {
+                // Redirigir a la pantalla de inicio de sesión
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
-}
+
+    private fun isUserAuthenticated(): Boolean {
+        return FirebaseAuth.getInstance().currentUser != null
+    }
+
+    private fun showSignInDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Iniciar Sesión Requerido")
+        builder.setMessage("Para acceder a esta funcionalidad, por favor inicia sesión.")
+        builder.setPositiveButton("Iniciar Sesión") { _, _ ->
+            // Redirigir a la pantalla de inicio de sesión
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+        builder.setNegativeButton("Cancelar") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.show()
+    }}
