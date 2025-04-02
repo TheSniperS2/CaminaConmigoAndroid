@@ -98,7 +98,10 @@ class MiPerfilActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK) {
             val imageUri = data?.data ?: return
-            binding.imageView23.setImageURI(imageUri)
+            Glide.with(this)
+                .load(imageUri)
+                .transform(CropCircleTransformation())
+                .into(binding.imageView23)
             viewModel.uploadProfileImage(imageUri) { photoURL ->
                 if (photoURL != null) {
                     Glide.with(this)
