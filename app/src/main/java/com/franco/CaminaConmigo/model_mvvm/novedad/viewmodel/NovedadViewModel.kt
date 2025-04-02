@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.franco.CaminaConmigo.model_mvvm.novedad.model.Reporte
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -14,26 +15,31 @@ class NovedadViewModel : ViewModel() {
     private val _reportes = MutableLiveData<List<Reporte>>()
     val reportes: LiveData<List<Reporte>> get() = _reportes
 
+    private val db = FirebaseFirestore.getInstance()
+    private var listenerRegistrations = mutableListOf<ListenerRegistration>()
+
     init {
         cargarReportes()
     }
 
     fun cargarReportes() {
-        val db = FirebaseFirestore.getInstance()
+        clearListeners()
         db.collection("reportes")
             .orderBy("timestamp", Query.Direction.DESCENDING) // Ordenar por timestamp descendente
-            .get()
-            .addOnSuccessListener { snapshot ->
+            .addSnapshotListener { snapshot, e ->
+                if (e != null || snapshot == null) {
+                    _reportes.value = emptyList()
+                    return@addSnapshotListener
+                }
+
                 val lista = snapshot.documents.mapNotNull { it.toObject(Reporte::class.java) }
                 _reportes.value = lista
-            }
-            .addOnFailureListener {
-                _reportes.value = emptyList() // Si falla, se envía una lista vacía
+                attachRealtimeListeners(lista)
             }
     }
 
     fun filtrarPorTendencias() {
-        val db = FirebaseFirestore.getInstance()
+        clearListeners()
         db.collection("reportes")
             .get()
             .addOnSuccessListener { snapshot ->
@@ -60,19 +66,8 @@ class NovedadViewModel : ViewModel() {
                                 if (reportesConTendencias.size == reportes.size) {
                                     reportesConTendencias.sortWith(compareByDescending<Reporte> { it.likes + it.comentarios })
                                     _reportes.value = reportesConTendencias
+                                    attachRealtimeListeners(reportesConTendencias)
                                 }
-                            }.addOnFailureListener {
-                                // Manejar errores de comentarios
-                                if (reportesConTendencias.size == reportes.size) {
-                                    reportesConTendencias.sortWith(compareByDescending<Reporte> { it.likes + it.comentarios })
-                                    _reportes.value = reportesConTendencias
-                                }
-                            }
-                        }.addOnFailureListener {
-                            // Manejar errores de likes
-                            if (reportesConTendencias.size == reportes.size) {
-                                reportesConTendencias.sortWith(compareByDescending<Reporte> { it.likes + it.comentarios })
-                                _reportes.value = reportesConTendencias
                             }
                         }
                     }
@@ -84,7 +79,7 @@ class NovedadViewModel : ViewModel() {
     }
 
     fun buscarReportes(query: String) {
-        val db = FirebaseFirestore.getInstance()
+        clearListeners()
         db.collection("reportes")
             .whereGreaterThanOrEqualTo("type", query)
             .whereLessThanOrEqualTo("type", query + '\uf8ff')
@@ -96,6 +91,7 @@ class NovedadViewModel : ViewModel() {
                     reportesList.add(reporte)
                 }
                 _reportes.value = reportesList
+                attachRealtimeListeners(reportesList)
             }
             .addOnFailureListener {
                 _reportes.value = emptyList()
@@ -103,7 +99,7 @@ class NovedadViewModel : ViewModel() {
     }
 
     fun filtrarPorCiudad(userLatitude: Double, userLongitude: Double) {
-        val db = FirebaseFirestore.getInstance()
+        clearListeners()
         db.collection("reportes")
             .get()
             .addOnSuccessListener { snapshot ->
@@ -113,6 +109,7 @@ class NovedadViewModel : ViewModel() {
                     distancia
                 }
                 _reportes.value = listaOrdenada
+                attachRealtimeListeners(listaOrdenada)
             }
             .addOnFailureListener {
                 _reportes.value = emptyList() // Si falla, se envía una lista vacía
@@ -121,5 +118,35 @@ class NovedadViewModel : ViewModel() {
 
     private fun calcularDistancia(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         return sqrt((lat1 - lat2).pow(2) + (lon1 - lon2).pow(2))
+    }
+
+    private fun attachRealtimeListeners(reportes: List<Reporte>) {
+        reportes.forEach { reporte ->
+            val docRef = db.collection("reportes").document(reporte.id)
+            val likesRef = docRef.collection("likes")
+            val comentariosRef = docRef.collection("comentarios")
+
+            val likesListener = likesRef.addSnapshotListener { snapshot, e ->
+                if (e == null && snapshot != null) {
+                    reporte.likes = snapshot.size()
+                    _reportes.value = reportes
+                }
+            }
+
+            val comentariosListener = comentariosRef.addSnapshotListener { snapshot, e ->
+                if (e == null && snapshot != null) {
+                    reporte.comentarios = snapshot.size()
+                    _reportes.value = reportes
+                }
+            }
+
+            listenerRegistrations.add(likesListener)
+            listenerRegistrations.add(comentariosListener)
+        }
+    }
+
+    private fun clearListeners() {
+        listenerRegistrations.forEach { it.remove() }
+        listenerRegistrations.clear()
     }
 }

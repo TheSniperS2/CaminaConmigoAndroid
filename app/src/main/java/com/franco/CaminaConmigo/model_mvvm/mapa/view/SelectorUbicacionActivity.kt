@@ -85,7 +85,6 @@ class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun cargarReportesDesdeFirestore() {
         db.collection("reportes").get().addOnSuccessListener { documents ->
             if (documents.isEmpty) {
-                Toast.makeText(this, "No hay reportes disponibles", Toast.LENGTH_SHORT).show()
                 return@addOnSuccessListener
             }
 
