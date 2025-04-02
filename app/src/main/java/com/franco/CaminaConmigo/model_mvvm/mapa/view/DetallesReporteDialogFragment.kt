@@ -342,6 +342,11 @@ class DetallesReporteDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun createCommentNotification(commentAuthorId: String, commentAuthorName: String, commentText: String, reportId: String, reportOwnerId: String) {
+        // Verificar si el autor del comentario es el mismo que el dueño del reporte
+        if (commentAuthorId == reportOwnerId) {
+            return // No enviar notificación si el autor del comentario es el mismo que el dueño del reporte
+        }
+
         val dataMap = mapOf(
             "commentAuthorId" to commentAuthorId,
             "commentAuthorName" to commentAuthorName,
