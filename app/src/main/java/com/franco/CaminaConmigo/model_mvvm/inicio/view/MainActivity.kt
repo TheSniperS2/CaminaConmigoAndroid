@@ -28,6 +28,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Verificar si el usuario ya está autenticado
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null) {
+            // Si el usuario ya está autenticado, redirigir a MapaActivity
+            val intent = Intent(this, MapaActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         // Configuración de Google Sign-In
         val gso = googleSignInViewModel.getSignInOptions()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
