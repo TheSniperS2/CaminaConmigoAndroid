@@ -36,10 +36,10 @@ class NotificationsAdapter : RecyclerView.Adapter<NotificationsAdapter.Notificat
 
             // Asignar icono según el título de la notificación
             val iconResId = when (notification.title) {
-                "Nuevo grupo" -> R.drawable.ic_group
+                "Nuevo grupo" -> R.drawable.grouppp_24px
                 "Nueva solicitud de amistad", "Solicitud aceptada" -> R.drawable.ic_person
-                "Nuevo reporte de amigo" -> R.drawable.ic_warning
-                "Nuevo comentario" -> R.drawable.ic_comment
+                "Nuevo reporte de amigo" -> R.drawable.report_24px
+                "Nuevo comentario" -> R.drawable.feedback_24px
                 else -> R.drawable.ic_anadir // Icono por defecto
             }
             binding.ivNotificationIcon.setImageResource(iconResId)
