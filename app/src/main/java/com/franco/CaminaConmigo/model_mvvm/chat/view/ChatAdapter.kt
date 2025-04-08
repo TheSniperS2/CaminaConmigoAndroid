@@ -68,19 +68,31 @@ class ChatViewHolder(
                     binding.profileImage.setImageResource(R.drawable.ic_imagen) // Imagen de grupo predeterminada
                 }
             } else if (chat.participants.size == 2) {
-                val friendId = chat.participants.first { it != auth.currentUser?.uid }
-                db.collection("users").document(friendId).get()
-                    .addOnSuccessListener { document ->
-                        val photoURL = document.getString("photoURL")
-                        if (!photoURL.isNullOrEmpty()) {
-                            Glide.with(binding.root.context)
-                                .load(photoURL)
-                                .circleCrop()
-                                .into(binding.profileImage)
-                        }
+                val currentUserId = auth.currentUser?.uid ?: return
+                val friendId = chat.participants.first { it != currentUserId }
+
+                // Recuperar el nickname desde la subcolección "friends"
+                db.collection("users").document(currentUserId).collection("friends").document(friendId).get()
+                    .addOnSuccessListener { friendDocument ->
+                        val nickname = friendDocument.getString("nickname") ?: "Desconocido"
+                        binding.chatName.text = nickname
+
+                        db.collection("users").document(friendId).get()
+                            .addOnSuccessListener { userDocument ->
+                                val photoURL = userDocument.getString("photoURL")
+                                if (!photoURL.isNullOrEmpty()) {
+                                    Glide.with(binding.root.context)
+                                        .load(photoURL)
+                                        .circleCrop()
+                                        .into(binding.profileImage)
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("ChatViewHolder", "Error al obtener la imagen de perfil: ${e.message}")
+                            }
                     }
                     .addOnFailureListener { e ->
-                        Log.e("ChatViewHolder", "Error al obtener la imagen de perfil: ${e.message}")
+                        Log.e("ChatViewHolder", "Error al obtener el nickname: ${e.message}")
                     }
             } else {
                 binding.profileImage.setImageResource(R.drawable.ic_imagen)

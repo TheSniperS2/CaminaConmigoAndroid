@@ -651,12 +651,18 @@ class ChatDetailActivity : AppCompatActivity() {
                         val participants = document.get("participants") as? List<String> ?: emptyList()
                         val currentUserId = auth.currentUser?.uid ?: return@addOnSuccessListener
                         val friendId = participants.firstOrNull { it != currentUserId } ?: return@addOnSuccessListener
+                        db.collection("users").document(currentUserId).collection("friends").document(friendId).get()
+                            .addOnSuccessListener { friendDocument ->
+                                val contactName = friendDocument.getString("nickname") ?: "Desconocido"
+                                binding.tvContactName.text = contactName
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("ChatDetailActivity", "Error al obtener información del amigo: ${e.message}")
+                            }
+
                         db.collection("users").document(friendId).get()
                             .addOnSuccessListener { userDocument ->
-                                val contactName = userDocument.getString("username") ?: "Desconocido"
                                 val photoURL = userDocument.getString("photoURL")
-
-                                binding.tvContactName.text = contactName
                                 if (!photoURL.isNullOrEmpty()) {
                                     Glide.with(this)
                                         .load(photoURL)
@@ -698,10 +704,6 @@ class ChatDetailActivity : AppCompatActivity() {
             .setNegativeButton("Cancelar", null)
             .create()
         dialog.show()
-
-        editText.requestFocus()
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     // Métodos adicionales para gestionar el estado de compartir ubicación

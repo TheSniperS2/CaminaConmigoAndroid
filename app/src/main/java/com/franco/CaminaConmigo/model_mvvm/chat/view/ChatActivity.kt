@@ -36,14 +36,12 @@ class ChatActivity : AppCompatActivity() {
         val adapter = ChatAdapter { chatId -> openChat(chatId) }
         binding.recyclerViewChats.adapter = adapter
 
-        // Agregar manejo de errores en verifyFriendship()
         try {
             verifyFriendship()
         } catch (e: Exception) {
             Log.e("ChatActivity", "Error en verifyFriendship: ${e.message}")
         }
 
-        // Agregar control de excepciones en loadChats()
         try {
             viewModel.loadChats()
         } catch (e: Exception) {
@@ -51,7 +49,6 @@ class ChatActivity : AppCompatActivity() {
             Log.e("ChatActivity", "Error en loadChats: ${e.message}")
         }
 
-        // Observador con control de errores
         viewModel.chats.observe(this) { chats ->
             if (chats != null) {
                 adapter.submitList(chats)
@@ -60,7 +57,6 @@ class ChatActivity : AppCompatActivity() {
             }
         }
 
-        // Funcionalidad de los botones inferiores
         val btnMapa = findViewById<LinearLayout>(R.id.MapaContainer)
         val btnNovedades = findViewById<LinearLayout>(R.id.NovedadContainer)
         val btnAyuda = findViewById<LinearLayout>(R.id.AyudaContainer)
@@ -112,18 +108,15 @@ class ChatActivity : AppCompatActivity() {
             return
         }
 
-        // Verifica la subcolección 'friends' del usuario actual
-        db.collection("users")  // Asegúrate de que 'users' es la colección de usuarios
-            .document(currentUserId)  // Obtén el documento del usuario actual
-            .collection("friends")  // Revisa la subcolección 'friends'
+        db.collection("users")
+            .document(currentUserId)
+            .collection("friends")
             .get()
             .addOnSuccessListener { result ->
                 if (result.isEmpty) {
-                    // No hay amigos en la subcolección
                     Toast.makeText(this, "No tienes amigos. Agrega amigos para iniciar chats.", Toast.LENGTH_LONG).show()
                     binding.recyclerViewChats.visibility = android.view.View.GONE
                 } else {
-                    // Hay amigos en la subcolección, puedes mostrar los chats
                     binding.recyclerViewChats.visibility = android.view.View.VISIBLE
                     loadChats()
                 }
@@ -169,7 +162,6 @@ class ChatActivity : AppCompatActivity() {
         builder.setTitle("Iniciar Sesión Requerido")
         builder.setMessage("Para acceder a esta funcionalidad, por favor inicia sesión.")
         builder.setPositiveButton("Iniciar Sesión") { _, _ ->
-            // Redirigir a la pantalla de inicio de sesión
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }

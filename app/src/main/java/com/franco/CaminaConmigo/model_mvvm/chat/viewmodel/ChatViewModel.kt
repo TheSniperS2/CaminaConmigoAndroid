@@ -272,14 +272,15 @@ class ChatViewModel : ViewModel() {
     fun updateNickname(friendId: String, newNickname: String, callback: (Boolean, String?) -> Unit) {
         val currentUser = auth.currentUser ?: return
         val userRef = db.collection("users").document(currentUser.uid)
-        val friendRef = userRef.collection("friends").document(friendId)
+        val friendRef = userRef.collection("friends").whereEqualTo("id", friendId).limit(1)
 
-        friendRef.get().addOnSuccessListener { document ->
-            if (document != null && document.exists()) {
-                friendRef.update("nickname", newNickname)
+        friendRef.get().addOnSuccessListener { querySnapshot ->
+            if (querySnapshot != null && !querySnapshot.isEmpty) {
+                val friendDocument = querySnapshot.documents[0]
+                friendDocument.reference.update("nickname", newNickname)
                     .addOnSuccessListener {
                         Log.d("ChatViewModel", "Apodo actualizado con éxito en la subcolección friends")
-                        callback(true, null)
+                        updateChatNickname(friendId, newNickname, callback)
                     }
                     .addOnFailureListener { e ->
                         Log.e("ChatViewModel", "Error al actualizar apodo en la subcolección friends: ${e.message}")
@@ -293,6 +294,41 @@ class ChatViewModel : ViewModel() {
             Log.e("ChatViewModel", "Error al obtener el documento del amigo: ${e.message}")
             callback(false, e.message)
         }
+    }
+
+    private fun updateChatNickname(friendId: String, newNickname: String, callback: (Boolean, String?) -> Unit) {
+        val currentUser = auth.currentUser ?: return
+        val userId = currentUser.uid
+
+        db.collection("chats")
+            .whereArrayContains("participants", userId)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val batch = db.batch()
+                for (document in querySnapshot.documents) {
+                    val chatId = document.id
+                    val participants = document.get("participants") as? List<String> ?: continue
+                    if (participants.contains(friendId)) {
+                        val userNames = document.get("userNames") as? MutableMap<String, String> ?: mutableMapOf()
+                        userNames[friendId] = newNickname
+                        val chatRef = db.collection("chats").document(chatId)
+                        batch.update(chatRef, "userNames", userNames)
+                    }
+                }
+                batch.commit()
+                    .addOnSuccessListener {
+                        Log.d("ChatViewModel", "Apodo actualizado con éxito en la colección chats")
+                        callback(true, null)
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("ChatViewModel", "Error al actualizar apodo en la colección chats: ${e.message}")
+                        callback(false, e.message)
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ChatViewModel", "Error al obtener los chats: ${e.message}")
+                callback(false, e.message)
+            }
     }
 
     fun isGroupChat(chatId: String, callback: (Boolean) -> Unit) {
