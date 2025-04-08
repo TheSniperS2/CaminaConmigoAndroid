@@ -23,7 +23,7 @@ class MyApplication : Application(), SensorEventListener {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
-    private var shakeThreshold = 12.0f
+    private var shakeThreshold = 20.0f
     private var lastShakeTime: Long = 0
     private lateinit var shakeAlertaReceiver: ShakeAlertaReceiver
     private var currentActivity: Activity? = null
