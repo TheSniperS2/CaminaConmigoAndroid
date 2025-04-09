@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">testing4</string>
+    <string name="app_name">CaminaConmigo</string>
     <string name="default_web_client_id">925265916348-8l7e2dotbohh2g0bc37bntbs60h7qh67.apps.googleusercontent.com</string>
     <string name="google_map_api_key">AIzaSyC_f1SLfUW-dFcE7dV9vEO3eLL5Yq3xmoY</string>
     <string name="previous_image">Imagen anterior</string>

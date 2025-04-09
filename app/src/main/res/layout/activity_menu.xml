@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Título: Perfil -->
             <TextView
                 android:id="@+id/textView1"
                 android:layout_width="wrap_content"
@@ -29,7 +30,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="Perfil"
-                android:textColor="#000000"
+                android:textColor="@color/colorText"
                 android:textSize="20dp"
                 android:textStyle="bold" />
 
@@ -191,6 +192,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Título: Ajustes y más -->
             <TextView
                 android:id="@+id/textView13"
                 android:layout_width="wrap_content"
@@ -199,7 +201,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="Ajustes y más"
-                android:textColor="#000000"
+                android:textColor="@color/colorText"
                 android:textSize="20dp"
                 android:textStyle="bold" />
 
@@ -319,9 +321,13 @@
         android:layout_width="160dp"
         android:layout_height="60dp"
         android:layout_marginTop="16dp"
+        android:accessibilityHeading="false"
         android:backgroundTint="#FFFFFF"
         android:text="Cerrar sesión"
-        android:textColor="#000000"
+        android:textAllCaps="false"
+        android:textColor="@color/black_to_back"
+        android:textSize="14sp"
+        android:letterSpacing="0"
         app:cornerRadius="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -344,12 +350,13 @@
         app:layout_constraintWidth_percent="0.5"
         app:srcCompat="@drawable/ic_logo" />
 
+    <!-- Copyright -->
     <TextView
         android:id="@+id/copyrightTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Copyright 2025 ®"
-        android:textColor="#000000"
+        android:textColor="@color/colorText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView16" />

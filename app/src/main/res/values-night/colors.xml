@@ -6,4 +6,5 @@
     <color name="colorBackground">#121212</color> <!-- Fondo oscuro -->
     <color name="colorText">#FFFFFF</color> <!-- Texto en blanco -->
     <color name="colorImage">#FFFFFF</color>
+    <color name="black_to_back">#000000</color>
 </resources>

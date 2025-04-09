@@ -8,7 +8,7 @@ data class Notification(
     val fromUserId: String = "",
     val fromUsername: String = "",
     val requestId: String = "",
-    val isRead: Boolean = false,
+    var isRead: Boolean = false,
     val message: String = "",
     val title: String = "",
     val type: String = "",
