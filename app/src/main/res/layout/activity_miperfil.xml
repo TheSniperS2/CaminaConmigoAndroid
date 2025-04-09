@@ -3,13 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="#FFFFFF"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
     tools:context="com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity">
-
-    <!-- Imagen del calendario -->
-
-    <!-- Imagen de perfil -->
 
     <ImageView
         android:id="@+id/imageView26"
@@ -35,7 +31,6 @@
         android:layout_marginTop="72dp"
         app:srcCompat="@drawable/ic_miperfil" />
 
-    <!-- Texto para cambiar la foto de perfil -->
     <TextView
         android:id="@+id/textView26"
         android:layout_width="wrap_content"
@@ -49,14 +44,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
-    <!-- CardView 1 -->
-
     <TextView
         android:id="@+id/textView43"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Miembro desde Enero 2025"
-        android:textColor="#000000"
+        android:textColor="@color/colorText"
         app:layout_constraintBottom_toBottomOf="@+id/imageView26"
         app:layout_constraintEnd_toEndOf="@id/fragmentContainerView4"
         app:layout_constraintHorizontal_bias="0.176"
@@ -80,7 +73,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="10dp"
             android:text="Nombre"
-            android:textColor="#000000"
+            android:textColor="@color/colorText"
             android:textSize="20dp"
             android:textStyle="bold" />
 
@@ -91,23 +84,19 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="43dp"
             android:text="Pepe Contreras"
-            android:textColor="#5B5B5B"
+            android:textColor="@color/gray"
             android:textSize="20dp" />
 
         <ImageButton
             android:id="@+id/imageButton11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
+            android:background="@android:color/transparent"
             android:layout_marginStart="374dp"
             android:layout_marginTop="30dp"
             app:srcCompat="@drawable/ic_arrow" />
-
     </androidx.cardview.widget.CardView>
 
-    <!-- CardView 2 -->
-
-    <!-- CardView 3 -->
     <androidx.cardview.widget.CardView
         android:id="@+id/fragmentContainerView3"
         android:layout_width="match_parent"
@@ -127,7 +116,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="10dp"
             android:text="Nombre de usuario"
-            android:textColor="#000000"
+            android:textColor="@color/colorText"
             android:textSize="20dp"
             android:textStyle="bold" />
 
@@ -138,20 +127,19 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="43dp"
             android:text="pepe_468276ad"
-            android:textColor="#5B5B5B"
+            android:textColor="@color/gray"
             android:textSize="20dp" />
 
         <ImageButton
             android:id="@+id/imageButton12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
+            android:background="@android:color/transparent"
             android:layout_marginStart="374dp"
             android:layout_marginTop="30dp"
             app:srcCompat="@drawable/ic_arrow" />
     </androidx.cardview.widget.CardView>
 
-    <!-- Texto de miembro desde -->
     <androidx.cardview.widget.CardView
         android:id="@+id/fragmentContainerView4"
         android:layout_width="match_parent"
@@ -171,7 +159,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="10dp"
             android:text="Tipo de perfil"
-            android:textColor="#000000"
+            android:textColor="@color/colorText"
             android:textSize="20dp"
             android:textStyle="bold" />
 
@@ -182,7 +170,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="43dp"
             android:text="Privado"
-            android:textColor="#5B5B5B"
+            android:textColor="@color/gray"
             android:textSize="20dp" />
 
         <TextView
@@ -192,7 +180,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="73dp"
             android:text="Si seleccionas esta opción, ningún usuario de CaminaConmigo podrá ver los reportes de tu perfil"
-            android:textColor="#5B5B5B"
+            android:textColor="@color/gray"
             android:textSize="15dp" />
 
         <Switch
@@ -200,15 +188,14 @@
             android:layout_width="54dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="354dp"
-            android:layout_marginTop="40dp"
-            android:background="#FFFFFF" />
+            android:layout_marginTop="40dp" />
     </androidx.cardview.widget.CardView>
 
     <ImageButton
         android:id="@+id/atras"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="#FFFFFF"
+        android:background="@color/colorBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.016"
