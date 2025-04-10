@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.franco.CaminaConmigo.model_mvvm.notificaciones.view.NotificationsActivity"
-    android:background="@android:color/white">
+    tools:context="com.franco.CaminaConmigo.model_mvvm.notificaciones.view.NotificationsActivity">
 
     <!-- Título en CardView -->
     <androidx.cardview.widget.CardView
