@@ -13,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Editar Contacto"
+        android:textColor="@color/black_to_back"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_gravity="center"
@@ -23,6 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nombre"
+        android:textColorHint="@color/gray"
+        android:textColor="@color/black_to_back"
         android:inputType="textPersonName"
         android:background="@drawable/edit_text_background"
         android:padding="10dp"
@@ -33,6 +36,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Número"
+        android:textColorHint="@color/gray"
+        android:textColor="@color/black_to_back"
         android:inputType="phone"
         android:background="@drawable/edit_text_background"
         android:padding="10dp"
@@ -53,6 +58,8 @@
             android:text="Cancelar"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
+            android:textAllCaps="false"
+            android:letterSpacing="0"
             android:background="@drawable/button_background_cancel"/>
 
         <Button
@@ -61,6 +68,8 @@
             android:layout_height="wrap_content"
             android:text="Guardar"
             android:layout_weight="1"
+            android:textAllCaps="false"
+            android:letterSpacing="0"
             android:background="@drawable/button_background_enabled"/>
     </LinearLayout>
 </LinearLayout>
