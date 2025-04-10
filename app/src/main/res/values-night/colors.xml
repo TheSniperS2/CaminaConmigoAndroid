@@ -8,4 +8,5 @@
     <color name="colorImage">#FFFFFF</color>
     <color name="black_to_back">#000000</color>
     <color name="iconColor">#FFFFFF</color>
+    <color name="white_to_back">#FFFFFF</color>
 </resources>
