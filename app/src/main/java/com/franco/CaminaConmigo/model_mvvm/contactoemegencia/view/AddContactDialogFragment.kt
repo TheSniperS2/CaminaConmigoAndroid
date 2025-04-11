@@ -47,28 +47,24 @@ class AddContactDialogFragment : DialogFragment() {
                 }
             }
 
-            override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) {
+                checkFieldsForEmptyValues()
+            }
         })
 
-        // Deshabilitar el botón de agregar inicialmente
-        btnAgregar.isEnabled = false
-
-        // Añadir TextWatcher para habilitar/deshabilitar el botón de agregar
-        editTextNumero.addTextChangedListener(object : TextWatcher {
+        // Añadir TextWatcher al campo de nombre
+        editTextNombre.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                if (s?.length == 12) {
-                    btnAgregar.isEnabled = true
-                    btnAgregar.setBackgroundResource(R.drawable.button_background_enabled)
-                } else {
-                    btnAgregar.isEnabled = false
-                    btnAgregar.setBackgroundResource(R.drawable.button_background_disabled)
-                }
+                checkFieldsForEmptyValues()
             }
         })
+
+        // Deshabilitar el botón de agregar inicialmente
+        btnAgregar.isEnabled = false
 
         btnAgregar.setOnClickListener {
             val nombre = editTextNombre.text.toString()
@@ -87,6 +83,19 @@ class AddContactDialogFragment : DialogFragment() {
         }
 
         return view
+    }
+
+    private fun checkFieldsForEmptyValues() {
+        val nombre = editTextNombre.text.toString()
+        val numero = editTextNumero.text.toString()
+
+        // Comprobar si ambos campos están rellenados correctamente
+        btnAgregar.isEnabled = nombre.isNotEmpty() && numero.startsWith("+569") && numero.length == 12
+        if (btnAgregar.isEnabled) {
+            btnAgregar.setBackgroundResource(R.drawable.button_background_enabled)
+        } else {
+            btnAgregar.setBackgroundResource(R.drawable.button_background_disabled)
+        }
     }
 
     override fun onStart() {
