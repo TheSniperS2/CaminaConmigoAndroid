@@ -41,8 +41,8 @@
                 android:layout_height="32dp"
                 android:layout_weight="1"
                 android:hint="Buscar reportes..."
-                android:padding="8dp"
-                android:textColor="@android:color/black"
+                android:textColorHint="@color/gray"
+                android:textColor="@color/black_to_back"
                 android:background="@null"
                 android:layout_marginEnd="8dp"
                 android:textSize="14sp"
@@ -56,7 +56,7 @@
                 android:textColor="@android:color/black"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:textSize="14sp"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:clickable="true"
                 android:focusable="true" />
         </LinearLayout>
@@ -80,10 +80,14 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="#DFDFDF"
                     android:text="Tendencias"
+                    android:textAllCaps="false"
+                    android:letterSpacing="0"
+                    app:cornerRadius="40dp"
                     android:textSize="12sp"
                     android:layout_marginEnd="10dp"
                     android:enabled="true"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@android:color/black"
+                    android:minWidth="113dp"/>
 
                 <Button
                     android:id="@+id/btnFilterRecientes"
@@ -91,10 +95,14 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="#DFDFDF"
                     android:text="Recientes"
+                    android:textAllCaps="false"
+                    android:letterSpacing="0"
+                    app:cornerRadius="40dp"
                     android:textSize="12sp"
                     android:layout_marginEnd="10dp"
                     android:enabled="true"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@android:color/black"
+                    android:minWidth="103dp"/>
 
                 <Button
                     android:id="@+id/btnFilterCiudad"
@@ -102,9 +110,13 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="#DFDFDF"
                     android:text="Ciudad"
+                    app:cornerRadius="40dp"
+                    android:textAllCaps="false"
+                    android:letterSpacing="0"
                     android:textSize="12sp"
                     android:enabled="true"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@android:color/black"
+                    android:minWidth="103dp" />
             </LinearLayout>
         </HorizontalScrollView>
     </LinearLayout>
