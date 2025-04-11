@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:textColor="@color/colorText"/>
         </LinearLayout>
 
         <!-- Descripción de la instrucción -->
@@ -131,11 +131,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#999999"
-                android:text="Atrás"
-                android:textSize="16sp"
+                android:minWidth="125dp"
+                android:minHeight="48dp"
+                android:drawableLeft="@drawable/ic_arrow_left_blanco"
                 android:enabled="false"
+                android:letterSpacing="0"
+                android:text="Atrás"
+                android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:drawableLeft="@drawable/ic_arrow_left_blanco" />
+                android:textSize="16sp"
+                app:cornerRadius="40dp" />
 
             <Button
                 android:id="@+id/buttonSiguiente"
@@ -143,7 +148,12 @@
                 android:layout_height="wrap_content"
                 android:text="Siguiente"
                 android:textSize="16sp"
+                android:minWidth="150dp"
+                android:minHeight="48dp"
                 android:layout_marginStart="16dp"
+                android:textAllCaps="false"
+                android:letterSpacing="0"
+                app:cornerRadius="40dp"
                 android:backgroundTint="@color/light_purple"
                 android:drawableEnd="@drawable/ic_arrow_right_blanco"
                 android:textColor="@android:color/white" />

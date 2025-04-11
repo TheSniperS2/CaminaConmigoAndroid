@@ -64,6 +64,8 @@
             android:layout_height="wrap_content"
             android:hint="Nombre del grupo"
             android:padding="12dp"
+            android:textColorHint="@color/gray"
+            android:textColor="@color/black_to_back"
             android:background="@drawable/edit_text_background"
             android:layout_marginBottom="16dp" />
 
@@ -86,6 +88,9 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/darker_gray"
             android:text="Crear Grupo"
+            android:textAllCaps="false"
+            android:letterSpacing="0"
+            app:cornerRadius="40dp"
             android:textColor="@android:color/white" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -57,11 +59,12 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         friendsAdapter = FriendsAdapter(emptyList()) { friend ->
-            updateCreateGroupButtonState(friendsAdapter.getSelectedFriends().size)
+            updateCreateGroupButtonState()
         }
         binding.recyclerViewFriends.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewFriends.adapter = friendsAdapter
 
+        setupListeners()
         loadFriends()
 
         val selectPhotoListener = View.OnClickListener {
@@ -203,12 +206,38 @@ class CreateGroupBottomSheetFragment : BottomSheetDialogFragment() {
             }
     }
 
-    private fun updateCreateGroupButtonState(selectedFriendsCount: Int) {
-        if (selectedFriendsCount >= 2) {
+    private fun updateCreateGroupButtonState() {
+        val groupName = binding.editTextGroupName.text.toString().trim() // Obtén el nombre del grupo
+        val selectedFriendsCount = friendsAdapter.getSelectedFriends().size // Número de amigos seleccionados
+
+        // Condición para habilitar el botón
+        val isButtonEnabled = groupName.isNotEmpty() && selectedFriendsCount >= 2
+
+        // Cambiar color y habilitación del botón
+        binding.buttonCreateGroup.isEnabled = isButtonEnabled
+        if (isButtonEnabled) {
             binding.buttonCreateGroup.setBackgroundColor(resources.getColor(android.R.color.holo_blue_dark))
         } else {
             binding.buttonCreateGroup.setBackgroundColor(resources.getColor(android.R.color.darker_gray))
         }
+    }
+
+    private fun setupListeners() {
+        // TextWatcher para detectar cambios en el nombre del grupo
+        binding.editTextGroupName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                updateCreateGroupButtonState()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        // Listener para la selección de amigos (ya está en FriendsAdapter)
+        friendsAdapter = FriendsAdapter(emptyList()) { friend ->
+            updateCreateGroupButtonState() // Actualiza el estado del botón al cambiar la selección
+        }
+        binding.recyclerViewFriends.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewFriends.adapter = friendsAdapter
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
