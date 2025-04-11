@@ -217,7 +217,10 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:hint="Añadir un comentario..."
-            android:background="@android:drawable/edit_text" />
+            android:textColorHint="@color/gray"
+            android:textColor="@color/black_to_back"
+            android:background="@drawable/search_bar_background"
+            android:padding="8dp"/>
 
         <!-- TextView para enviar el comentario -->
         <TextView

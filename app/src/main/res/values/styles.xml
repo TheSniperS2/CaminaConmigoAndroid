@@ -1,0 +1,19 @@
+<resources>
+    <!-- Tema personalizado para BottomSheetDialogFragment -->
+    <style name="RoundedBottomSheetTheme" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <!-- Fondo del dialogo -->
+        <item name="bottomSheetStyle">@style/RoundedBottomSheet</item>
+    </style>
+
+    <!-- Estilo para el fondo del BottomSheet -->
+    <style name="RoundedBottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">@style/RoundedCorners</item>
+        <item name="android:background">@color/colorBackground</item>
+    </style>
+
+    <!-- Bordes redondeados -->
+    <style name="RoundedCorners" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item> <!-- Ajusta el tamaño del radio -->
+    </style>
+</resources>
