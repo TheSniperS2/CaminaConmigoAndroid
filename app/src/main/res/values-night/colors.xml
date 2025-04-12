@@ -9,4 +9,6 @@
     <color name="black_to_back">#000000</color>
     <color name="iconColor">#FFFFFF</color>
     <color name="white_to_back">#FFFFFF</color>
+    <color name="white_to_gray">#999999</color>
+    <color name="gray_to_white">#FFFFFF</color>
 </resources>

@@ -32,13 +32,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.franco.CaminaConmigo.R
 import com.franco.CaminaConmigo.databinding.ActivityChatDetailBinding
-import com.franco.CaminaConmigo.model_mvvm.ayuda.view.AyudaActivity
 import com.franco.CaminaConmigo.model_mvvm.chat.model.Message
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.ChatViewModel
 import com.franco.CaminaConmigo.model_mvvm.chat.viewmodel.LocationSharingViewModel
-import com.franco.CaminaConmigo.model_mvvm.mapa.view.MapaActivity
-import com.franco.CaminaConmigo.model_mvvm.menu.view.MenuActivity
-import com.franco.CaminaConmigo.model_mvvm.novedad.view.NovedadActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -82,26 +78,10 @@ class ChatDetailActivity : AppCompatActivity() {
         val btnMenu = findViewById<ImageButton>(R.id.imageButton14)
         val btnCall = findViewById<ImageButton>(R.id.btnCall)
 
-        btnMapa.setOnClickListener {
-            startActivity(Intent(this, MapaActivity::class.java))
-        }
-
         // Añadir este código dentro de onCreate después de setContentView y antes de cualquier otro código
         val btnBack = findViewById<ImageButton>(R.id.btnBack)
         btnBack.setOnClickListener {
             finish() // Cerrar la actividad actual y volver a la actividad anterior
-        }
-
-        btnNovedades.setOnClickListener {
-            startActivity(Intent(this, NovedadActivity::class.java))
-        }
-
-        btnAyuda.setOnClickListener {
-            startActivity(Intent(this, AyudaActivity::class.java))
-        }
-
-        btnMenu.setOnClickListener {
-            startActivity(Intent(this, MenuActivity::class.java))
         }
 
         // Observa los userNames y crea el adaptador cuando estén disponibles

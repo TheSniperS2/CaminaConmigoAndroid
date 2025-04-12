@@ -2,6 +2,7 @@ package com.franco.CaminaConmigo.model_mvvm.mapa.view
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Geocoder
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -69,6 +71,24 @@ class SelectorUbicacionActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
         val defaultLocation = LatLng(-29.9027, -71.2519) // La Serena, Chile
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 12f))
+
+        // Verificar si el sistema está en modo oscuro
+        val isNightMode = (resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+        if (isNightMode) {
+            try {
+                val success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style_night)
+                )
+                if (!success) {
+                    Log.e("SelectorUbicacionActivity", "Error al aplicar el estilo del mapa.")
+                }
+            } catch (e: Resources.NotFoundException) {
+                Log.e("SelectorUbicacionActivity", "No se encontró el estilo del mapa. Error: ", e)
+            }
+        }
+
 
         // Cargar reportes desde Firebase Firestore
         cargarReportesDesdeFirestore()

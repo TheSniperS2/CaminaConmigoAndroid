@@ -179,5 +179,8 @@
         android:backgroundTint="#FA79B6"
         android:textColor="@android:color/white"
         android:layout_marginTop="12dp"
+        android:textAllCaps="false"
+        android:letterSpacing="0"
+        app:cornerRadius="40dp"
         android:layout_gravity="bottom"/>
 </LinearLayout>
